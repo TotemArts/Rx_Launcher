@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace LauncherTwo
 {
@@ -36,8 +37,13 @@ namespace LauncherTwo
         private static string GetPath()
         {
             string FileName = string.Empty; 
+            // Exe location
             FileName += System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            // Go up one directory.
+            FileName = Directory.GetParent(FileName).FullName;
+            // Now into UDK.exe location.
             FileName += EXE_PATH;
+
             return FileName; 
         }
     }

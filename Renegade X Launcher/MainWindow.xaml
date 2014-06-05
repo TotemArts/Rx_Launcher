@@ -988,7 +988,7 @@
                 </Grid.Background>
                 <Grid x:Name="Header" Margin="0" Height="39" VerticalAlignment="Top" Background="#FF0B1A22">
                     <Image Height="42" Margin="0,-1,0,-2" VerticalAlignment="Top" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
-                    <Label x:Name="SD_Username" HorizontalAlignment="Left" Margin="26,6,0,0" VerticalAlignment="Top" Height="30" Width="287" Content="Mastermid" FontFamily="Arial" FontSize="18" Background="{x:Null}">
+                    <Label x:Name="SD_Username" HorizontalAlignment="Left" Margin="26,6,0,0" VerticalAlignment="Top" Height="30" Width="287" Content="Player Name" FontFamily="Arial" FontSize="18" Background="{x:Null}">
                         <Label.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Label.Foreground>
