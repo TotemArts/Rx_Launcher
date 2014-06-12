@@ -176,9 +176,16 @@ namespace LauncherTwo
             }
         }
 
+        private ServerInfo GetSelectedServer()
+        {
+            return ServerInfoGrid.SelectedValue as ServerInfo;
+        }
+
         private void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
         {
-            LaunchTools.JoinGame(OFilteredServerList[ServerInfoGrid.SelectedIndex].IPAddress, Properties.Settings.Default.Username);
+            ServerInfo SelectedServerInfo = GetSelectedServer();
+            if (SelectedServerInfo != null)
+                LaunchTools.JoinGame(GetSelectedServer().IPAddress, Properties.Settings.Default.Username);
         }
 
         private void RefreshServers(bool FilterResults = false)
@@ -224,7 +231,7 @@ namespace LauncherTwo
             if (ServerInfoGrid.SelectedIndex >= OFilteredServerList.Count || ServerInfoGrid.SelectedIndex <= -1)
                 return;
 
-            ServerInfo selected = OFilteredServerList[ServerInfoGrid.SelectedIndex];
+            ServerInfo selected = GetSelectedServer();
 
             sv_MapPreview.Source = MapPreviewSettings.GetMapImage(selected.MapName);
 
@@ -282,7 +289,7 @@ namespace LauncherTwo
             if (ServerInfoGrid.SelectedIndex >= OFilteredServerList.Count || ServerInfoGrid.SelectedIndex <= -1)
                return;
 
-            ServerInfo selected = OFilteredServerList[ServerInfoGrid.SelectedIndex];
+            ServerInfo selected = GetSelectedServer();
 
             BannerTools.LaunchBannerLink(selected.IPAddress);
         }
