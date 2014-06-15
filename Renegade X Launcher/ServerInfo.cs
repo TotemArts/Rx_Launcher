@@ -236,7 +236,7 @@ using System.Dynamic;
                 {
                     if (pingTasks[i] != null)
                         if (pingTasks[i].Result != null)
-                            ActiveServers[i].Ping = pingTasks[i].Result.RoundtripTime.ToString();
+                            ActiveServers[i].Ping = (int)pingTasks[i].Result.RoundtripTime;
                 }
 
                 MainWindow.Instance.FilterServers();
@@ -262,12 +262,43 @@ using System.Dynamic;
         // FRONT PAGE INFO
         public string ServerName { get; set; }
         public string MapName { get; set; }
-        public string Ping { get; set; }
+        // Raw ping value
+        public int Ping { get; set; }
+        // Formatted ping value for display
+        public string PingString
+        {
+            get
+            {
+                if (Ping < 0)
+                    return "-";
+                else return Ping.ToString();
+            }
+        }
+        // Raw player count
         public int PlayerCount { get; set; }
-        public int Port { get; set; }
+        // Nice player count string, for display
+        public string PlayerCountString
+        {
+            get
+            {
+                return PlayerCount.ToString() + "/" + MaxPlayers.ToString();
+            }
+        }
+        
        
         // SIDE BAR INFO
         public string   IPAddress { get; set; }
+        public int Port { get; set; }
+        public string IPWithPort
+        {
+            get
+            {
+                if (Port > 0)
+                    return IPAddress + ":" + Port.ToString();
+                else
+                    return IPAddress;
+            }
+        }
         public string   GameVersion { get; set; }
         public int      MineLimit { get; set; }
         public bool     SteamRequired { get; set; }
@@ -288,7 +319,7 @@ using System.Dynamic;
             ServerName = string.Empty;
             MapName = string.Empty;
             PlayerCount = -1;
-            Ping = "∞";
+            Ping = -1;
             Port = -1;
 
             IPAddress = string.Empty;

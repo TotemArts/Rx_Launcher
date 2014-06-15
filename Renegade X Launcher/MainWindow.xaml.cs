@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
+using System.Reflection;
 using System;
 
 namespace LauncherTwo
@@ -18,22 +20,30 @@ namespace LauncherTwo
     /// </summary>
     public partial class MainWindow : Window
     {
+        public const bool SHOW_DEBUG = true;
+
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
+        public const int TICK_RATE = 1; // Once per second.
         private bool isOpen = false;
         public static readonly int MAX_PLAYER_COUNT = 64;
         public static MainWindow Instance { get; private set; }
         public ObservableCollection<ServerInfo> OFilteredServerList = new ObservableCollection<ServerInfo>();
+        Thread TickThread = null;
+
+        string messageText = "";
+
+        const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
+        const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
+        const string MESSAGE_IDLE = "Welcome back commander.";
 
         #region -= Filters =-
         private int filter_MaxPlayers = 64;
         private int filter_MinPlayers = 0;
         #endregion -= Filters =-
-   
 
         public MainWindow()
         {
-
             Instance = this;
 
             //We want the window to be in the middle of the screen. 
@@ -75,14 +85,46 @@ namespace LauncherTwo
                 SD_Username.Content = Properties.Settings.Default.Username;
             }
 
-            
+            SetMessageboxText(MESSAGE_IDLE);
+
+            TickThread = new Thread(new ThreadStart(TickThreadFunc));
+            TickThread.Start();
+
+           // System.ComponentModel.BackgroundWorker Background = new System.ComponentModel.BackgroundWorker();
+            //Background.WorkerSupportsCancellation = true;
+            //Background.WorkerReportsProgress = false;
+            //Background.DoWork += new System.ComponentModel.DoWorkEventHandler(TickThreadFunc);
         }
+
+
+        private void TickThreadFunc()
+        {
+            while (true)
+            {
+                Thread.Sleep((int)(1000.0f / TICK_RATE));
+                // Have the dispatcher call tick, so we don't have to worry about cross-thread stuff.
+                Dispatcher.Invoke(Tick);
+            }
+        }
+
+        private void Tick ()
+        {
+            if (GetMessageboxText() == MESSAGE_JOINGAME && !LaunchTools.LastRunStillRunning())
+            {
+                OnGameExit();
+            }
+        }
+
+        private void OnGameExit()
+        {
+            SetMessageboxText(MESSAGE_IDLE);
+        }
+
 
         private async void AutoPingUpdate()
         {
             while (true)
             {
-
                 ServerInfo.PingActiveServers();
                 RefreshServers();
                 FilterServers();
@@ -109,15 +151,12 @@ namespace LauncherTwo
         {
             ServerInfoGrid.ItemsSource = OFilteredServerList;
 
-            Binding nameBinding = new Binding("ServerName");
-            Binding mapBinding = new Binding("MapName");
-            Binding playerBinding = new Binding("PlayerCount");
-            Binding pingBinding = new Binding("Ping");
-
-            ServerNameColumn.Binding = nameBinding;
-            MapNameColumn.Binding = mapBinding;
-            PlayerCountColumn.Binding = playerBinding;
-            PingColumn.Binding = pingBinding;
+            ServerNameColumn.Binding = new Binding("ServerName");
+            MapNameColumn.Binding  = new Binding("MapName");
+            PlayerCountColumn.Binding = new Binding("PlayerCountString");
+            PlayerCountColumn.SortMemberPath = "PlayerCount";
+            PingColumn.Binding = new Binding("PingString");
+            PingColumn.SortMemberPath = "Ping";
 
             //Reset our grid length
             ServerContentSplit.RowDefinitions[0].Height = new GridLength(40);
@@ -149,7 +188,19 @@ namespace LauncherTwo
             OFilteredServerList.Clear();
 
             foreach (ServerInfo info in ServerInfo.ActiveServers)
-                OFilteredServerList.Add(info);
+            {
+                if (sv_ServerSearch.Text != "")
+                {
+                    if (info.ServerName.ToLower().Contains(sv_ServerSearch.Text.ToLower()) ||
+                        info.IPAddress == sv_ServerSearch.Text ||
+                        info.IPWithPort == sv_ServerSearch.Text)
+                    {
+                        OFilteredServerList.Add(info);
+                    }
+                }
+                else
+                    OFilteredServerList.Add(info);
+            }
 
             for (int i = OFilteredServerList.Count - 1; i > -1; i--)
             {
@@ -163,16 +214,7 @@ namespace LauncherTwo
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
-                }
-
-                if( sv_ServerSearch.Text != "" )
-                {
-                    if (!OFilteredServerList[i].ServerName.ToLower().Contains(sv_ServerSearch.Text.ToLower()))
-                    {
-                        OFilteredServerList.RemoveAt(i);
-                        continue;
-                    }
-                }
+                }                
             }
         }
 
@@ -185,7 +227,22 @@ namespace LauncherTwo
         {
             ServerInfo SelectedServerInfo = GetSelectedServer();
             if (SelectedServerInfo != null)
-                LaunchTools.JoinGame(GetSelectedServer().IPAddress, Properties.Settings.Default.Username);
+            {
+                if (LaunchTools.JoinServer(GetSelectedServer().IPWithPort, Properties.Settings.Default.Username))
+                {
+                    if (SHOW_DEBUG)
+                        SetMessageboxText(GetSelectedServer().IPWithPort);
+                    else
+                        SetMessageboxText(MESSAGE_JOINGAME);
+                }
+                else
+                {
+                    if (SHOW_DEBUG)
+                        SetMessageboxText(GetSelectedServer().IPWithPort);
+                    else
+                        SetMessageboxText(MESSAGE_CANTSTARTGAME);
+                }
+            }
         }
 
         private void RefreshServers(bool FilterResults = false)
@@ -238,7 +295,7 @@ namespace LauncherTwo
             SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
 
             SD_Name.Text = selected.ServerName;
-            SD_IP.Text = selected.IPAddress;
+            SD_IP.Text = selected.IPWithPort;
             SD_GameLength.Content = selected.TimeLimit.ToString();
             SD_MineLimit.Content = selected.MineLimit.ToString();
             SD_usesCrates.IsChecked = selected.SpawnCrates;
@@ -256,6 +313,17 @@ namespace LauncherTwo
             ServerInfoGrid.UpdateLayout();
         }
 
+        public void SetMessageboxText(string text)
+        {
+            MessageBoxText.Text = text;
+            messageText = text;
+        }
+
+        public string GetMessageboxText()
+        {
+            return messageText;
+        }
+
         private void XBtn_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -264,11 +332,10 @@ namespace LauncherTwo
         protected override void OnClosed(System.EventArgs e)
         {
             base.OnClosed(e);
+            TickThread.Abort();
 
             Application.Current.Shutdown();
         }
-
-
 
         private void sv_ServerSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -312,6 +379,11 @@ namespace LauncherTwo
         {
             RefreshServers();
             FilterServers();
+        }
+
+        private void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
+        {
+            LaunchTools.LaunchGame(Properties.Settings.Default.Username);
         }
     }
 }
