@@ -1,0 +1,10 @@
+Launcher fixes:
+X- Ability to launch to main menu
+- Show password protected servers
+- Minimize and exit buttons missing icons
+X- Add news ticker back to the bottom, but use it as a status indicator / log (Game.exe not found, launching game, etc)
+- Tick boxes on server options are hard to see.
+- Highlighted servers text is unreadable when the window is not in focus
+X- Highlighted server in list does not match server in preview if list sorting changes
+X- Launch game seems to rejoin last server
+- Exit still runs app in background
