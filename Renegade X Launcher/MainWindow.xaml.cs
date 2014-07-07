@@ -20,7 +20,7 @@ namespace LauncherTwo
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const bool SHOW_DEBUG = true;
+        public const bool SHOW_DEBUG = false;
 
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
@@ -156,7 +156,7 @@ namespace LauncherTwo
             PlayerCountColumn.Binding = new Binding("PlayerCountString");
             PlayerCountColumn.SortMemberPath = "PlayerCount";
             PingColumn.Binding = new Binding("PingString");
-            PingColumn.SortMemberPath = "Ping";
+            PingColumn.SortMemberPath = "PingSort";
 
             //Reset our grid length
             ServerContentSplit.RowDefinitions[0].Height = new GridLength(40);
@@ -384,6 +384,7 @@ namespace LauncherTwo
         private void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
         {
             LaunchTools.LaunchGame(Properties.Settings.Default.Username);
+            SetMessageboxText("Launching Renegade-X");
         }
     }
 }

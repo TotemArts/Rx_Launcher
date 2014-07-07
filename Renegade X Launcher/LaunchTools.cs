@@ -17,7 +17,7 @@ namespace LauncherTwo
 
         public static bool LaunchGame(string Username)
         {
-            Arguments += INI_PATH + Username;
+            Arguments = INI_PATH + Username;
 
             Process UDKProcess = new Process();
             UDKProcess.StartInfo.FileName = GetPath();
@@ -38,7 +38,6 @@ namespace LauncherTwo
 
         public static bool JoinServer(string anIPAdress, string Username)
         {
-
             Arguments = anIPAdress + " ";
             Arguments += INI_PATH + Username;
 

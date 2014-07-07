@@ -264,12 +264,23 @@ using System.Dynamic;
         public string MapName { get; set; }
         // Raw ping value
         public int Ping { get; set; }
+        // Value used to sort ping in the server list
+        public int PingSort
+        {
+           get
+            {
+                if (Ping <= 0)
+                    return int.MaxValue;
+                else return Ping;
+            }
+            
+        }
         // Formatted ping value for display
         public string PingString
         {
             get
             {
-                if (Ping < 0)
+                if (Ping <= 0)
                     return "-";
                 else return Ping.ToString();
             }
