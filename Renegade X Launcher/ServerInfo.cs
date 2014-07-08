@@ -295,6 +295,16 @@ using System.Dynamic;
                 return PlayerCount.ToString() + "/" + MaxPlayers.ToString();
             }
         }
+
+        public string LockImage
+        {
+            get
+            {
+                if (PasswordProtected)
+                    return "pack://siteoforigin:,,,/Resources/LockIcon.png";
+                else return "";
+            }
+        }
         
        
         // SIDE BAR INFO

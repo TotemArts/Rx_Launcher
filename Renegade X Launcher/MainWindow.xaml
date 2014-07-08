@@ -1,11 +1,14 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow"
         Title="Renagade X " Height="735" Width="945" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" ResizeMode="NoResize" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" WindowStyle="None" MouseDown="Window_MouseDown">
+
+   
 
     <!-- BYRONS TEST RESOURCE -->
     <Window.Resources>
+
         <FontFamily x:Key="Font Awesome">/Renegade X Launcher;component/Resources/#FontAwesome</FontFamily>
         <Style x:Key="DataHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="#9910171B" />
@@ -29,6 +32,7 @@
         <SolidColorBrush x:Key="SliderThumb.Disabled.Border" Color="#FFD9D9D9"/>
         <SolidColorBrush x:Key="SliderThumb.Static.Background" Color="#FFF0F0F0"/>
         <SolidColorBrush x:Key="SliderThumb.Static.Border" Color="#FFACACAC"/>
+
         <ControlTemplate x:Key="SliderThumbHorizontalTop" TargetType="{x:Type Thumb}">
             <Grid HorizontalAlignment="Center" UseLayoutRounding="True" VerticalAlignment="Center">
                 <Path x:Name="grip" Data="M 0,6 C0,6 5.5,0 5.5,0 5.5,0 11,6 11,6 11,6 11,18 11,18 11,18 0,18 0,18 0,18 0,6 0,6 z" Fill="{StaticResource SliderThumb.Static.Background}" Stretch="Fill" SnapsToDevicePixels="True" Stroke="{StaticResource SliderThumb.Static.Border}" StrokeThickness="1" UseLayoutRounding="True" VerticalAlignment="Center"/>
@@ -977,6 +981,55 @@
             </Setter>
         </Style>
 
+        <SolidColorBrush x:Key="CheckBoxFillNormal" Color="#F4F4F4"/>
+        <SolidColorBrush x:Key="CheckBoxStroke" Color="#8E8F8F"/>
+        <Style x:Key="EmptyCheckBoxFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeDashArray="1 2" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" Margin="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CheckRadioFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeDashArray="1 2" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" Margin="14,0,0,0"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="RenxCheckbox" TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Background" Value="{StaticResource CheckBoxFillNormal}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource CheckBoxStroke}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource EmptyCheckBoxFocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent" SnapsToDevicePixels="true" Margin="1,0,-1,0">
+                            <BulletDecorator.Bullet>
+                                <Themes1:BulletChrome BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" IsChecked="{TemplateBinding IsChecked}" RenderMouseOver="{TemplateBinding IsMouseOver}" RenderPressed="{TemplateBinding IsPressed}"/>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter HorizontalAlignment="Right" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasContent" Value="true">
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource CheckRadioFocusVisual}"/>
+                                <Setter Property="Padding" Value="4,0,0,0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <!-- END RESOURCE -->
@@ -993,12 +1046,17 @@
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Label.Foreground>
                     </Label>
-                    <Button x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Margin="3,13,0,0" VerticalAlignment="Top" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xf044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
+                    <Button x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Margin="3,13,0,0" VerticalAlignment="Top" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
                         <Button.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Button.Foreground>
                     </Button>
                     <Button x:Name="SD_LaunchGameBtn" HorizontalAlignment="Left" Margin="828,8,0,0" VerticalAlignment="Top" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" Focusable="False">
+                        <Button.Foreground>
+                            <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
+                        </Button.Foreground>
+                    </Button>
+                    <Button x:Name="SD_JoinIPBtn" HorizontalAlignment="Left" Margin="728,8,0,0" VerticalAlignment="Top" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" Focusable="False">
                         <Button.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Button.Foreground>
@@ -1075,12 +1133,12 @@
                                         <Label Content="Game Length:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="1"/>
                                         <Label Content="Mine Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="2" Grid.Column="1"/>
                                         <Label Content="Player Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,51,0" Grid.Row="1" Grid.Column="1"/>
-                                        <CheckBox x:Name="SD_steamRequired" Content="CheckBox" Margin="99,5,35,5" RenderTransformOrigin="-1.062,0.656" Grid.Row="4" IsEnabled="False"/>
-                                        <CheckBox x:Name="SD_usesCrates" Content="CheckBox" Margin="54,5,80,5" Grid.Row="3" IsEnabled="False"/>
+                                        <CheckBox x:Name="SD_steamRequired" Content="CheckBox" Margin="99,5,35,5" RenderTransformOrigin="-1.062,0.656" Grid.Row="4" Background="Black"/>
+                                        <CheckBox x:Name="SD_usesCrates" Content="CheckBox" Margin="54,5,80,5" Grid.Row="3" Background="Black"/>
                                         <Label Content="Crates:" Foreground="White" FontFamily="Arial" Margin="0,0,96,0" Grid.Row="3"/>
                                         <Label Content="Steam Required:" Foreground="White" FontFamily="Arial" Margin="0,0,41,0" Grid.Row="4"/>
-                                        <CheckBox x:Name="SD_usesAutoBalance" Content="CheckBox" Margin="89,5,44,5" Grid.Row="3" Grid.Column="1" IsEnabled="False"/>
-                                        <CheckBox x:Name="SD_usesInfantryOnly" Content="CheckBox" Margin="89,6,44,3" Grid.Row="4" Grid.Column="1" IsEnabled="False"/>
+                                        <CheckBox x:Name="SD_usesAutoBalance" Content="CheckBox" Margin="89,5,44,5" Grid.Row="3" Grid.Column="1" Foreground="#FF363636" Background="Black"/>
+                                        <CheckBox x:Name="SD_usesInfantryOnly" Content="CheckBox" Margin="89,6,44,3" Grid.Row="4" Grid.Column="1" Background="Black" Style="{DynamicResource RenxCheckbox}"/>
                                         <Label Content="Auto Balance:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="3" Grid.Column="1"/>
                                         <Label Content="Infantry Only:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="4" Grid.Column="1"/>
                                         <Label x:Name="SD_VehicleLimit" Content="" Foreground="White" FontFamily="Arial" Margin="86,0,0,0" Grid.Row="2"/>
@@ -1142,10 +1200,17 @@
                                         <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                     </DataGrid.BorderBrush>
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn x:Name="ServerNameColumn" ClipboardContentBinding="{x:Null}" Header="Server Name" IsReadOnly="True" Width="290" FontFamily="Arial" Foreground="White" d:IsHidden="True" />
-                                        <DataGridTextColumn x:Name="MapNameColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Map" IsReadOnly="True" Width="140" FontFamily="Arial" Foreground="#FF98ABAE" d:IsHidden="True"/>
-                                        <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Players" FontFamily="Arial" IsReadOnly="True" Width="68" Foreground="#FF98ABAE" d:IsHidden="True"/>
-                                        <DataGridTextColumn x:Name="PingColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Ping" IsReadOnly="True" Width="48" FontFamily="Arial" Foreground="#FF88A4A8" d:IsHidden="True" SortMemberPath=""/>
+                                        <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" IsReadOnly="True">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Image Source="{Binding LockImage}" Width="10" Height="10" Margin="0"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn x:Name="ServerNameColumn" ClipboardContentBinding="{x:Null}" Header="Server Name" IsReadOnly="True" Width="310" FontFamily="Arial" Foreground="White" />
+                                        <DataGridTextColumn x:Name="MapNameColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Map" IsReadOnly="True" Width="100" FontFamily="Arial" Foreground="#FF98ABAE"/>
+                                        <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Players" FontFamily="Arial" IsReadOnly="True" Width="68" Foreground="#FF98ABAE"/>
+                                        <DataGridTextColumn x:Name="PingColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Ping" IsReadOnly="True" Width="48" FontFamily="Arial" Foreground="#FF88A4A8" SortMemberPath=""/>
                                     </DataGrid.Columns>
                                     <DataGrid.BindingGroup>
                                         <BindingGroup/>
@@ -1179,12 +1244,12 @@
                                     </Label>
                                 </Border>
                             </Grid>
-                            <TextBox x:Name="sv_ServerSearch" HorizontalAlignment="Left" Height="23" Margin="96,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="159" TextChanged="sv_ServerSearch_TextChanged" Grid.Column="1"/>
-                            <Label x:Name="sd_Refresh" Content="&#xF021;" Margin="270,5,8,2" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="24" RenderTransformOrigin="-2.143,0.543" Grid.Column="1" MouseDown="sd_Refresh_MouseDown">
-                                <Label.Foreground>
+                            <TextBox x:Name="sv_ServerSearch" HorizontalAlignment="Left" Height="23" Margin="96,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="159" TextChanged="sv_ServerSearch_TextChanged" Grid.Column="1" Background="#199DD2FF" Foreground="White"/>
+                            <Button x:Name="sd_Refresh" Content="&#xF021;" Margin="272,6,6,6" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="24" RenderTransformOrigin="-2.143,0.543" Grid.Column="1" MouseDown="sd_Refresh_MouseDown" Focusable="False">
+                                <Button.Foreground>
                                     <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                                </Label.Foreground>
-                            </Label>
+                                </Button.Foreground>
+                            </Button>
                         </Grid>
                         <Expander Header="Filters" Margin="10,10,507,419" Background="{x:Null}" Foreground="White" FontFamily="Arial" Grid.RowSpan="2">
                             <Grid Height="154" Margin="0,0,-500,0" Background="#FF0F171D" HorizontalAlignment="Left" Width="567">
@@ -1209,15 +1274,8 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Button x:Name="XBtn" Content="X" HorizontalAlignment="Left" Margin="891,0,0,0" VerticalAlignment="Top" Width="48" Height="19" Foreground="White" Style="{DynamicResource RenXQuitBtn}" Click="XBtn_Click" FontFamily="Arial">
-            <Button.BorderBrush>
-                <SolidColorBrush Color="#FF838C91"/>
-            </Button.BorderBrush>
-            <Button.Background>
-                <SolidColorBrush Color="#FF061923"/>
-            </Button.Background>
-        </Button>
-        <Button x:Name="MinBtn" Content="fdasf" HorizontalAlignment="Left" Margin="865,0,0,0" VerticalAlignment="Top" Width="27" Height="19" Foreground="White" BorderBrush="#FF838C91" Background="#FF061923" Style="{DynamicResource RenXMinBtn}" FontFamily="Arial" Click="MinBtn_Click"/>
+        <Button x:Name="XBtn" Content="X" HorizontalAlignment="Left" Margin="891,0,0,0" VerticalAlignment="Top" Width="48" Height="19" Foreground="White" Click="XBtn_Click" FontFamily="Arial" BorderBrush="#FF838C91" Background="#FF061923"/>
+        <Button x:Name="MinBtn" Content="_" Margin="865,0,53,0" VerticalAlignment="Top" Height="19" Foreground="White" BorderBrush="#FF838C91" Background="#FF061923" FontFamily="Arial" Click="MinBtn_Click"/>
     </Grid>
 </Window>
  

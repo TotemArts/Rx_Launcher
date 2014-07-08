@@ -57,6 +57,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -90,10 +91,21 @@
     <Compile Include="MapPreviewSettings.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="PingTools.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RenXWebLinks.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="URI.cs" />
+    <Compile Include="Views\JoinIPWindow.xaml.cs">
+      <DependentUpon>JoinIPWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PasswordWindow.xaml.cs">
+      <DependentUpon>PasswordWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
     </Compile>
@@ -113,6 +125,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\JoinIPWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PasswordWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\UsernameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -122,11 +142,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -134,8 +149,8 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -260,6 +275,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon_Silver.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\LockIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

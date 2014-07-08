@@ -11,13 +11,31 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
 using System.Reflection;
+using System.Globalization;
+using System.Net;
 using System;
+
 
 namespace LauncherTwo
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    public class LockTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate LockedTemplate { get; set; }
+        public DataTemplate UnlockedTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item,
+                      DependencyObject container)
+        {
+            if (item == null)
+                return LockedTemplate;
+            return UnlockedTemplate;
+
+            //if ((bool)item == true)
+            //    return LockedTemplate;
+            //else
+            //    return UnlockedTemplate;
+        }
+    }
     public partial class MainWindow : Window
     {
         public const bool SHOW_DEBUG = false;
@@ -90,6 +108,8 @@ namespace LauncherTwo
             TickThread = new Thread(new ThreadStart(TickThreadFunc));
             TickThread.Start();
 
+
+            PingStats();
            // System.ComponentModel.BackgroundWorker Background = new System.ComponentModel.BackgroundWorker();
             //Background.WorkerSupportsCancellation = true;
             //Background.WorkerReportsProgress = false;
@@ -150,6 +170,9 @@ namespace LauncherTwo
         private void BindDataColumns()
         {
             ServerInfoGrid.ItemsSource = OFilteredServerList;
+
+            PasswordedNameColumn.CellTemplateSelector = new LockTemplateSelector();
+            //PasswordedNameColumn.ClipboardContentBinding = new Binding("ServerName");
 
             ServerNameColumn.Binding = new Binding("ServerName");
             MapNameColumn.Binding  = new Binding("MapName");
@@ -228,21 +251,36 @@ namespace LauncherTwo
             ServerInfo SelectedServerInfo = GetSelectedServer();
             if (SelectedServerInfo != null)
             {
-                if (LaunchTools.JoinServer(GetSelectedServer().IPWithPort, Properties.Settings.Default.Username))
+                if (GetSelectedServer().PasswordProtected)
+                    JoinPasswordServer(GetSelectedServer().IPWithPort);
+                else
+                    JoinServer(GetSelectedServer().IPWithPort);
+            }
+        }
+
+        void PingStats()
+        {
+            Uri uri = new Uri("http://www.renegade-x.com/launcher_data/launcher_ping.html", UriKind.Absolute);
+            WebClient wc = new WebClient();
+            wc.OpenReadAsync(uri);
+        }
+
+        void JoinServer(string IP, string Password = "")
+        {
+            if (LaunchTools.JoinServer(IP, Properties.Settings.Default.Username,Password))
                 {
                     if (SHOW_DEBUG)
-                        SetMessageboxText(GetSelectedServer().IPWithPort);
+                        SetMessageboxText(IP);
                     else
                         SetMessageboxText(MESSAGE_JOINGAME);
                 }
                 else
                 {
                     if (SHOW_DEBUG)
-                        SetMessageboxText(GetSelectedServer().IPWithPort);
+                        SetMessageboxText(IP);
                     else
                         SetMessageboxText(MESSAGE_CANTSTARTGAME);
                 }
-            }
         }
 
         private void RefreshServers(bool FilterResults = false)
@@ -257,6 +295,7 @@ namespace LauncherTwo
             //Reset the list
             foreach (ServerInfo info in ServerInfo.ActiveServers)
                 OFilteredServerList.Add(info);
+
         }
 
         private void SD_MaxPlayerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -265,10 +304,11 @@ namespace LauncherTwo
                 return;
 
             if (filter_MaxPlayers != (int)SD_MaxPlayerSlider.Value)
+            {
+                filter_MaxPlayers = (int)SD_MaxPlayerSlider.Value;
+                SD_MaxPlayerDile.Content = filter_MaxPlayers;
                 FilterServers();
-
-            filter_MaxPlayers = (int)SD_MaxPlayerSlider.Value;
-            SD_MaxPlayerDile.Content = filter_MaxPlayers;
+            }            
         }
 
         private void SD_MinPlayerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -277,10 +317,12 @@ namespace LauncherTwo
                 return;
 
             if (filter_MinPlayers != (int)SD_MinPlayerSlider.Value)
+            {
+                filter_MinPlayers = (int)SD_MinPlayerSlider.Value;
+                SD_MinPlayerDile.Content = filter_MinPlayers;
                 FilterServers();
+            }
 
-            filter_MinPlayers = (int)SD_MinPlayerSlider.Value;
-            SD_MinPlayerDile.Content = filter_MinPlayers;
         }
 
         private void ServerInfoGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -385,6 +427,30 @@ namespace LauncherTwo
         {
             LaunchTools.LaunchGame(Properties.Settings.Default.Username);
             SetMessageboxText("Launching Renegade-X");
+        }
+
+        void JoinPasswordServer(string IP)
+        {
+            PasswordWindow PassWindow = new PasswordWindow();
+
+            PassWindow.ShowDialog();
+
+            if (PassWindow.WantsToJoin)
+            {
+                JoinServer(IP, PassWindow.Password);
+            }
+        }
+
+        private void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
+        {
+            JoinIPWindow IPWindow = new JoinIPWindow();
+
+            IPWindow.ShowDialog();
+
+            if (IPWindow.WantsToJoin)
+            {
+                JoinServer(IPWindow.IP, IPWindow.Pass);
+            }
         }
     }
 }

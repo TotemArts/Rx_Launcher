@@ -36,9 +36,11 @@ namespace LauncherTwo
             return true;
         }
 
-        public static bool JoinServer(string anIPAdress, string Username)
+        public static bool JoinServer(string anIPAdress, string Username, string aPassword = "")
         {
             Arguments = anIPAdress + " ";
+            if (aPassword != "")
+                Arguments += "password=" + aPassword + " ";
             Arguments += INI_PATH + Username;
 
             Process UDKProcess = new Process();
@@ -49,14 +51,13 @@ namespace LauncherTwo
             {
                 UDKProcess.Start();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
                 return false;
             }
             LastRunprocess = UDKProcess;
             return true;
-
         }
 
         public static bool LastRunStillRunning()
