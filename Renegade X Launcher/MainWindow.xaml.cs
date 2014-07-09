@@ -178,7 +178,9 @@ namespace LauncherTwo
             MapNameColumn.Binding  = new Binding("MapName");
             PlayerCountColumn.Binding = new Binding("PlayerCountString");
             PlayerCountColumn.SortMemberPath = "PlayerCount";
+            //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Ascending;
             PingColumn.Binding = new Binding("PingString");
+            PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Descending;
             PingColumn.SortMemberPath = "PingSort";
 
             //Reset our grid length
@@ -307,7 +309,7 @@ namespace LauncherTwo
             {
                 filter_MaxPlayers = (int)SD_MaxPlayerSlider.Value;
                 SD_MaxPlayerDile.Content = filter_MaxPlayers;
-                FilterServers();
+                //FilterServers(); // Do filtering on button press now.
             }            
         }
 
@@ -320,7 +322,7 @@ namespace LauncherTwo
             {
                 filter_MinPlayers = (int)SD_MinPlayerSlider.Value;
                 SD_MinPlayerDile.Content = filter_MinPlayers;
-                FilterServers();
+                //FilterServers(); // Do filtering on button press now.
             }
 
         }
@@ -379,10 +381,6 @@ namespace LauncherTwo
             Application.Current.Shutdown();
         }
 
-        private void sv_ServerSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterServers();
-        }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -417,11 +415,7 @@ namespace LauncherTwo
             this.WindowState = System.Windows.WindowState.Minimized;
         }
 
-        private void sd_Refresh_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            RefreshServers();
-            FilterServers();
-        }
+        
 
         private void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
         {
@@ -451,6 +445,22 @@ namespace LauncherTwo
             {
                 JoinServer(IPWindow.IP, IPWindow.Pass);
             }
+        }
+
+        private void sd_Refresh_MouseDown(object sender, RoutedEventArgs e)
+        {
+            RefreshServers();
+            FilterServers();
+        }
+
+        private void sd_SearchClick(object sender, RoutedEventArgs e)
+        {
+            FilterServers();
+        }
+
+        private void SD_ApplyFilters_Click(object sender, RoutedEventArgs e)
+        {
+            FilterServers();
         }
     }
 }

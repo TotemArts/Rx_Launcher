@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow"
         Title="Renagade X " Height="735" Width="945" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" ResizeMode="NoResize" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" WindowStyle="None" MouseDown="Window_MouseDown">
 
-   
+
 
     <!-- BYRONS TEST RESOURCE -->
     <Window.Resources>
@@ -1102,8 +1102,8 @@
                             </Button>
                             <TextBlock x:Name="SD_Name" TextWrapping="Wrap" Foreground="White" FontFamily="Arial" Margin="90,194,10,93"/>
                             <TextBlock x:Name="SD_IP" TextWrapping="Wrap" Foreground="White" FontFamily="Arial" Margin="28,210,72,77"/>
-                            <TextBlock TextWrapping="Wrap" Text="Version:" Margin="5,237,283,55" Foreground="#FF7E7E7E" FontFamily="Arial" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Foreground="#FF6C6C6C" FontFamily="Arial" Margin="47,237,53,52" FontSize="9"/>
+                            <TextBlock TextWrapping="Wrap" Text="Server Version:" Margin="5,237,248,55" Foreground="#FF7E7E7E" FontFamily="Arial" FontWeight="Bold" FontSize="9"/>
+                            <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Foreground="#FF6C6C6C" FontFamily="Arial" Margin="73,237,53,52" FontSize="9"/>
                         </Grid>
                         <Grid x:Name="Server_Info_Bot_Frame" Margin="0,2,0,0" Grid.Row="1">
                             <Grid.Background>
@@ -1237,15 +1237,15 @@
                                     <Border.BorderBrush>
                                         <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                     </Border.BorderBrush>
-                                    <Label Content="&#xF002;" Margin="342,5,214,6" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="16" RenderTransformOrigin="-2.143,0.543">
-                                        <Label.Foreground>
+                                    <Button Content="&#xF002;" Margin="342,5,214,6" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="16" RenderTransformOrigin="-2.143,0.543" Click="sd_SearchClick" Focusable="False">
+                                        <Button.Foreground>
                                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                                        </Label.Foreground>
-                                    </Label>
+                                        </Button.Foreground>
+                                    </Button>
                                 </Border>
                             </Grid>
-                            <TextBox x:Name="sv_ServerSearch" HorizontalAlignment="Left" Height="23" Margin="96,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="159" TextChanged="sv_ServerSearch_TextChanged" Grid.Column="1" Background="#199DD2FF" Foreground="White"/>
-                            <Button x:Name="sd_Refresh" Content="&#xF021;" Margin="272,6,6,6" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="24" RenderTransformOrigin="-2.143,0.543" Grid.Column="1" MouseDown="sd_Refresh_MouseDown" Focusable="False">
+                            <TextBox x:Name="sv_ServerSearch" HorizontalAlignment="Left" Height="23" Margin="96,7,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="159" Grid.Column="1" Background="#199DD2FF" Foreground="White"/>
+                            <Button x:Name="sd_Refresh" Content="&#xF021;" Margin="272,6,6,6" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="24" RenderTransformOrigin="-2.143,0.543" Grid.Column="1" Focusable="False" Click="sd_Refresh_MouseDown">
                                 <Button.Foreground>
                                     <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                                 </Button.Foreground>
@@ -1253,21 +1253,26 @@
                         </Grid>
                         <Expander Header="Filters" Margin="10,10,507,419" Background="{x:Null}" Foreground="White" FontFamily="Arial" Grid.RowSpan="2">
                             <Grid Height="154" Margin="0,0,-500,0" Background="#FF0F171D" HorizontalAlignment="Left" Width="567">
-                                <Label Content="Auto Balance:" HorizontalAlignment="Left" Margin="355,62,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial" RenderTransformOrigin="-0.059,0"/>
+                                <!--<Label Content="Auto Balance:" HorizontalAlignment="Left" Margin="355,62,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial" RenderTransformOrigin="-0.059,0"/>-->
                                 <Label Content="Max Players:" HorizontalAlignment="Left" Margin="16,51,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial"/>
                                 <Label Content="Min Players:" HorizontalAlignment="Left" Margin="16,17,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial"/>
-                                <Label Content="Bots Enabled:" HorizontalAlignment="Left" Margin="354,33,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial"/>
+                                <!--<Label Content="Bots Enabled:" HorizontalAlignment="Left" Margin="354,33,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Arial"/>-->
                                 <Label x:Name="SD_MinPlayerDile" Content="0" Height="22" VerticalAlignment="Top" Margin="87,17,451,0" Background="{x:Null}" Foreground="White" FontFamily="Arial"/>
                                 <Slider x:Name="SD_MaxPlayerSlider" Margin="16,75,234,52" Foreground="Red" BorderBrush="{x:Null}" Background="{x:Null}" ValueChanged="SD_MaxPlayerSlider_ValueChanged" Maximum="64" SmallChange="1" Value="64"/>
                                 <Slider x:Name="SD_MinPlayerSlider" Margin="16,33,234,94" Foreground="Red" BorderBrush="{x:Null}" Background="{x:Null}" ValueChanged="SD_MinPlayerSlider_ValueChanged" Maximum="64" SmallChange="1"/>
-                                <CheckBox x:Name="SD_BotsEnabled" Content="" HorizontalAlignment="Left" Width="16" Margin="440,37,0,96"/>
+                                <!--<CheckBox x:Name="SD_BotsEnabled" Content="" HorizontalAlignment="Left" Width="16" Margin="440,37,0,96"/>-->
                                 <Label x:Name="SD_MaxPlayerDile" Content="64" Height="22" VerticalAlignment="Top" Margin="89,52,440,0" Background="{x:Null}" Foreground="White" FontFamily="Arial"/>
-                                <CheckBox x:Name="SD_AutoBalanceEnabled" Content="" HorizontalAlignment="Left" Width="16" Margin="440,66,0,67"/>
+                                <!--<CheckBox x:Name="SD_AutoBalanceEnabled" Content="" HorizontalAlignment="Left" Width="16" Margin="440,66,0,67"/>-->
                                 <Border BorderThickness="2" Margin="0">
                                     <Border.BorderBrush>
                                         <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                     </Border.BorderBrush>
                                 </Border>
+                                <Button x:Name="SD_FilterApplyBtn" HorizontalAlignment="Left" Margin="457,120,0,0" VerticalAlignment="Top" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Apply Filters" Click="SD_ApplyFilters_Click" Focusable="False">
+                                    <Button.Foreground>
+                                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
+                                    </Button.Foreground>
+                                </Button>
                             </Grid>
                         </Expander>
                     </Grid>
