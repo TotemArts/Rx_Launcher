@@ -79,8 +79,8 @@ namespace LauncherTwo
             //This will update the servers pings every X seconds.
             //AutoPingUpdate();
 
-            //SD_GameVersion.Text = VersionCheck.GetGameVersion();
-            //VersionCheck.StartFindVersion();
+            SD_GameVersion.Text = VersionCheck.GetGameVersion();
+            VersionCheck.StartFindVersion();
 
             RefreshServers();
             FilterServers();
