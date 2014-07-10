@@ -100,11 +100,15 @@
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="URI.cs" />
+    <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\JoinIPWindow.xaml.cs">
       <DependentUpon>JoinIPWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PasswordWindow.xaml.cs">
       <DependentUpon>PasswordWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UpdateAvailableWindow.xaml.cs">
+      <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
@@ -130,6 +134,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\PasswordWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UpdateAvailableWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

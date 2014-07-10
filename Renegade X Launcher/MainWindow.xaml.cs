@@ -38,7 +38,7 @@ namespace LauncherTwo
     }
     public partial class MainWindow : Window
     {
-        public const bool SHOW_DEBUG = false;
+        public const bool SHOW_DEBUG = true;
 
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
@@ -48,6 +48,7 @@ namespace LauncherTwo
         public static MainWindow Instance { get; private set; }
         public ObservableCollection<ServerInfo> OFilteredServerList = new ObservableCollection<ServerInfo>();
         Thread TickThread = null;
+        bool FoundLatestVersion = false;
 
         string messageText = "";
 
@@ -64,6 +65,8 @@ namespace LauncherTwo
         {
             Instance = this;
 
+            
+
             //We want the window to be in the middle of the screen. 
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
@@ -75,6 +78,9 @@ namespace LauncherTwo
 
             //This will update the servers pings every X seconds.
             //AutoPingUpdate();
+
+            //SD_GameVersion.Text = VersionCheck.GetGameVersion();
+            //VersionCheck.StartFindVersion();
 
             RefreshServers();
             FilterServers();
@@ -106,8 +112,7 @@ namespace LauncherTwo
             SetMessageboxText(MESSAGE_IDLE);
 
             TickThread = new Thread(new ThreadStart(TickThreadFunc));
-            TickThread.Start();
-
+            TickThread.Start();            
 
             PingStats();
            // System.ComponentModel.BackgroundWorker Background = new System.ComponentModel.BackgroundWorker();
@@ -115,6 +120,8 @@ namespace LauncherTwo
             //Background.WorkerReportsProgress = false;
             //Background.DoWork += new System.ComponentModel.DoWorkEventHandler(TickThreadFunc);
         }
+
+        
 
 
         private void TickThreadFunc()
@@ -132,6 +139,46 @@ namespace LauncherTwo
             if (GetMessageboxText() == MESSAGE_JOINGAME && !LaunchTools.LastRunStillRunning())
             {
                 OnGameExit();
+            }
+
+            if (!FoundLatestVersion && VersionCheck.GetLatestVersion() != "")
+                LatestVersionFound();
+        }
+
+        void LatestVersionFound()
+        {
+            FoundLatestVersion = true;
+
+            if (VersionCheck.GetGameVersion() == "")
+            {
+                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestVersion());
+                return;
+            }
+
+            if (VersionCheck.IsOutOfDate())
+            {
+                ShowUpdateWindow();
+            }
+            else
+            {
+                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersion());
+            }
+
+            //if (SHOW_DEBUG)
+            //{
+            //    SetMessageboxText("Latest Version: " + VersionCheck.GetLatestVersion() + " ( " + VersionCheck.GetLatestVersionNumerical().ToString() + ") Game Version: " + VersionCheck.GetGameVersion() + " (" + VersionCheck.GetGameVersionNumerical().ToString() + ")");
+            //}
+        }
+
+        void ShowUpdateWindow()
+        {
+            UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
+            theWindow.ShowDialog();
+
+            if (theWindow.WantsToUpdate)
+            {
+                System.Diagnostics.Process.Start(VersionCheck.DOWNLOAD_URL);
+                this.Close();
             }
         }
 
@@ -227,6 +274,8 @@ namespace LauncherTwo
                     OFilteredServerList.Add(info);
             }
 
+            bool SameVersionOnly = (SD_Filter_SameVersionOnly.IsChecked.HasValue) ? SD_Filter_SameVersionOnly.IsChecked.Value : false;
+
             for (int i = OFilteredServerList.Count - 1; i > -1; i--)
             {
                 if (OFilteredServerList[i].PlayerCount < filter_MinPlayers)
@@ -239,7 +288,13 @@ namespace LauncherTwo
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
-                }                
+                }
+
+                if (SameVersionOnly && VersionCheck.GetGameVersion() != "" && OFilteredServerList[i].GameVersion != VersionCheck.GetGameVersion())
+                {
+                    OFilteredServerList.RemoveAt(i);
+                    continue;
+                }   
             }
         }
 
@@ -346,7 +401,7 @@ namespace LauncherTwo
             SD_usesAutoBalance.IsChecked = selected.AutoBalance;
             SD_steamRequired.IsChecked = selected.SteamRequired;
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
-            SD_GameVersion.Text = selected.GameVersion;
+            SD_ServerVersion.Text = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
 
             if (selected.VehicleLimit <= 0)
