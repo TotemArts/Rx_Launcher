@@ -16,30 +16,55 @@ namespace LauncherTwo
         // Read from DefaultRenegadeX.ini
         const string INI_PATH = "\\UDKGame\\Config\\DefaultRenegadeX.ini";
         const string VERSION_KEY = "GameVersion";
-        const string LATEST_VERSION_URL = "http://renegade-x.com/launcher_data/currentversion";
-        public const string DOWNLOAD_URL = "http://renegade-x.com/download";
-        static string LatestVersion = "";
+        const string LATEST_GAMEVERSION_URL = "http://renegade-x.com/launcher_data/gameversion";
+        const string LATEST_LAUNCHERVERSION_URL = "http://renegade-x.com/launcher_data/launcherversion";
+        static string DownloadingURL = "";
+       
+        public const string GAME_DOWNLOAD_URL = "http://renegade-x.com/download";
+        public const string LAUNCHER_DOWNLOAD_URL = "http://renegade-x.com/download";
+        static string LatestGameVersion = "";
+        static string LatestLauncherVersion = "";
+        const string LauncherVersion = "0.1";
         static string GameVersion = "";
 
-        public static float GetLatestVersionNumerical()
+        public static float GetLatestGameVersionNumerical()
         {
-            return GetFloatVer(GetLatestVersion());
+            return GetFloatVer(GetLatestGameVersion());
         }
         public static float GetGameVersionNumerical()
         {
             return GetFloatVer(GetGameVersion());
         }
 
-        public static string GetLatestVersion()
+        public static string GetLatestGameVersion()
         {
-            return LatestVersion;
+            return LatestGameVersion;
         }
-
+        
         public static string GetGameVersion()
         {
             if (GameVersion == "")
                 GameVersion = ReadGameVersion();
             return GameVersion;
+        }
+
+        public static float GetLatestLauncherVersionNumerical()
+        {
+            return GetFloatVer(GetLatestLauncherVersion());
+        }
+        public static float GetLauncherVersionNumerical()
+        {
+            return GetFloatVer(GetLauncherVersion());
+        }
+
+        public static string GetLatestLauncherVersion()
+        {
+            return LatestLauncherVersion;
+        }
+
+        public static string GetLauncherVersion()
+        {
+            return LauncherVersion;
         }
 
         static string ReadGameVersion()
@@ -76,23 +101,24 @@ namespace LauncherTwo
             }
         }
 
-        public static void StartDownloadLatestVersion()
+        public static void StartFindGameVersion()
         {
-
+            StartDownloadData(LATEST_GAMEVERSION_URL);
         }
 
-        static string PollVersion()
+        public static void StartFindLauncherVersion()
         {
-            return LatestVersion;
+            StartDownloadData(LATEST_LAUNCHERVERSION_URL);
         }
 
-        public static void StartFindVersion()
+        public static string GetDownloadingURL()
         {
-            StartDownloadData(LATEST_VERSION_URL);
+            return DownloadingURL;
         }
 
         static void StartDownloadData(string URL)
         {
+            DownloadingURL = URL;
             WebClient Client = new WebClient();
             Client.DownloadDataCompleted += DownloadDataCompleted;
             Uri URI = null;
@@ -106,25 +132,45 @@ namespace LauncherTwo
             {
                 byte[] raw = e.Result;
                 string webData = System.Text.Encoding.UTF8.GetString(raw);
-                LatestVersion = webData;
+                if (DownloadingURL == LATEST_GAMEVERSION_URL)
+                    LatestGameVersion = webData;
+                else if (DownloadingURL == LATEST_LAUNCHERVERSION_URL)
+                    LatestLauncherVersion = webData;
             }
         }
 
-        public static bool IsOutOfDate()
+        public static bool IsLauncherOutOfDate()
+        {
+            float LauncherVerFloat;
+            float LatestLauncherVerFloat;
+
+            if (LatestLauncherVersion != "" && LauncherVersion != "")
+            {
+                LauncherVerFloat = GetFloatVer(LauncherVersion);
+                LatestLauncherVerFloat = GetFloatVer(LatestLauncherVersion);
+                if (LauncherVerFloat == -1f || LatestLauncherVerFloat == -1f)
+                    return false;
+                else if (LatestLauncherVerFloat > LauncherVerFloat)
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool IsGameOutOfDate()
         {
             if (GameVersion == "")
                 GameVersion = ReadGameVersion();
 
             float GameVerFloat;
-            float LatestVerFloat;
+            float LatestGameVerFloat;
 
-            if (LatestVersion != "" && GameVersion != "")
+            if (LatestGameVersion != "" && GameVersion != "")
             {
                 GameVerFloat = GetFloatVer(GameVersion);
-                LatestVerFloat = GetFloatVer(LatestVersion);
-                if (GameVerFloat == -1f || LatestVerFloat == -1f)
+                LatestGameVerFloat = GetFloatVer(LatestGameVersion);
+                if (GameVerFloat == -1f || LatestGameVerFloat == -1f)
                     return false;
-                else if (LatestVerFloat > GameVerFloat)
+                else if (LatestGameVerFloat > GameVerFloat)
                     return true;
             }
             return false;

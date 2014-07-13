@@ -98,6 +98,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RenXWebLinks.cs" />
+    <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="URI.cs" />

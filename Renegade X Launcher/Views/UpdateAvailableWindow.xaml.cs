@@ -24,11 +24,7 @@ namespace LauncherTwo.Views
         public UpdateAvailableWindow()
         {
             InitializeComponent();
-            this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-
-            LatestVersionText.Content = VersionCheck.GetLatestVersion();
-            GameVersionText.Content =  VersionCheck.GetGameVersion();
-         
+            this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;         
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

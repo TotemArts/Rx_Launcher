@@ -48,7 +48,8 @@ namespace LauncherTwo
         public static MainWindow Instance { get; private set; }
         public ObservableCollection<ServerInfo> OFilteredServerList = new ObservableCollection<ServerInfo>();
         Thread TickThread = null;
-        bool FoundLatestVersion = false;
+        bool FoundLatestGameVersion = false;
+        bool FoundLatestLauncherVersion = false;
 
         string messageText = "";
 
@@ -80,7 +81,7 @@ namespace LauncherTwo
             //AutoPingUpdate();
 
             SD_GameVersion.Text = VersionCheck.GetGameVersion();
-            VersionCheck.StartFindVersion();
+            VersionCheck.StartFindLauncherVersion();
 
             RefreshServers();
             FilterServers();
@@ -141,23 +142,26 @@ namespace LauncherTwo
                 OnGameExit();
             }
 
-            if (!FoundLatestVersion && VersionCheck.GetLatestVersion() != "")
-                LatestVersionFound();
+            if (!FoundLatestGameVersion && VersionCheck.GetLatestGameVersion() != "")
+                LatestGameVersionFound();
+
+            if (!FoundLatestLauncherVersion && VersionCheck.GetLatestLauncherVersion() != "")
+                LatestLauncherVersionFound();
         }
 
-        void LatestVersionFound()
+        void LatestGameVersionFound()
         {
-            FoundLatestVersion = true;
+            FoundLatestGameVersion = true;
 
             if (VersionCheck.GetGameVersion() == "")
             {
-                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestVersion());
+                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersion());
                 return;
             }
 
-            if (VersionCheck.IsOutOfDate())
+            if (VersionCheck.IsGameOutOfDate())
             {
-                ShowUpdateWindow();
+                ShowGameUpdateWindow();
             }
             else
             {
@@ -170,14 +174,48 @@ namespace LauncherTwo
             //}
         }
 
-        void ShowUpdateWindow()
+        void LatestLauncherVersionFound()
+        {
+            FoundLatestLauncherVersion = true;
+
+            if (VersionCheck.IsLauncherOutOfDate())
+            {
+                ShowLauncherUpdateWindow();
+            }
+            else
+            {
+                SetMessageboxText("Launcher is up to date! " + VersionCheck.GetGameVersion());
+                // If launcher is up to date, check to see if game is up to date.
+                VersionCheck.StartFindGameVersion();
+            }
+        }
+
+        void ShowGameUpdateWindow()
         {
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
+            theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersion();
+            theWindow.GameVersionText.Content = VersionCheck.GetGameVersion();
+            theWindow.WindowTitle.Content = "Game Update Available!";
             theWindow.ShowDialog();
 
             if (theWindow.WantsToUpdate)
             {
-                System.Diagnostics.Process.Start(VersionCheck.DOWNLOAD_URL);
+                System.Diagnostics.Process.Start(VersionCheck.GAME_DOWNLOAD_URL);
+                this.Close();
+            }
+        }
+
+        void ShowLauncherUpdateWindow()
+        {
+            UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
+            theWindow.LatestVersionText.Content = VersionCheck.GetLatestLauncherVersion();
+            theWindow.GameVersionText.Content = VersionCheck.GetLauncherVersion();
+            theWindow.WindowTitle.Content = "Launcher Update Available!";
+            theWindow.ShowDialog();
+
+            if (theWindow.WantsToUpdate)
+            {
+                System.Diagnostics.Process.Start(VersionCheck.LAUNCHER_DOWNLOAD_URL);
                 this.Close();
             }
         }

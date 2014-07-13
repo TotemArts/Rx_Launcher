@@ -20,7 +20,7 @@
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                 </Border.BorderBrush>
-                <Label Content="Update Available!" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" FontWeight="Bold" FontSize="18">
+                <Label x:Name="WindowTitle" Content="Title" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" FontWeight="Bold" FontSize="18">
                     <Label.Foreground>
                         <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
                     </Label.Foreground>
@@ -32,7 +32,7 @@
                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </Border.BorderBrush>
         </Border>
-        <Label Content="Game Version:" Margin="69,4,148,16" FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" Width="95" Grid.RowSpan="2" Grid.ColumnSpan="2">
+        <Label Content="Installed Version:" Margin="57,4,150,16" FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" Width="105" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <Label.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Label.Foreground>
