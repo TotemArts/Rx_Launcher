@@ -42,7 +42,7 @@ namespace LauncherTwo
         {
             return UpdateState;
         }
-        
+
         static float GetStatePercentComplete()
         {
             return statePercentComplete;
@@ -59,45 +59,51 @@ namespace LauncherTwo
             UpdaterWindow = aUpdaterWindow;
             if (UpdateState != eUpdateState.Downloading && UpdateState != eUpdateState.Extracting && UpdateState != eUpdateState.ReadyToInstall)
             {
-                //if (UpdateThread == null)
-                //    UpdateThread = new Thread(new ThreadStart(StartDownload));
-
-                //UpdateThread.Start();
                 StartDownload();
             }
         }
 
         static void StartDownload()
         {
-            UpdateState = eUpdateState.Downloading;
-            UpdaterWindow.StatusLabel.Content = "Starting Download...";
-            
-            
+            try
+            {
+                UpdateState = eUpdateState.Downloading;
+                UpdaterWindow.StatusLabel.Content = "Starting Download...";
 
-            if (File.Exists(SAVE_PATH))
-                File.Delete(SAVE_PATH);
-            if (!Directory.Exists(TEMP_DIRECTORY))
-                Directory.CreateDirectory(TEMP_DIRECTORY);
+                if (File.Exists(SAVE_PATH))
+                    File.Delete(SAVE_PATH);
+                if (!Directory.Exists(TEMP_DIRECTORY))
+                    Directory.CreateDirectory(TEMP_DIRECTORY);
 
+                Client = new WebClient();
+                Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
+                Client.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(DownloadCompletedCallback);
 
-            
-            Client = new WebClient ();
-            Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
-            Client.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(DownloadCompletedCallback);
-
-            Uri uri = new Uri(DOWNLOAD_URL);
-            Client.DownloadFileAsync(uri, SAVE_PATH);
+                Uri uri = new Uri(DOWNLOAD_URL);
+                Client.DownloadFileAsync(uri, SAVE_PATH);
+            }
+            catch (Exception e)
+            {
+                UpdaterWindow.StatusLabel.Content = "Error Downloading: " + e.Message;
+            }
         }
 
         static void StartExtract()
         {
-            if (Directory.Exists(EXTRACT_DIRECTORY))
-                Directory.Delete(EXTRACT_DIRECTORY, true);
+            try
+            {
+                if (Directory.Exists(EXTRACT_DIRECTORY))
+                    Directory.Delete(EXTRACT_DIRECTORY, true);
 
-            UpdateState = eUpdateState.Extracting;
-            UpdaterWindow.StatusLabel.Content = "Extracting...";
-            ZipFile.ExtractToDirectory(SAVE_PATH,EXTRACT_DIRECTORY);
-            ReadyToInstall();
+                UpdateState = eUpdateState.Extracting;
+                UpdaterWindow.StatusLabel.Content = "Extracting...";
+                ZipFile.ExtractToDirectory(SAVE_PATH, EXTRACT_DIRECTORY);
+                ReadyToInstall();
+            }
+            catch (Exception e)
+            {
+                UpdaterWindow.StatusLabel.Content = "Error Extracting: " + e.Message;
+            }
         }
 
         static void ReadyToInstall()
@@ -109,35 +115,40 @@ namespace LauncherTwo
 
         public static void ExecuteInstall()
         {
-            if (UpdateState == eUpdateState.ReadyToInstall)
+            try
             {
-                string InstallLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                string ExecutableName = System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                // Write .bat file
+                if (UpdateState == eUpdateState.ReadyToInstall)
+                {
+                    string InstallLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    string ExecutableName = System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    // Write .bat file
 
-                string Contents = "";
-                // Give the launcher a second to exit.
-                Contents += "TIMEOUT 1 \n";
-                // Clean install location
-                Contents += "rmdir \"" + InstallLocation + "\" /s /q \n";
-                // Copy extracted files and overwrite existing launcher files.
-                Contents += "xcopy \"" + EXTRACT_DIRECTORY.TrimEnd('\\') + "\" \"" + InstallLocation + "\" /v /f /e /s /r /h /y " + "\n";
-                // Restart launcher
-                Contents += "start \"" + InstallLocation + "\" \"" + ExecutableName + "\" \n";
-                // Delete temp directory.
-                Contents += "rmdir \"" + TEMP_DIRECTORY.TrimEnd('\\') + "\" /s /q \n";
-                
+                    string Contents = "";
+                    // Give the launcher a second to exit.
+                    Contents += "TIMEOUT 1 \n";
+                    // Clean install location
+                    Contents += "rmdir \"" + InstallLocation + "\" /s /q \n";
+                    // Copy extracted files and overwrite existing launcher files.
+                    Contents += "xcopy \"" + EXTRACT_DIRECTORY.TrimEnd('\\') + "\" \"" + InstallLocation + "\" /v /f /e /s /r /h /y " + "\n";
+                    // Restart launcher
+                    Contents += "start \"" + InstallLocation + "\" \"" + ExecutableName + "\" \n";
+                    // Delete temp directory.
+                    Contents += "rmdir \"" + TEMP_DIRECTORY.TrimEnd('\\') + "\" /s /q \n";
 
-                File.WriteAllText(BAT_PATH, Contents);
+                    File.WriteAllText(BAT_PATH, Contents);
 
+                    // Execute .bat file.
 
-                // Execute .bat file.
-
-                Process InstallProc = new Process();
-                ProcessStartInfo startInfo = new ProcessStartInfo(BAT_PATH,"/B");
-                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                InstallProc.StartInfo = startInfo;
-                InstallProc.Start();
+                    Process InstallProc = new Process();
+                    ProcessStartInfo startInfo = new ProcessStartInfo(BAT_PATH, "/B");
+                    startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    InstallProc.StartInfo = startInfo;
+                    InstallProc.Start();
+                }
+            }
+            catch (Exception e)
+            {
+                UpdaterWindow.StatusLabel.Content = "Error Installing: " + e.Message;
             }
         }
 
