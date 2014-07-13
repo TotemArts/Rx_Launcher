@@ -24,7 +24,7 @@ namespace LauncherTwo
         public const string LAUNCHER_DOWNLOAD_URL = "http://renegade-x.com/download";
         static string LatestGameVersion = "";
         static string LatestLauncherVersion = "";
-        const string LauncherVersion = "0.1";
+        const string LauncherVersion = "0.15";
         static string GameVersion = "";
 
         public static float GetLatestGameVersionNumerical()

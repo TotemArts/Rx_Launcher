@@ -66,8 +66,6 @@ namespace LauncherTwo
         {
             Instance = this;
 
-            
-
             //We want the window to be in the middle of the screen. 
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
@@ -121,9 +119,6 @@ namespace LauncherTwo
             //Background.WorkerReportsProgress = false;
             //Background.DoWork += new System.ComponentModel.DoWorkEventHandler(TickThreadFunc);
         }
-
-        
-
 
         private void TickThreadFunc()
         {
@@ -205,6 +200,18 @@ namespace LauncherTwo
             }
         }
 
+        void DownloadLauncherUpdate()
+        {
+            UpdateDownloadWindow theWindow = new UpdateDownloadWindow();
+            theWindow.ShowDialog();
+
+            if (theWindow.UpdateFinished)
+            {
+                SelfUpdater.ExecuteInstall();
+                this.Close();
+            }
+        }
+
         void ShowLauncherUpdateWindow()
         {
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
@@ -215,8 +222,7 @@ namespace LauncherTwo
 
             if (theWindow.WantsToUpdate)
             {
-                System.Diagnostics.Process.Start(VersionCheck.LAUNCHER_DOWNLOAD_URL);
-                this.Close();
+                DownloadLauncherUpdate();
             }
         }
 

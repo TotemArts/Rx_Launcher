@@ -1,0 +1,45 @@
+﻿<Window x:Class="LauncherTwo.Views.UpdateDownloadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="132" Width="312" ResizeMode="NoResize" WindowStyle="None" Activated="OnActivated">
+    <Window.Resources>
+        <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
+    </Window.Resources>
+    <Grid Background="#FF12171A">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="9*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="13*"/>
+        </Grid.RowDefinitions>
+        <Grid Margin="0" Background="#FF0B1A22" Grid.ColumnSpan="2">
+            <Border BorderThickness="1" Margin="0">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                </Border.BorderBrush>
+                <Label x:Name="WindowTitle" Content="Updating" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" FontWeight="Bold" FontSize="18">
+                    <Label.Foreground>
+                        <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
+                    </Label.Foreground>
+                </Label>
+            </Border>
+        </Grid>
+        <Border BorderThickness="1,0,1,1" Margin="0" Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2">
+            <Border.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+            </Border.BorderBrush>
+        </Border>
+        <Label x:Name="StatusLabel" Content="Status" Margin="10,4,12,42" FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" Width="290" Grid.RowSpan="3">
+            <Label.Foreground>
+                <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
+            </Label.Foreground>
+        </Label>
+        <Button x:Name="CloseBtn" Content="Close" HorizontalAlignment="Left" Margin="125,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="Close_Click">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
+            </Button.Foreground>
+            <Button.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+            </Button.BorderBrush>
+        </Button>
+    </Grid>
+</Window>

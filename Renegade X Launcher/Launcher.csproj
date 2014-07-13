@@ -63,6 +63,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -112,6 +114,9 @@
     <Compile Include="Views\UpdateAvailableWindow.xaml.cs">
       <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UpdateDownloadWindow.xaml.cs">
+      <DependentUpon>UpdateDownloadWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
     </Compile>
@@ -140,6 +145,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\UpdateAvailableWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UpdateDownloadWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
