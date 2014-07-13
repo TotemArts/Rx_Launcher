@@ -13,12 +13,13 @@ using System.Windows.Controls;
 using System.Net.NetworkInformation;
 using LauncherTwo;
 using System.Dynamic;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 
 
     public class ServerInfo
     {
-
         public enum SERVER_INFO_POSITIONS
         {
             Server_Name = 0,
@@ -296,13 +297,17 @@ using System.Dynamic;
             }
         }
 
-        public string LockImage
+        private BitmapImage lockImage;
+        public BitmapImage LockImage
         {
             get
             {
+                if (lockImage == null)
+                    lockImage = new BitmapImage(new Uri("Resources/LockIcon.png", UriKind.Relative));
+
                 if (PasswordProtected)
-                    return "pack://siteoforigin:,,,/Resources/LockIcon.png";
-                else return "";
+                    return lockImage;
+                else return null;
             }
         }
         

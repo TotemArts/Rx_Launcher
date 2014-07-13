@@ -218,8 +218,9 @@ namespace LauncherTwo
         {
             ServerInfoGrid.ItemsSource = OFilteredServerList;
 
-            PasswordedNameColumn.CellTemplateSelector = new LockTemplateSelector();
+            //PasswordedNameColumn.CellTemplateSelector = new LockTemplateSelector();
             //PasswordedNameColumn.ClipboardContentBinding = new Binding("ServerName");
+            
 
             ServerNameColumn.Binding = new Binding("ServerName");
             MapNameColumn.Binding  = new Binding("MapName");
