@@ -1,8 +1,7 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow"
-        Title="Renagade X " Height="735" Width="945" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" ResizeMode="NoResize" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" WindowStyle="None" MouseDown="Window_MouseDown">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Height="735" Width="945" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" ResizeMode="NoResize" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" WindowStyle="None" MouseDown="Window_MouseDown">
 
 
 
@@ -1135,18 +1134,18 @@
                                         <Label Content="Game Length:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="1"/>
                                         <Label Content="Mine Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="2" Grid.Column="1"/>
                                         <Label Content="Player Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,51,0" Grid.Row="1" Grid.Column="1"/>
-                                        <CheckBox x:Name="SD_steamRequired" Content="CheckBox" Margin="99,5,35,5" RenderTransformOrigin="-1.062,0.656" Grid.Row="4" Background="Black"/>
-                                        <CheckBox x:Name="SD_usesCrates" Content="CheckBox" Margin="54,5,80,5" Grid.Row="3" Background="Black"/>
-                                        <Label Content="Crates:" Foreground="White" FontFamily="Arial" Margin="0,0,96,0" Grid.Row="3"/>
-                                        <Label Content="Steam Required:" Foreground="White" FontFamily="Arial" Margin="0,0,41,0" Grid.Row="4"/>
-                                        <CheckBox x:Name="SD_usesAutoBalance" Content="CheckBox" Margin="89,5,44,5" Grid.Row="3" Grid.Column="1" Foreground="#FF363636" Background="Black"/>
-                                        <CheckBox x:Name="SD_usesInfantryOnly" Content="CheckBox" Margin="89,6,44,3" Grid.Row="4" Grid.Column="1" Background="Black" Style="{DynamicResource RenxCheckbox}"/>
-                                        <Label Content="Auto Balance:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="3" Grid.Column="1"/>
-                                        <Label Content="Infantry Only:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="4" Grid.Column="1"/>
+                                        <Label Content="Crates" Foreground="White" FontFamily="Arial" Margin="17,0,79,0" Grid.Row="3"/>
+                                        <Label Content="Steam Required" Foreground="White" FontFamily="Arial" Margin="19,0,22,0" Grid.Row="4"/>
+                                        <Label Content="Auto Balance" Foreground="White" FontFamily="Arial" Margin="15,0,46,0" Grid.Row="3" Grid.Column="1"/>
+                                        <Label Content="Infantry Only" Foreground="White" FontFamily="Arial" Margin="15,0,46,0" Grid.Row="4" Grid.Column="1"/>
                                         <Label x:Name="SD_VehicleLimit" Content="" Foreground="White" FontFamily="Arial" Margin="86,0,0,0" Grid.Row="2"/>
                                         <Label x:Name="SD_PlayerLimit" Content="" Foreground="White" FontFamily="Arial" Margin="74,0,0,0" Grid.Row="1" Grid.Column="1"/>
                                         <Label x:Name="SD_GameLength" Content="" Foreground="White" FontFamily="Arial" Margin="84,0,0,0" Grid.Row="1"/>
                                         <Label x:Name="SD_MineLimit" Content="" Foreground="White" FontFamily="Arial" Margin="64,0,0,0" Grid.Row="2" Grid.Column="1"/>
+                                        <Image x:Name="Crates_Checkbx" HorizontalAlignment="Left" Height="12" Margin="6,6,0,0" Grid.Row="3" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png"/>
+                                        <Image x:Name="Steam_Checkbx" HorizontalAlignment="Left" Height="12" Margin="6,5,0,0" Grid.Row="4" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png" RenderTransformOrigin="0.438,0.333"/>
+                                        <Image x:Name="Autobalance_Checkbx" HorizontalAlignment="Left" Height="12" Margin="4,6,0,0" Grid.Row="3" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png" Grid.Column="1"/>
+                                        <Image x:Name="InfantryOnly_Checkbx" HorizontalAlignment="Left" Height="12" Margin="4,5,0,0" Grid.Row="4" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png" RenderTransformOrigin="0.438,0.333" Grid.Column="1"/>
                                         <!-- <Border BorderThickness="1" Margin="2" Grid.Row="7" d:IsHidden="True">
                                             <Border.BorderBrush>
                                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
@@ -1282,9 +1281,15 @@
                     </Grid>
                 </Grid>
             </Grid>
+            <Label x:Name="TitleText" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Renegade-X Launcher" FontFamily="Arial" FontSize="10" Background="{x:Null}" Margin="15,-26,0,0" >
+                <Label.Foreground>
+                    <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
+                </Label.Foreground>
+            </Label>
         </Grid>
         <Button x:Name="XBtn" Content="X" HorizontalAlignment="Left" Margin="891,0,0,0" VerticalAlignment="Top" Width="48" Height="19" Foreground="White" Click="XBtn_Click" FontFamily="Arial" BorderBrush="#FF838C91" Background="#FF061923"/>
         <Button x:Name="MinBtn" Content="_" Margin="865,0,53,0" VerticalAlignment="Top" Height="19" Foreground="White" BorderBrush="#FF838C91" Background="#FF061923" FontFamily="Arial" Click="MinBtn_Click"/>
+        <Image HorizontalAlignment="Left" Height="18" Margin="4,4,0,0" VerticalAlignment="Top" Width="18" Source="Icon_Silver.ico"/>
     </Grid>
 </Window>
  

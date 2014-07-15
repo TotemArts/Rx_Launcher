@@ -57,6 +57,18 @@ namespace LauncherTwo
         const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
         const string MESSAGE_IDLE = "Welcome back commander.";
 
+        private BitmapImage chkBoxOnImg;
+        private BitmapImage chkBoxOffImg;
+        public BitmapImage GetChkBxImg (bool Value)
+        {
+            if (chkBoxOnImg == null)
+                chkBoxOnImg = new BitmapImage(new Uri("Resources/Checkbox_ON.png", UriKind.Relative));
+            if (chkBoxOffImg == null)
+                chkBoxOffImg = new BitmapImage(new Uri("Resources/Checkbox_OFF.png", UriKind.Relative));
+
+            return Value ? chkBoxOnImg : chkBoxOffImg;
+        }
+
         #region -= Filters =-
         private int filter_MaxPlayers = 64;
         private int filter_MinPlayers = 0;
@@ -65,7 +77,6 @@ namespace LauncherTwo
         public MainWindow()
         {
             Instance = this;
-
             //We want the window to be in the middle of the screen. 
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
@@ -118,6 +129,11 @@ namespace LauncherTwo
             //Background.WorkerSupportsCancellation = true;
             //Background.WorkerReportsProgress = false;
             //Background.DoWork += new System.ComponentModel.DoWorkEventHandler(TickThreadFunc);
+
+            string Title = "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion();
+            this.Title = Title;
+            TitleText.Content = Title;
+            
         }
 
         private void TickThreadFunc()
@@ -441,18 +457,15 @@ namespace LauncherTwo
             SD_Name.Text = selected.ServerName;
             SD_IP.Text = selected.IPWithPort;
             SD_GameLength.Content = selected.TimeLimit.ToString();
-            SD_MineLimit.Content = selected.MineLimit.ToString();
-            SD_usesCrates.IsChecked = selected.SpawnCrates;
-            SD_usesAutoBalance.IsChecked = selected.AutoBalance;
-            SD_steamRequired.IsChecked = selected.SteamRequired;
+            SD_MineLimit.Content = selected.MineLimit.ToString();            
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
             SD_ServerVersion.Text = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
 
-            if (selected.VehicleLimit <= 0)
-                SD_usesInfantryOnly.IsChecked = true;
-            else
-                SD_usesInfantryOnly.IsChecked = false;
+            Autobalance_Checkbx.Source = GetChkBxImg(selected.AutoBalance);
+            Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);
+            Crates_Checkbx.Source = GetChkBxImg(selected.SpawnCrates);
+            InfantryOnly_Checkbx.Source = GetChkBxImg(selected.VehicleLimit <= 0);
 
             ServerInfoGrid.UpdateLayout();
         }

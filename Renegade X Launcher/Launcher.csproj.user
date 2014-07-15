@@ -5,10 +5,10 @@
     </StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup>
-    <PublishUrlHistory>publish\</PublishUrlHistory>
+    <PublishUrlHistory>E:\Users\Martin\Desktop\Launcher\|publish\</PublishUrlHistory>
     <InstallUrlHistory />
     <SupportUrlHistory />
-    <UpdateUrlHistory />
+    <UpdateUrlHistory>http://localhost/Renegade X Launcher/</UpdateUrlHistory>
     <BootstrapperUrlHistory />
     <ErrorReportUrlHistory />
     <FallbackCulture>en-US</FallbackCulture>
