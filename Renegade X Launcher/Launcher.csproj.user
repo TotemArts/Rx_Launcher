@@ -5,7 +5,7 @@
     </StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup>
-    <PublishUrlHistory>E:\Users\Martin\Desktop\Launcher\|publish\</PublishUrlHistory>
+    <PublishUrlHistory>publish\|E:\Users\Martin\Desktop\Launcher\</PublishUrlHistory>
     <InstallUrlHistory />
     <SupportUrlHistory />
     <UpdateUrlHistory>http://localhost/Renegade X Launcher/</UpdateUrlHistory>
