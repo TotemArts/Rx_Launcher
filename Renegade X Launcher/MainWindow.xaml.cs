@@ -38,7 +38,7 @@ namespace LauncherTwo
     }
     public partial class MainWindow : Window
     {
-        public const bool SHOW_DEBUG = true;
+        public const bool SHOW_DEBUG = false;
 
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
@@ -100,24 +100,10 @@ namespace LauncherTwo
 
             BannerTools.Setup();
 
-            UsernameWindow usernameWindow = new UsernameWindow();
-
-            if ( Properties.Settings.Default.Username == "")
-            {
-                usernameWindow.m_Username = Properties.Settings.Default.Username;
-
-                usernameWindow.ShowDialog();
-
-                Properties.Settings.Default.Username = usernameWindow.m_Username;
-
-                Properties.Settings.Default.Save();
-
-                SD_Username.Content = usernameWindow.m_Username;
-            } 
+            if (Properties.Settings.Default.Username == "")
+                ShowUsernameBox();
             else
-            {
                 SD_Username.Content = Properties.Settings.Default.Username;
-            }
 
             SetMessageboxText(MESSAGE_IDLE);
 
@@ -195,7 +181,7 @@ namespace LauncherTwo
             }
             else
             {
-                SetMessageboxText("Launcher is up to date! " + VersionCheck.GetGameVersion());
+                SetMessageboxText("Launcher is up to date!");
                 // If launcher is up to date, check to see if game is up to date.
                 VersionCheck.StartFindGameVersion();
             }
@@ -279,8 +265,7 @@ namespace LauncherTwo
             ServerInfoGrid.ItemsSource = OFilteredServerList;
 
             //PasswordedNameColumn.CellTemplateSelector = new LockTemplateSelector();
-            //PasswordedNameColumn.ClipboardContentBinding = new Binding("ServerName");
-            
+            //PasswordedNameColumn.ClipboardContentBinding = new Binding("ServerName");            
 
             ServerNameColumn.Binding = new Binding("ServerName");
             MapNameColumn.Binding  = new Binding("MapName");
@@ -288,8 +273,10 @@ namespace LauncherTwo
             PlayerCountColumn.SortMemberPath = "PlayerCount";
             //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Ascending;
             PingColumn.Binding = new Binding("PingString");
-            PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Descending;
+            //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Descending;
             PingColumn.SortMemberPath = "PingSort";
+
+            ServerInfoGrid.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription(PlayerCountColumn.SortMemberPath,System.ComponentModel.ListSortDirection.Descending));
 
             //Reset our grid length
             ServerContentSplit.RowDefinitions[0].Height = new GridLength(40);
@@ -516,11 +503,20 @@ namespace LauncherTwo
 
         private void SD_EditUsernameBtn_Click(object sender, RoutedEventArgs e)
         {
+            ShowUsernameBox();
+        }
+
+        private void ShowUsernameBox()
+        {
             UsernameWindow login = new UsernameWindow();
             login.m_Username = Properties.Settings.Default.Username;
             login.SD_UsernameBox.Text = Properties.Settings.Default.Username;
+
             login.ShowDialog();
-            SD_Username.Content = login.m_Username; 
+
+            Properties.Settings.Default.Username = login.m_Username;
+            Properties.Settings.Default.Save();
+            SD_Username.Content = login.m_Username;
         }
 
         private void MinBtn_Click(object sender, RoutedEventArgs e)

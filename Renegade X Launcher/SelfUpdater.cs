@@ -29,14 +29,31 @@ namespace LauncherTwo
         static Views.UpdateDownloadWindow UpdaterWindow = null;
         static WebClient Client;
 
-        const string TEMP_DIRECTORY = @"C:\RxTmp\";
+
         const string DOWNLOAD_FILENAME = "RxLauncher_Current";
         const string DOWNLOAD_EXTENSION = ".zip";
-        const string BAT_PATH = TEMP_DIRECTORY + "Install.bat";
-        const string EXTRACT_DIRECTORY = TEMP_DIRECTORY + DOWNLOAD_FILENAME + @"\";
-        const string SAVE_PATH = TEMP_DIRECTORY + DOWNLOAD_FILENAME + DOWNLOAD_EXTENSION;
         const string DOWNLOAD_URL = "http://www.renegade-x.com/launcher_data/" + DOWNLOAD_FILENAME + DOWNLOAD_EXTENSION;
 
+
+        static string GetTempDirectory()
+        {
+            return Path.GetTempPath() + @"\RxTmp\";
+        }
+
+        static string GetBatPath()
+        {
+            return GetTempDirectory() + "Install.bat";
+        }
+
+        static string GetExtractDirectory()
+        {
+            return GetTempDirectory() + DOWNLOAD_FILENAME + @"\";
+        }
+
+        static string GetSavePath()
+        {
+            return GetTempDirectory() + DOWNLOAD_FILENAME + DOWNLOAD_EXTENSION;
+        }
 
         static eUpdateState GetUpdateState()
         {
@@ -70,17 +87,17 @@ namespace LauncherTwo
                 UpdateState = eUpdateState.Downloading;
                 UpdaterWindow.StatusLabel.Content = "Starting Download...";
 
-                if (File.Exists(SAVE_PATH))
-                    File.Delete(SAVE_PATH);
-                if (!Directory.Exists(TEMP_DIRECTORY))
-                    Directory.CreateDirectory(TEMP_DIRECTORY);
+                if (File.Exists(GetSavePath()))
+                    File.Delete(GetSavePath());
+                if (!Directory.Exists(GetTempDirectory()))
+                    Directory.CreateDirectory(GetTempDirectory());
 
                 Client = new WebClient();
                 Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
                 Client.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(DownloadCompletedCallback);
 
                 Uri uri = new Uri(DOWNLOAD_URL);
-                Client.DownloadFileAsync(uri, SAVE_PATH);
+                Client.DownloadFileAsync(uri, GetSavePath());
             }
             catch (Exception e)
             {
@@ -92,12 +109,12 @@ namespace LauncherTwo
         {
             try
             {
-                if (Directory.Exists(EXTRACT_DIRECTORY))
-                    Directory.Delete(EXTRACT_DIRECTORY, true);
+                if (Directory.Exists(GetExtractDirectory()))
+                    Directory.Delete(GetExtractDirectory(), true);
 
                 UpdateState = eUpdateState.Extracting;
                 UpdaterWindow.StatusLabel.Content = "Extracting...";
-                ZipFile.ExtractToDirectory(SAVE_PATH, EXTRACT_DIRECTORY);
+                ZipFile.ExtractToDirectory(GetSavePath(), GetExtractDirectory());
                 ReadyToInstall();
             }
             catch (Exception e)
@@ -129,18 +146,18 @@ namespace LauncherTwo
                     // Clean install location
                     Contents += "rmdir \"" + InstallLocation + "\" /s /q \n";
                     // Copy extracted files and overwrite existing launcher files.
-                    Contents += "xcopy \"" + EXTRACT_DIRECTORY.TrimEnd('\\') + "\" \"" + InstallLocation + "\" /v /f /e /s /r /h /y " + "\n";
+                    Contents += "xcopy \"" + GetExtractDirectory().TrimEnd('\\') + "\" \"" + InstallLocation + "\" /v /f /e /s /r /h /y " + "\n";
                     // Restart launcher
                     Contents += "start \"" + InstallLocation + "\" \"" + ExecutableName + "\" \n";
                     // Delete temp directory.
-                    Contents += "rmdir \"" + TEMP_DIRECTORY.TrimEnd('\\') + "\" /s /q \n";
+                    Contents += "rmdir \"" + GetTempDirectory().TrimEnd('\\') + "\" /s /q \n";
 
-                    File.WriteAllText(BAT_PATH, Contents);
+                    File.WriteAllText(GetBatPath(), Contents);
 
                     // Execute .bat file.
 
                     Process InstallProc = new Process();
-                    ProcessStartInfo startInfo = new ProcessStartInfo(BAT_PATH, "/B");
+                    ProcessStartInfo startInfo = new ProcessStartInfo(GetBatPath(), "/B");
                     startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     InstallProc.StartInfo = startInfo;
                     InstallProc.Start();

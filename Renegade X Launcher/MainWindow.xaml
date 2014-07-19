@@ -1115,20 +1115,20 @@
                                     <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                 </Border.BorderBrush>
                                 <ScrollViewer Template="{DynamicResource ScrollViewerControlRenX}">
-                                    <Grid Height="544" Width="300">
+                                    <Grid Height="300" Width="300">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="150*"/>
                                             <ColumnDefinition Width="150*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="9*"/>
-                                            <RowDefinition Height="25*"/>
-                                            <RowDefinition Height="25*"/>
-                                            <RowDefinition Height="25*"/>
-                                            <RowDefinition Height="25*"/>
-                                            <RowDefinition Height="25*"/>
-                                            <RowDefinition Height="28*"/>
-                                            <RowDefinition Height="382*"/>
+                                            <RowDefinition Height="9"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="28"/>
+                                            <RowDefinition Height="2"/>
                                         </Grid.RowDefinitions>
                                         <Label Content="Vehicle Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,71,0" Grid.Row="2"/>
                                         <Label Content="Game Length:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="1"/>
