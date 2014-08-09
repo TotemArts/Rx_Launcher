@@ -1,8 +1,8 @@
 Launcher fixes:
-- Patch update notification
-- Typing in search box lags
-- Tick boxes on server options are hard to see.
 - Highlighted servers text is unreadable when the window is not in focus
+X- Patch update notification
+X- Typing in search box lags
+X- Tick boxes on server options are hard to see.
 X- Filter bug (operates on previous value)
 X- Show password protected servers
 X- Join by IP
