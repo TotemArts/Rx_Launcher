@@ -1,5 +1,10 @@
 Launcher fixes:
+- F5 should trigger refresh
+- Enter and escape keys should work in popul dialogs windows
+- Enter should trigger server to filter in search box
 - Highlighted servers text is unreadable when the window is not in focus
+- Filter window should not overlap server browser when extended
+- 
 X- Patch update notification
 X- Typing in search box lags
 X- Tick boxes on server options are hard to see.
