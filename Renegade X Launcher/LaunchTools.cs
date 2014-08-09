@@ -36,12 +36,18 @@ namespace LauncherTwo
             return true;
         }
 
+        public static string GetArguments(string anIPAdress, string Username, string aPassword = "")
+        {
+            Arguments = anIPAdress;
+            if (aPassword != "")
+                Arguments += "?PASSWORD=" + aPassword;
+            Arguments += " " + INI_PATH + Username;
+            return Arguments;
+        }
+
         public static bool JoinServer(string anIPAdress, string Username, string aPassword = "")
         {
-            Arguments = anIPAdress + " ";
-            if (aPassword != "")
-                Arguments += "password=" + aPassword + " ";
-            Arguments += INI_PATH + Username;
+            Arguments = GetArguments(anIPAdress, Username, aPassword);
 
             Process UDKProcess = new Process();
             UDKProcess.StartInfo.FileName = GetPath();

@@ -367,7 +367,17 @@ namespace LauncherTwo
         {
             Uri uri = new Uri("http://www.renegade-x.com/launcher_data/launcher_ping.html", UriKind.Absolute);
             WebClient wc = new WebClient();
+            wc.OpenReadCompleted += new OpenReadCompletedEventHandler(OpenReadComplete);
             wc.OpenReadAsync(uri);
+        }
+
+        void OpenReadComplete(object o, OpenReadCompletedEventArgs args)
+        {
+            WebClient wc = o as WebClient;
+            if (wc != null)
+            {
+
+            }
         }
 
         void JoinServer(string IP, string Password = "")
@@ -375,7 +385,7 @@ namespace LauncherTwo
             if (LaunchTools.JoinServer(IP, Properties.Settings.Default.Username,Password))
                 {
                     if (SHOW_DEBUG)
-                        SetMessageboxText(IP);
+                        SetMessageboxText(LaunchTools.GetArguments(IP, Properties.Settings.Default.Username, Password));
                     else
                         SetMessageboxText(MESSAGE_JOINGAME);
                 }
