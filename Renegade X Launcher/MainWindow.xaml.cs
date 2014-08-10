@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Globalization;
 using System.Net;
 using System;
+using System.Windows.Threading;
 
 
 namespace LauncherTwo
@@ -50,6 +51,7 @@ namespace LauncherTwo
         Thread TickThread = null;
         bool FoundLatestGameVersion = false;
         bool FoundLatestLauncherVersion = false;
+        private DispatcherTimer refreshTimer;
 
         string messageText = "";
 
@@ -83,17 +85,14 @@ namespace LauncherTwo
             //The init step for the window.
             InitializeComponent();
 
-            //This will poll the json site for all active servers.
-            //AutoRefresh();
-
-            //This will update the servers pings every X seconds.
-            //AutoPingUpdate();
-
             SD_GameVersion.Text = VersionCheck.GetGameVersion();
             VersionCheck.StartFindLauncherVersion();
 
-            RefreshServers();
-            FilterServers();
+            refreshTimer = new DispatcherTimer();
+            refreshTimer.Interval = new TimeSpan(0, 0, SERVER_REFRESH_RATE);
+            refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
+            refreshTimer.Start();
+            StartRefreshingServers();
 
             //This attachs all the data we pulled from the Json link to our columns.
             BindDataColumns();
@@ -233,33 +232,6 @@ namespace LauncherTwo
             SetMessageboxText(MESSAGE_IDLE);
         }
 
-
-        private async void AutoPingUpdate()
-        {
-            while (true)
-            {
-                ServerInfo.PingActiveServers();
-                RefreshServers();
-                FilterServers();
-                await Task.Delay(SERVER_AUTO_PING_RATE);
-            }
-        }
-
-        private async void AutoRefresh()
-        {
-            while (true)
-            {
-                int select = ServerInfoGrid.SelectedIndex;
-                RefreshServers();
-                FilterServers();
-                ServerInfoGrid.SelectedIndex = select;
-
-                FocusManager.SetFocusedElement(ServerInfoGrid, null);
-
-                await Task.Delay(SERVER_REFRESH_RATE);
-            }
-        }
-
         private void BindDataColumns()
         {
             ServerInfoGrid.ItemsSource = OFilteredServerList;
@@ -299,8 +271,10 @@ namespace LauncherTwo
             }
         }
 
-        public void FilterServers()
+        public void RefilterServers()
         {
+            var previousSelectedServer = GetSelectedServer();
+
             //If we don't have an active server list we want to return
             if (ServerInfo.ActiveServers == null)
                 return;
@@ -344,11 +318,28 @@ namespace LauncherTwo
                     continue;
                 }   
             }
+
+            if (previousSelectedServer != null)
+            {
+                SetSelectedServer(previousSelectedServer.IPWithPort);
+            }
         }
 
         private ServerInfo GetSelectedServer()
         {
             return ServerInfoGrid.SelectedValue as ServerInfo;
+        }
+
+        private void SetSelectedServer(string ipWithPort)
+        {
+            foreach (ServerInfo item in ServerInfoGrid.Items)
+            {
+                if (item.IPWithPort == ipWithPort)
+                {
+                    ServerInfoGrid.SelectedItem = item;
+                    break;
+                }
+            }
         }
 
         private void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
@@ -398,19 +389,18 @@ namespace LauncherTwo
                 }
         }
 
-        private void RefreshServers(bool FilterResults = false)
+        private async Task RefreshServersAsync()
         {
-            //This requests all the servers from the RenX Json link.
-           // ServerInfo.ParseServers();
-            ServerInfo.ParseJsonServers();
+            await ServerInfo.ParseJsonServersAsync();
+            await ServerInfo.PingActiveServersAsync();
+            RefilterServers();
+        }
 
-            //Empty the list
-            OFilteredServerList.Clear();
-
-            //Reset the list
-            foreach (ServerInfo info in ServerInfo.ActiveServers)
-                OFilteredServerList.Add(info);
-
+        private void StartRefreshingServers()
+        {
+#pragma warning disable 4014
+            RefreshServersAsync();
+#pragma warning restore 4014
         }
 
         private void SD_MaxPlayerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -422,8 +412,8 @@ namespace LauncherTwo
             {
                 filter_MaxPlayers = (int)SD_MaxPlayerSlider.Value;
                 SD_MaxPlayerDile.Content = filter_MaxPlayers;
-                //FilterServers(); // Do filtering on button press now.
-            }            
+                RefilterServers();
+            }
         }
 
         private void SD_MinPlayerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -435,7 +425,7 @@ namespace LauncherTwo
             {
                 filter_MinPlayers = (int)SD_MinPlayerSlider.Value;
                 SD_MinPlayerDile.Content = filter_MinPlayers;
-                //FilterServers(); // Do filtering on button press now.
+                RefilterServers();
             }
 
         }
@@ -568,18 +558,22 @@ namespace LauncherTwo
 
         private void sd_Refresh_MouseDown(object sender, RoutedEventArgs e)
         {
-            RefreshServers();
-            FilterServers();
+            StartRefreshingServers();
         }
 
-        private void sd_SearchClick(object sender, RoutedEventArgs e)
+        private void sv_ServerSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            FilterServers();
+            RefilterServers();
         }
 
-        private void SD_ApplyFilters_Click(object sender, RoutedEventArgs e)
+        private void SD_Filter_SameVersionOnly_Checked(object sender, RoutedEventArgs e)
         {
-            FilterServers();
+            RefilterServers();
+        }
+
+        private void SD_Filter_SameVersionOnly_Unchecked(object sender, RoutedEventArgs e)
+        {
+            RefilterServers();
         }
     }
 }

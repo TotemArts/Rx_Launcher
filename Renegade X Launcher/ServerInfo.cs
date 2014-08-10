@@ -13,7 +13,6 @@ using System.Windows.Controls;
 using System.Net.NetworkInformation;
 using LauncherTwo;
 using System.Dynamic;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 
@@ -58,14 +57,12 @@ using System.Windows.Media.Imaging;
         /// This function will request all the server info on the RenXServers. This
         /// must be called to populate the server list. 
         /// </summary>
-        public async static void ParseJsonServers()
+        public static async Task ParseJsonServersAsync()
         {
-
-            //Empty the list of our active servesr
-            ActiveServers = new List<ServerInfo>();
+            var NewActiveServers = new List<ServerInfo>();
 
             //Grab the string from the RenX Website.
-            string jsonText = new WebClient().DownloadString(RenXWebLinks.RENX_ACTIVE_SERVER_JSON_URL);
+            string jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RENX_ACTIVE_SERVER_JSON_URL);
 
             //Turn it into a JSon object that we can parse.
             var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
@@ -114,14 +111,13 @@ using System.Windows.Media.Imaging;
 
                 NewServer.AutoBalance = Data.Variables["bAutoBalanceTeams"] ?? false;
 
-                NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false; 
+                NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
 
-                ActiveServers.Add(NewServer);
+                NewActiveServers.Add(NewServer);
             }
-            #endregion 
+            #endregion
 
-
-            PingActiveServers();
+            ActiveServers = NewActiveServers;
         }
 
         public static void ParseServers()
@@ -184,9 +180,6 @@ using System.Windows.Media.Imaging;
 
                 ActiveServers.Add(newServer);
             }
-
-            PingActiveServers();
-
         }
 
 
@@ -220,7 +213,7 @@ using System.Windows.Media.Imaging;
 
  
 
-        public async static void PingActiveServers()
+        public async static Task PingActiveServersAsync()
         {
             try
             {
@@ -239,10 +232,8 @@ using System.Windows.Media.Imaging;
                         if (pingTasks[i].Result != null)
                             ActiveServers[i].Ping = (int)pingTasks[i].Result.RoundtripTime;
                 }
-
-                MainWindow.Instance.FilterServers();
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Console.WriteLine("Failed to call servers");
             }
