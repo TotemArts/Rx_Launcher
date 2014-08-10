@@ -25,7 +25,7 @@ namespace LauncherTwo
         static string LatestGameVersion = "";
         static string LatestLauncherVersion = "";
         const string LauncherVersion = "0.27";
-        static string GameVersion = "";
+        static string GameVersion = null;
 
         public static float GetLatestGameVersionNumerical()
         {
@@ -43,7 +43,7 @@ namespace LauncherTwo
         
         public static string GetGameVersion()
         {
-            if (GameVersion == "")
+            if (GameVersion == null)
                 GameVersion = ReadGameVersion();
             return GameVersion;
         }
@@ -88,7 +88,6 @@ namespace LauncherTwo
                         VersionString = VersionString.Replace(VERSION_KEY, "");
                         VersionString = VersionString.Replace("=", "");
                         VersionString = VersionString.Replace("\"", "");
-                        GameVersion = VersionString;
                         return VersionString;
                     }
                 }
@@ -158,8 +157,7 @@ namespace LauncherTwo
 
         public static bool IsGameOutOfDate()
         {
-            if (GameVersion == "")
-                GameVersion = ReadGameVersion();
+            GetGameVersion(); // Ensure that GameVersion is set.
 
             float GameVerFloat;
             float LatestGameVerFloat;
