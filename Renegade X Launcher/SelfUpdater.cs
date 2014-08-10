@@ -24,8 +24,6 @@ namespace LauncherTwo
     public static class SelfUpdater
     {
         static eUpdateState UpdateState = eUpdateState.NotStarted;
-        static Thread UpdateThread;
-        static float statePercentComplete;
         static Views.UpdateDownloadWindow UpdaterWindow = null;
         static WebClient Client;
 
@@ -58,11 +56,6 @@ namespace LauncherTwo
         static eUpdateState GetUpdateState()
         {
             return UpdateState;
-        }
-
-        static float GetStatePercentComplete()
-        {
-            return statePercentComplete;
         }
 
         public static void CancelUpdate()

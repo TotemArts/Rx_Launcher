@@ -352,7 +352,7 @@ namespace SteamWebAPI
 
                 return avatar;
             }
-            catch ( Exception e )
+            catch ( Exception )
             {
                 return null;
             }
@@ -714,7 +714,7 @@ namespace SteamWebAPI
                 response.Close();
                 return src;
             }
-            catch ( WebException e )
+            catch ( WebException )
             {
                 return null;
             }
