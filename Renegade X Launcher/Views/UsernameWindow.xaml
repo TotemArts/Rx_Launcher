@@ -41,7 +41,15 @@
                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </TextBox.BorderBrush>
         </TextBox>
-        <Button x:Name="SubmitBtn" Content="Submit" HorizontalAlignment="Left" Margin="90,18,0,0" Grid.Row="3" VerticalAlignment="Top" Width="140" Background="#FF061923" Click="Button_Click">
+        <Button x:Name="SubmitBtn" Content="Submit" HorizontalAlignment="Right" Margin="0,15,80,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="SubmitButton_Click" IsDefault="True">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
+            </Button.Foreground>
+            <Button.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+            </Button.BorderBrush>
+        </Button>
+        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="80,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="CancelButton_Click" IsCancel="True">
             <Button.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Button.Foreground>

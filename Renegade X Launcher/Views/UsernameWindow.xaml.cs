@@ -28,7 +28,12 @@ namespace LauncherTwo.Views
          
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
             m_Username = SD_UsernameBox.Text;
             this.Close();

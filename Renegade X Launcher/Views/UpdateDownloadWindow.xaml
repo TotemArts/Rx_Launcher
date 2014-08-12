@@ -33,7 +33,7 @@
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Label.Foreground>
         </Label>
-        <Button x:Name="CloseBtn" Content="Close" HorizontalAlignment="Left" Margin="125,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="Close_Click">
+        <Button x:Name="CloseBtn" Content="Close" HorizontalAlignment="Left" Margin="125,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="Close_Click" IsCancel="True">
             <Button.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Button.Foreground>

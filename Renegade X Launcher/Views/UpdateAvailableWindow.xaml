@@ -38,7 +38,7 @@
             </Label.Foreground>
         </Label>
         <Button x:Name="SubmitBtn" Content="Download
-" HorizontalAlignment="Right" Margin="0,15,80,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="SubmitButton_Click" Grid.Column="1">
+" HorizontalAlignment="Right" Margin="0,15,80,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="SubmitButton_Click" Grid.Column="1" IsDefault="True">
             <Button.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Button.Foreground>
@@ -46,7 +46,7 @@
                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </Button.BorderBrush>
         </Button>
-        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="80,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="CancelButton_Click" Grid.ColumnSpan="2">
+        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="80,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="CancelButton_Click" Grid.ColumnSpan="2" IsCancel="True">
             <Button.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Button.Foreground>
