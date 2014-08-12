@@ -568,11 +568,13 @@ namespace LauncherTwo
 
         private void SD_Filter_SameVersionOnly_Checked(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialized) return;
             RefilterServers();
         }
 
         private void SD_Filter_SameVersionOnly_Unchecked(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialized) return;
             RefilterServers();
         }
     }
