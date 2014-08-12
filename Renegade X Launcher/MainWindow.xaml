@@ -1,7 +1,7 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Height="735" Width="945" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" WindowStyle="None" MouseDown="Window_MouseDown">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" WindowStyle="None" MouseDown="Window_MouseDown" d:DesignWidth="1284" d:DesignHeight="844" SnapsToDevicePixels="True" UseLayoutRounding="True">
 
 
 
@@ -421,7 +421,7 @@
                                                 <RowDefinition Height="*"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <DataGridColumnHeadersPresenter Grid.Row="0" Grid.Column="1" x:Name="PART_ColumnHeadersPresenter" Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.Column}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" Margin="0,0,5,0" Style="{DynamicResource DataGridColumnHeadersRebX}"/>
+                                            <DataGridColumnHeadersPresenter Grid.Row="0" Grid.Column="1" x:Name="PART_ColumnHeadersPresenter" Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.Column}, Converter={x:Static DataGrid.HeadersVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" Style="{DynamicResource DataGridColumnHeadersRebX}"/>
                                             <ScrollContentPresenter Grid.Row="1" Grid.Column="1" x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}"/>
                                             <ScrollBar Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" x:Name="PART_VerticalScrollBar" Maximum="{TemplateBinding ScrollableHeight}" Orientation="Vertical" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}" Style="{DynamicResource RenXScrollVert}"/>
                                             <Grid Grid.Column="1" Grid.Row="2">
@@ -788,52 +788,13 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridColumnHeadersPresenter}">
                         <Grid>
-                            <DataGridColumnHeader x:Name="PART_FillerColumnHeader" IsHitTestVisible="False" Template="{DynamicResource DataGridColumnHeaderControlRenx}"/>
+                            <DataGridColumnHeader x:Name="PART_FillerColumnHeader" IsHitTestVisible="False"/>
                             <ItemsPresenter/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        <ControlTemplate x:Key="DataGridColumnHeaderControlRenx" TargetType="{x:Type DataGridColumnHeader}">
-            <Grid>
-                <!-- <Themes:DataGridHeaderBorder BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" IsClickable="{TemplateBinding CanUserSort}" IsPressed="{TemplateBinding IsPressed}" IsHovered="{TemplateBinding IsMouseOver}" Padding="{TemplateBinding Padding}" SortDirection="{TemplateBinding SortDirection}" SeparatorBrush="{TemplateBinding SeparatorBrush}" SeparatorVisibility="{TemplateBinding SeparatorVisibility}"> -->
-                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                <!--= </Themes:DataGridHeaderBorder> -->
-                <Thumb x:Name="PART_LeftHeaderGripper" HorizontalAlignment="Left">
-                    <Thumb.Style>
-                        <Style TargetType="{x:Type Thumb}">
-                            <Setter Property="Width" Value="8"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Cursor" Value="SizeWE"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type Thumb}">
-                                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Thumb.Style>
-                </Thumb>
-                <Thumb x:Name="PART_RightHeaderGripper" HorizontalAlignment="Right">
-                    <Thumb.Style>
-                        <Style TargetType="{x:Type Thumb}">
-                            <Setter Property="Width" Value="8"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Cursor" Value="SizeWE"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type Thumb}">
-                                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Thumb.Style>
-                </Thumb>
-            </Grid>
-        </ControlTemplate>
         <ControlTemplate x:Key="WindowTemplateKey" TargetType="{x:Type Window}">
             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
                 <Grid>
@@ -1052,7 +1013,7 @@
             <Button Grid.Column="2" x:Name="MinBtn" Content="_" Width="18" Height="18" Foreground="White" Background="#FF061923" BorderBrush="#FF838C91" FontFamily="Arial" FontSize="10" Click="MinBtn_Click"/>
             <Button Grid.Column="3" x:Name="XBtn" Content="X" Width="48" Height="18" Foreground="White" Background="#FF061923" BorderBrush="#FF838C91" FontFamily="Arial" FontSize="10" Click="XBtn_Click"/>
         </Grid>
-        <Border Grid.Row="1" x:Name="WindowInnerBorder" Margin="6,6,6,6" BorderBrush="#FFF7FCFF" BorderThickness="1">
+        <Border Grid.Row="1" x:Name="WindowInnerBorder" Margin="6" BorderBrush="#FFF7FCFF" BorderThickness="1">
             <Border.Background>
                 <ImageBrush ImageSource="pack://siteoforigin:,,,/Resources/rx_Background.png"/>
             </Border.Background>
@@ -1069,31 +1030,32 @@
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Margin="6,6,6,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
+                    <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
                         <Button.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Button.Foreground>
                     </Button>
-                    <Label Grid.Column="1" Margin="6,6,6,6" x:Name="SD_Username" HorizontalAlignment="Left" Height="30" Content="Player Name" FontFamily="Arial" FontSize="18" Background="{x:Null}">
+                    <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" HorizontalAlignment="Left" Height="30" Content="Player Name" FontFamily="Arial" FontSize="18" Background="{x:Null}">
                         <Label.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Label.Foreground>
                     </Label>
-                    <Image Grid.Column="2" Margin="6,6,6,6" Height="42" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
-                    <Button Grid.Column="3" Margin="6,6,6,6" x:Name="SD_LaunchGameBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click">
+                    <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
+                    <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click">
                         <Button.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Button.Foreground>
                     </Button>
-                    <Button Grid.Column="4" Margin="6,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click">
+                    <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click">
                         <Button.Foreground>
                             <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                         </Button.Foreground>
                     </Button>
                 </Grid>
-                <Grid Grid.Row="1" x:Name="ContentSplit">
+                <Grid Grid.Row="1" x:Name="ContentSplit" Margin="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid x:Name="ServerContentSplit">
@@ -1101,20 +1063,22 @@
                             <RowDefinition Height="0" MaxHeight="0"/>
                             <!-- A nasty hack because an expander in the first grid row does not seem to resize properly. -->
                             <RowDefinition Height="auto"/>
+                            <RowDefinition Height="4"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="4"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-                        <Border Grid.Row="1" x:Name="FilterControlsBorder" Margin="6" Background="#B2010304" BorderThickness="1">
+                        <Border Grid.Row="1" x:Name="FilterControlsBorder" Background="#B2010304" BorderThickness="1">
                             <Border.BorderBrush>
                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                             </Border.BorderBrush>
                             <Grid>
                                 <Expander Header="Filter" x:Name="FilterControls" Foreground="White" VerticalAlignment="Top" Margin="6">
-                                    <Border BorderThickness="2" Margin="0,10,0,0">
+                                    <Border BorderThickness="0,1,0,0" Margin="-7,9,-7,-7">
                                         <Border.BorderBrush>
                                             <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                         </Border.BorderBrush>
-                                        <Grid Margin="12,6">
+                                        <Grid Margin="6">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="auto"/>
                                                 <ColumnDefinition Width="auto"/>
@@ -1160,20 +1124,20 @@
                                 </Grid>
                             </Grid>
                         </Border>
-                        <Border Grid.Row="2" x:Name="Servers_Border" Margin="6" Background="#B2010304" BorderThickness="1">
+                        <Border Grid.Row="3" x:Name="Servers_Border" Background="#B2010304" BorderThickness="1">
                             <Border.BorderBrush>
                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                             </Border.BorderBrush>
-                            <DataGrid x:Name="ServerInfoGrid" AlternationCount="1" FontFamily="Arial" GridLinesVisibility="None" SelectionMode="Single" MinRowHeight="20" SelectionChanged="ServerInfoGrid_SelectionChanged" Foreground="White" AutoGenerateColumns="False" CanUserResizeRows="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}">
+                            <DataGrid x:Name="ServerInfoGrid" AlternationCount="1" FontFamily="Arial" GridLinesVisibility="None" MinRowHeight="20" SelectionChanged="ServerInfoGrid_SelectionChanged" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single">
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" IsReadOnly="True">
+                                    <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" IsReadOnly="True" CanUserResize="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Image Source="{Binding LockImage}" Width="10" Height="10" Margin="0"/>
+                                                <Image Source="{Binding LockImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn x:Name="ServerNameColumn" ClipboardContentBinding="{x:Null}" Header="Server Name" IsReadOnly="True" Width="310" FontFamily="Arial" Foreground="White" />
+                                    <DataGridTextColumn x:Name="ServerNameColumn" ClipboardContentBinding="{x:Null}" Header="Server Name" IsReadOnly="True" Width="*" FontFamily="Arial" Foreground="White" />
                                     <DataGridTextColumn x:Name="MapNameColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Map" IsReadOnly="True" Width="100" FontFamily="Arial" Foreground="#FF98ABAE"/>
                                     <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Players" FontFamily="Arial" IsReadOnly="True" Width="68" Foreground="#FF98ABAE"/>
                                     <DataGridTextColumn x:Name="PingColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Ping" IsReadOnly="True" Width="48" FontFamily="Arial" Foreground="#FF88A4A8" SortMemberPath=""/>
@@ -1183,128 +1147,147 @@
                                 </DataGrid.BindingGroup>
                             </DataGrid>
                         </Border>
-                        <Border Grid.Row="3" x:Name="MessageBox_Border" BorderThickness="1" Margin="6">
+                        <Border Grid.Row="5" x:Name="MessageBox_Border" BorderThickness="1">
                             <Border.BorderBrush>
                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                             </Border.BorderBrush>
                             <TextBlock x:Name="MessageBoxText" TextWrapping="Wrap" Text="TextBlock" Margin="6" Foreground="#FF939393"/>
                         </Border>
                     </Grid>
-                    <Grid x:Name="ServerInfo_Split" Margin="5,0,0,0" Grid.Column="1">
+                    <Grid x:Name="ServerInfo_Split" Grid.Column="2" Width="324">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="292*"/>
-                            <RowDefinition Height="327*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="4"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <Grid x:Name="Server_Info_Top_Frame" Margin="0,0,0,2">
-                            <Grid.Background>
+                        <Border BorderThickness="1" VerticalAlignment="Top">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                            </Border.BorderBrush>
+                            <Border.Background>
                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Background_Color}"/>
-                            </Grid.Background>
-                            <TextBlock TextWrapping="Wrap" Text="Server Name:" Foreground="White" FontFamily="Arial" FontWeight="Bold" Margin="5,194,236,93"/>
-                            <TextBlock TextWrapping="Wrap" Text="IP:" Margin="5,210,298,70" Foreground="#FFFFF8F8" FontFamily="Arial" FontWeight="Bold"/>
-                            <Border x:Name="Map_Preview_Frame" BorderThickness="1" Margin="4,58,4,0" Height="133" VerticalAlignment="Top">
-                                <Border.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                </Border.BorderBrush>
-                                <Image x:Name="sv_MapPreview" Margin="1" Source="pack://siteoforigin:,,,/Resources/___map-pic-cnc-goldrush.png" Stretch="Fill"/>
-                            </Border>
-                            <Border x:Name="Clan_Header_Frame" BorderThickness="1" Margin="4" Height="48" VerticalAlignment="Top">
-                                <Border.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                </Border.BorderBrush>
-                                <Image x:Name="SD_ClanHeader" Margin="1" Stretch="Fill" Source="pack://siteoforigin:,,,/Resources/defaultBanner.png" MouseDown="SD_ClanHeader_MouseDown"/>
-                            </Border>
-                            <Border x:Name="Server_Info_Top_Border" BorderThickness="1" Margin="0">
-                                <Border.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                </Border.BorderBrush>
-                            </Border>
-                            <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="4,0,4,5" Height="48" VerticalAlignment="Bottom" Background="#FF061923" FontSize="24" Foreground="White" Click="Join_Server_Btn_Click" FontFamily="Arial" Focusable="False">
-                                <Button.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                </Button.BorderBrush>
-                            </Button>
-                            <TextBlock x:Name="SD_Name" TextWrapping="Wrap" Foreground="White" FontFamily="Arial" Margin="90,194,10,93"/>
-                            <TextBlock x:Name="SD_IP" TextWrapping="Wrap" Foreground="White" FontFamily="Arial" Margin="28,210,72,77"/>
-                            <TextBlock TextWrapping="Wrap" Text="Server Version:" Margin="5,237,248,55" Foreground="#FF7E7E7E" FontFamily="Arial" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock x:Name="SD_ServerVersion" TextWrapping="Wrap" Foreground="#FF6C6C6C" FontFamily="Arial" Margin="73,237,53,52" FontSize="9"/>
-                            <TextBlock TextWrapping="Wrap" Text="Game Version:" Margin="5,227,248,65" Foreground="#FF7E7E7E" FontFamily="Arial" FontWeight="Bold" FontSize="9"/>
-                            <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Foreground="#FF6C6C6C" FontFamily="Arial" Margin="73,227,53,62" FontSize="9"/>
-                        </Grid>
-                        <Grid x:Name="Server_Info_Bot_Frame" Margin="0,2,0,0" Grid.Row="1">
-                            <Grid.Background>
+                            </Border.Background>
+                            <StackPanel x:Name="Server_Info_Top_Frame">
+                                <Border BorderThickness="1" Margin="3">
+                                    <Border.BorderBrush>
+                                        <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                    </Border.BorderBrush>
+                                    <Image x:Name="SD_ClanHeader" Width="314" Height="44" Stretch="Fill" Source="pack://siteoforigin:,,,/Resources/defaultBanner.png" MouseDown="SD_ClanHeader_MouseDown"/>
+                                </Border>
+                                <Border BorderThickness="1" Margin="3">
+                                    <Border.BorderBrush>
+                                        <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                    </Border.BorderBrush>
+                                    <Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="pack://siteoforigin:,,,/Resources/___map-pic-cnc-goldrush.png"/>
+                                </Border>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock TextWrapping="Wrap" Margin="3" Text="Server Name:" Foreground="#FFFFF8F8" FontFamily="Arial" FontWeight="Bold"/>
+                                    <TextBlock x:Name="SD_Name" TextWrapping="Wrap" Margin="3" Foreground="White" FontFamily="Arial"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock TextWrapping="Wrap" Margin="3" Text="IP:" Foreground="#FFFFF8F8" FontFamily="Arial" FontWeight="Bold"/>
+                                    <TextBlock x:Name="SD_IP" TextWrapping="Wrap" Margin="3" Foreground="White" FontFamily="Arial"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock TextWrapping="Wrap" Margin="3" Text="Server Version:" Foreground="#FF7E7E7E" FontFamily="Arial" FontWeight="Bold" FontSize="9"/>
+                                    <TextBlock x:Name="SD_ServerVersion" TextWrapping="Wrap" Margin="3" Foreground="#FF6C6C6C" FontFamily="Arial" FontSize="9"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock TextWrapping="Wrap" Margin="3" Text="Game Version:" Foreground="#FF7E7E7E" FontFamily="Arial" FontWeight="Bold" FontSize="9"/>
+                                    <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Margin="3" Foreground="#FF6C6C6C" FontFamily="Arial" FontSize="9"/>
+                                </StackPanel>
+                                <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" VerticalAlignment="Bottom" Background="#FF061923" FontSize="24" Foreground="White" Click="Join_Server_Btn_Click" FontFamily="Arial" Focusable="False">
+                                    <Button.BorderBrush>
+                                        <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                    </Button.BorderBrush>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Info_Bot_Border" BorderThickness="1" Grid.Row="2">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                            </Border.BorderBrush>
+                            <Border.Background>
                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Background_Color}"/>
-                            </Grid.Background>
-                            <Border x:Name="Info_Bot_Border" BorderThickness="1" Margin="0,0,0,3" Padding="1,1,2,1">
-                                <Border.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                </Border.BorderBrush>
-                                <ScrollViewer Template="{DynamicResource ScrollViewerControlRenX}">
-                                    <Grid Height="300" Width="300">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150*"/>
-                                            <ColumnDefinition Width="150*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="9"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="25"/>
-                                            <RowDefinition Height="28"/>
-                                            <RowDefinition Height="2"/>
-                                        </Grid.RowDefinitions>
-                                        <Label Content="Vehicle Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,71,0" Grid.Row="2"/>
-                                        <Label Content="Game Length:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="1"/>
-                                        <Label Content="Mine Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,61,0" Grid.Row="2" Grid.Column="1"/>
-                                        <Label Content="Player Limit:" Foreground="White" FontFamily="Arial" Margin="0,0,51,0" Grid.Row="1" Grid.Column="1"/>
-                                        <Label Content="Crates" Foreground="White" FontFamily="Arial" Margin="17,0,79,0" Grid.Row="3"/>
-                                        <Label Content="Steam Required" Foreground="White" FontFamily="Arial" Margin="19,0,22,0" Grid.Row="4"/>
-                                        <Label Content="Auto Balance" Foreground="White" FontFamily="Arial" Margin="15,0,46,0" Grid.Row="3" Grid.Column="1"/>
-                                        <Label Content="Infantry Only" Foreground="White" FontFamily="Arial" Margin="15,0,46,0" Grid.Row="4" Grid.Column="1"/>
-                                        <Label x:Name="SD_VehicleLimit" Content="" Foreground="White" FontFamily="Arial" Margin="86,0,0,0" Grid.Row="2"/>
-                                        <Label x:Name="SD_PlayerLimit" Content="" Foreground="White" FontFamily="Arial" Margin="74,0,0,0" Grid.Row="1" Grid.Column="1"/>
-                                        <Label x:Name="SD_GameLength" Content="" Foreground="White" FontFamily="Arial" Margin="84,0,0,0" Grid.Row="1"/>
-                                        <Label x:Name="SD_MineLimit" Content="" Foreground="White" FontFamily="Arial" Margin="64,0,0,0" Grid.Row="2" Grid.Column="1"/>
-                                        <Image x:Name="Crates_Checkbx" HorizontalAlignment="Left" Height="12" Margin="6,6,0,0" Grid.Row="3" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png"/>
-                                        <Image x:Name="Steam_Checkbx" HorizontalAlignment="Left" Height="12" Margin="6,5,0,0" Grid.Row="4" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png" RenderTransformOrigin="0.438,0.333"/>
-                                        <Image x:Name="Autobalance_Checkbx" HorizontalAlignment="Left" Height="12" Margin="4,6,0,0" Grid.Row="3" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png" Grid.Column="1"/>
-                                        <Image x:Name="InfantryOnly_Checkbx" HorizontalAlignment="Left" Height="12" Margin="4,5,0,0" Grid.Row="4" VerticalAlignment="Top" Width="12" Source="Resources/Checkbox_OFF.png" RenderTransformOrigin="0.438,0.333" Grid.Column="1"/>
-                                        <!-- <Border BorderThickness="1" Margin="2" Grid.Row="7" d:IsHidden="True">
-                                            <Border.BorderBrush>
-                                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                            </Border.BorderBrush>
-                                        </Border>
-                                        <Border BorderThickness="1" Margin="2" Grid.Row="7" Grid.Column="1" d:IsHidden="True">
-                                            <Border.BorderBrush>
-                                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                            </Border.BorderBrush>
-                                        </Border>
+                            </Border.Background>
+                            <ScrollViewer Template="{DynamicResource ScrollViewerControlRenX}">
+                                <Grid Margin="6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                                        <Label Content="Game Length:" Foreground="White" FontFamily="Arial"/>
+                                        <Label x:Name="SD_GameLength" Content="" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                        <Label Content="Player Limit:" Foreground="White" FontFamily="Arial"/>
+                                        <Label x:Name="SD_PlayerLimit" Content="" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                                        <Label Content="Vehicle Limit:" Foreground="White" FontFamily="Arial"/>
+                                        <Label x:Name="SD_VehicleLimit" Content="" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                        <Label Content="Mine Limit:" Foreground="White" FontFamily="Arial"/>
+                                        <Label x:Name="SD_MineLimit" Content="" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                                        <Image x:Name="Crates_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                                        <Label Content="Crates" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                        <Image x:Name="Autobalance_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                                        <Label Content="Auto Balance" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
+                                        <Image x:Name="Steam_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                                        <Label Content="Steam Required" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                        <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                                        <Label Content="Infantry Only" Foreground="White" FontFamily="Arial"/>
+                                    </StackPanel>
+                                    <!-- <Border BorderThickness="1" Margin="2" Grid.Row="7" d:IsHidden="True">
+                                        <Border.BorderBrush>
+                                            <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                        </Border.BorderBrush>
+                                    </Border>
+                                    <Border BorderThickness="1" Margin="2" Grid.Row="7" Grid.Column="1" d:IsHidden="True">
+                                        <Border.BorderBrush>
+                                            <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                        </Border.BorderBrush>
+                                    </Border>
                                         
-                                        <Grid Margin="2" Grid.Row="6">
-                                            <Label Content="GDI" Foreground="White" FontFamily="Arial" Margin="0,1,114,1" Height="22"/>
-                                            <Label x:Name="SD_GDIScore" Content="{}{Bind}" Foreground="White" FontFamily="Arial" Margin="68,1,0,1" Height="22"/>
-                                            <Border BorderThickness="1" Margin="0" Height="24">
-                                                <Border.BorderBrush>
-                                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                                </Border.BorderBrush>
-                                            </Border>
-                                        </Grid>
-                                        <Grid Margin="2" Grid.Row="6" Grid.Column="1">
-                                            <Label Content="Nod" Foreground="White" FontFamily="Arial" Margin="0,1,114,1" Height="22"/>
-                                            <Label x:Name="SD_NodScore" Content="{}{Bind}" Foreground="White" FontFamily="Arial" Margin="68,1,0,1" Height="22"/>
-                                            <Border BorderThickness="1" Margin="0" Height="24">
-                                                <Border.BorderBrush>
-                                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                                </Border.BorderBrush>
-                                            </Border>
-                                      
-                                        </Grid>
-                                          -->
+                                    <Grid Margin="2" Grid.Row="6">
+                                        <Label Content="GDI" Foreground="White" FontFamily="Arial" Margin="0,1,114,1" Height="22"/>
+                                        <Label x:Name="SD_GDIScore" Content="{}{Bind}" Foreground="White" FontFamily="Arial" Margin="68,1,0,1" Height="22"/>
+                                        <Border BorderThickness="1" Margin="0" Height="24">
+                                            <Border.BorderBrush>
+                                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                            </Border.BorderBrush>
+                                        </Border>
                                     </Grid>
-                                </ScrollViewer>
-                            </Border>
-                        </Grid>
+                                    <Grid Margin="2" Grid.Row="6" Grid.Column="1">
+                                        <Label Content="Nod" Foreground="White" FontFamily="Arial" Margin="0,1,114,1" Height="22"/>
+                                        <Label x:Name="SD_NodScore" Content="{}{Bind}" Foreground="White" FontFamily="Arial" Margin="68,1,0,1" Height="22"/>
+                                        <Border BorderThickness="1" Margin="0" Height="24">
+                                            <Border.BorderBrush>
+                                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                            </Border.BorderBrush>
+                                        </Border>
+                                      
+                                    </Grid>
+                                        -->
+                                </Grid>
+                            </ScrollViewer>
+                        </Border>
                     </Grid>
                 </Grid>
             </Grid>

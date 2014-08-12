@@ -1,11 +1,11 @@
 Launcher fixes:
 - F5 should trigger refresh
-- Enter and escape keys should work in popul dialogs windows
 - Highlighted servers text is unreadable when the window is not in focus
-- Filter window should not overlap server browser when extended
 - Make pings update asynchronously. (i.e. show server list before pings are determined.)
 - Fix focus after (automatic and manual) server list refresh. (Why is focus lost?)
 
+X- Filter window should not overlap server browser when extended
+X- Enter and escape keys should work in popup dialogs windows
 X- Enter should trigger server to filter in search box
 X- Patch update notification
 X- Typing in search box lags
