@@ -451,9 +451,45 @@ namespace LauncherTwo
             return messageText;
         }
 
-        private void XBtn_Click(object sender, RoutedEventArgs e)
+        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            this.Close();
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                if (e.ClickCount == 2)
+                {
+                    ToggleMaximization();
+                }
+                else
+                {
+                    DragMove();
+                }
+            }
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleMaximization();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+        private void ToggleMaximization()
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                WindowState = WindowState.Normal;
+            }
+            else
+            {
+                WindowState = WindowState.Maximized;
+            }
         }
 
         protected override void OnClosed(System.EventArgs e)
@@ -462,16 +498,6 @@ namespace LauncherTwo
             TickThread.Abort();
 
             Application.Current.Shutdown();
-        }
-
-
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if( e.GetPosition(this).Y < 35 )
-                this.DragMove();
-            }
         }
 
         private void SD_ClanHeader_MouseDown(object sender, MouseButtonEventArgs e)
@@ -500,11 +526,6 @@ namespace LauncherTwo
             Properties.Settings.Default.Username = login.m_Username;
             Properties.Settings.Default.Save();
             SD_Username.Content = login.m_Username;
-        }
-
-        private void MinBtn_Click(object sender, RoutedEventArgs e)
-        {
-            this.WindowState = System.Windows.WindowState.Minimized;
         }
 
         
