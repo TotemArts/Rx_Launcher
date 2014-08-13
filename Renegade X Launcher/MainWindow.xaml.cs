@@ -579,5 +579,13 @@ namespace LauncherTwo
             if (!IsInitialized) return;
             RefilterServers();
         }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F5)
+            {
+                StartRefreshingServers();
+            }
+        }
     }
 }
