@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 
 
 
-    public class ServerInfo
+    public class ServerInfo : INotifyPropertyChanged
     {
         public enum SERVER_INFO_POSITIONS
         {
@@ -29,7 +29,6 @@ using System.Windows.Media.Imaging;
             Server_Settings = 5,
             Player_Count = 6,
             Player_Limit = 7,
-
         }
 
 
@@ -215,40 +214,29 @@ using System.Windows.Media.Imaging;
 
         public async static Task PingActiveServersAsync()
         {
-            try
+            List<Task> pingTasks = new List<Task>();
+            foreach (ServerInfo serverInfo in ActiveServers)
             {
-
-                List<Task<PingReply>> pingTasks = new List<Task<PingReply>>();
-                foreach (ServerInfo address in ActiveServers)
-                {
-                    pingTasks.Add(PingAsync(address.IPAddress));
-                }
-
-                await Task.WhenAll(pingTasks.ToArray());
-
-                for (int i = 0; i < ActiveServers.Count; i++)
-                {
-                    if (pingTasks[i] != null)
-                        if (pingTasks[i].Result != null)
-                            ActiveServers[i].Ping = (int)pingTasks[i].Result.RoundtripTime;
-                }
+                pingTasks.Add(PingAsync(serverInfo));
             }
-            catch(Exception)
-            {
-                Console.WriteLine("Failed to call servers");
-            }
+            await Task.WhenAll(pingTasks.ToArray());
         }
 
-        static Task<PingReply> PingAsync(string address)
+        static async Task PingAsync(ServerInfo serverInfo)
         {
-            var tcs = new TaskCompletionSource<PingReply>();
-            Ping ping = new Ping();
-            ping.PingCompleted += (obj, sender) =>
+            try
             {
-                tcs.SetResult(sender.Reply);
-            };
-            ping.SendAsync(address, new object());
-            return tcs.Task;
+                PingReply reply = await new Ping().SendPingAsync(serverInfo.IPAddress);
+                serverInfo.Ping = (int)reply.RoundtripTime;
+                if (serverInfo.PropertyChanged != null)
+                {
+                    serverInfo.PropertyChanged(serverInfo, new PropertyChangedEventArgs("Ping"));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to ping server: " + e.ToString());
+            }
         }
 
         // FRONT PAGE INFO
@@ -356,5 +344,6 @@ using System.Windows.Media.Imaging;
 
         }
 
- }
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
         

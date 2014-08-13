@@ -47,7 +47,7 @@ namespace LauncherTwo
         private bool isOpen = false;
         public static readonly int MAX_PLAYER_COUNT = 64;
         public static MainWindow Instance { get; private set; }
-        public ObservableCollection<ServerInfo> OFilteredServerList = new ObservableCollection<ServerInfo>();
+        public TrulyObservableCollection<ServerInfo> OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
         Thread TickThread = null;
         bool FoundLatestGameVersion = false;
         bool FoundLatestLauncherVersion = false;
@@ -392,8 +392,8 @@ namespace LauncherTwo
         private async Task RefreshServersAsync()
         {
             await ServerInfo.ParseJsonServersAsync();
-            await ServerInfo.PingActiveServersAsync();
             RefilterServers();
+            await ServerInfo.PingActiveServersAsync();
         }
 
         private void StartRefreshingServers()
@@ -444,7 +444,7 @@ namespace LauncherTwo
             SD_Name.Text = selected.ServerName;
             SD_IP.Text = selected.IPWithPort;
             SD_GameLength.Content = selected.TimeLimit.ToString();
-            SD_MineLimit.Content = selected.MineLimit.ToString();            
+            SD_MineLimit.Content = selected.MineLimit.ToString();
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
             SD_ServerVersion.Text = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;

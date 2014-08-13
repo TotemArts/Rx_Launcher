@@ -124,6 +124,7 @@
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
+    <Compile Include="TrulyObservableCollection.cs" />
     <Compile Include="URI.cs" />
     <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\JoinIPWindow.xaml.cs">
