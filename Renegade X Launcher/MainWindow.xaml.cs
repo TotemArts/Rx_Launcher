@@ -98,6 +98,7 @@ namespace LauncherTwo
             BindDataColumns();
 
             BannerTools.Setup();
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
             if (Properties.Settings.Default.Username == "")
                 ShowUsernameBox();
@@ -423,6 +424,7 @@ namespace LauncherTwo
             sv_MapPreview.Source = MapPreviewSettings.GetMapImage(selected.MapName);
 
             SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
 
             SD_Name.Text = selected.ServerName;
             SD_IP.Text = selected.IPWithPort;
@@ -502,12 +504,8 @@ namespace LauncherTwo
 
         private void SD_ClanHeader_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (ServerInfoGrid.SelectedIndex >= OFilteredServerList.Count || ServerInfoGrid.SelectedIndex <= -1)
-               return;
-
             ServerInfo selected = GetSelectedServer();
-
-            BannerTools.LaunchBannerLink(selected.IPAddress);
+            BannerTools.LaunchBannerLink(selected != null ? selected.IPAddress : null);
         }
 
         private void SD_EditUsernameBtn_Click(object sender, RoutedEventArgs e)

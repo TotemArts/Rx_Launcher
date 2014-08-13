@@ -53,16 +53,23 @@ namespace LauncherTwo
             }
         }
 
-        public static void LaunchBannerLink(string IPAddress )
+        public static void LaunchBannerLink(string IPAddress)
         {
-            if (Banners.ContainsKey(IPAddress))
+            System.Diagnostics.Process.Start(GetBannerLink(IPAddress));
+        }
+
+        public static string GetBannerLink(string IPAddress)
+        {
+            string Link;
+            if (IPAddress != null && Banners.ContainsKey(IPAddress))
             {
-                System.Diagnostics.Process.Start( Banners[IPAddress].m_WebsiteLink );
+                Link = Banners[IPAddress].m_WebsiteLink;
             }
             else
             {
-                System.Diagnostics.Process.Start(Banners["Default"].m_WebsiteLink);
+                Link = Banners["Default"].m_WebsiteLink;
             }
+            return Link;
         }
 
         public static void Setup()
