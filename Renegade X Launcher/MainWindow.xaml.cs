@@ -254,20 +254,6 @@ namespace LauncherTwo
             ServerInfoGrid.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (isOpen)
-            {
-                ServerContentSplit.RowDefinitions[0].Height = new GridLength(40);
-                isOpen = false;
-            }
-            else
-            {
-                ServerContentSplit.RowDefinitions[0].Height = new GridLength(200);
-                isOpen = true;
-            }
-        }
-
         public void RefilterServers()
         {
             var previousSelectedServer = GetSelectedServer();

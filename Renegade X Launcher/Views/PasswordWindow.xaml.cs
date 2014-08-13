@@ -26,12 +26,6 @@ namespace LauncherTwo.Views
         {
             InitializeComponent();
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-         
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
