@@ -242,16 +242,13 @@ namespace LauncherTwo
             ServerNameColumn.Binding = new Binding("ServerName");
             MapNameColumn.Binding  = new Binding("MapName");
             PlayerCountColumn.Binding = new Binding("PlayerCountString");
-            PlayerCountColumn.SortMemberPath = "PlayerCount";
+            PlayerCountColumn.SortMemberPath = "PlayerCountSort";
             //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Ascending;
             PingColumn.Binding = new Binding("PingString");
             //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Descending;
             PingColumn.SortMemberPath = "PingSort";
 
-            ServerInfoGrid.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription(PlayerCountColumn.SortMemberPath,System.ComponentModel.ListSortDirection.Descending));
-
-            //Reset our grid length
-            ServerContentSplit.RowDefinitions[0].Height = new GridLength(40);
+            ServerInfoGrid.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription(PlayerCountColumn.SortMemberPath,System.ComponentModel.ListSortDirection.Ascending));
 
             //Since we don't use the scroll bars we will hide them
             ServerInfoGrid.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;

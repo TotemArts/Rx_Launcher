@@ -267,6 +267,8 @@ using System.Windows.Media.Imaging;
         }
         // Raw player count
         public int PlayerCount { get; set; }
+        // Inverted player count for sorting purposes
+        public int PlayerCountSort { get { return -PlayerCount; } }
         // Nice player count string, for display
         public string PlayerCountString
         {
