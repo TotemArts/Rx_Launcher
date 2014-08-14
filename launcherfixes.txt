@@ -1,7 +1,7 @@
 Launcher fixes:
-- Highlighted servers text is unreadable when the window is not in focus
 - Fix focus after (automatic and manual) server list refresh. (Why is focus lost?)
 
+X- Highlighted servers text is unreadable when the window is not in focus
 X- F5 should trigger refresh
 X- Make pings update asynchronously. (i.e. show server list before pings are determined.)
 X- Filter window should not overlap server browser when extended
