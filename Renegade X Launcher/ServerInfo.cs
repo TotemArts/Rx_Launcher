@@ -15,8 +15,8 @@ using LauncherTwo;
 using System.Dynamic;
 using System.Windows.Media.Imaging;
 
-
-
+namespace LauncherTwo
+{
     public class ServerInfo : INotifyPropertyChanged
     {
         public enum SERVER_INFO_POSITIONS
@@ -348,4 +348,4 @@ using System.Windows.Media.Imaging;
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
-        
+}

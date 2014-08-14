@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Net;
 using System;
 using System.Windows.Threading;
+using System.ComponentModel;
 
 
 namespace LauncherTwo
@@ -47,7 +48,7 @@ namespace LauncherTwo
         private bool isOpen = false;
         public static readonly int MAX_PLAYER_COUNT = 64;
         public static MainWindow Instance { get; private set; }
-        public TrulyObservableCollection<ServerInfo> OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
+        public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         Thread TickThread = null;
         bool FoundLatestGameVersion = false;
         bool FoundLatestLauncherVersion = false;
@@ -78,6 +79,7 @@ namespace LauncherTwo
 
         public MainWindow()
         {
+            OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
             Instance = this;
             //We want the window to be in the middle of the screen. 
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
@@ -94,8 +96,7 @@ namespace LauncherTwo
             refreshTimer.Start();
             StartRefreshingServers();
 
-            //This attachs all the data we pulled from the Json link to our columns.
-            BindDataColumns();
+            ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
@@ -231,28 +232,6 @@ namespace LauncherTwo
         private void OnGameExit()
         {
             SetMessageboxText(MESSAGE_IDLE);
-        }
-
-        private void BindDataColumns()
-        {
-            ServerInfoGrid.ItemsSource = OFilteredServerList;
-
-            //PasswordedNameColumn.CellTemplateSelector = new LockTemplateSelector();
-            //PasswordedNameColumn.ClipboardContentBinding = new Binding("ServerName");            
-
-            ServerNameColumn.Binding = new Binding("ServerName");
-            MapNameColumn.Binding  = new Binding("MapName");
-            PlayerCountColumn.Binding = new Binding("PlayerCountString");
-            PlayerCountColumn.SortMemberPath = "PlayerCountSort";
-            //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Ascending;
-            PingColumn.Binding = new Binding("PingString");
-            //PlayerCountColumn.SortDirection = System.ComponentModel.ListSortDirection.Descending;
-            PingColumn.SortMemberPath = "PingSort";
-
-            ServerInfoGrid.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription(PlayerCountColumn.SortMemberPath,System.ComponentModel.ListSortDirection.Ascending));
-
-            //Since we don't use the scroll bars we will hide them
-            ServerInfoGrid.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
         }
 
         public void RefilterServers()

@@ -1,7 +1,9 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" d:DesignWidth="1284" d:DesignHeight="844" SnapsToDevicePixels="True" UseLayoutRounding="True" WindowStyle="None" KeyDown="Window_KeyDown">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:LauncherTwo" xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="28 6 6 6" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFAC4545" Style="{DynamicResource RenXWindow}" d:DesignWidth="1284" d:DesignHeight="844" SnapsToDevicePixels="True" UseLayoutRounding="True" WindowStyle="None" KeyDown="Window_KeyDown"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        d:DataContext="{d:DesignData /SampleServers.xaml}">
 
 
 
@@ -1154,23 +1156,20 @@
                             <Border.BorderBrush>
                                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                             </Border.BorderBrush>
-                            <DataGrid x:Name="ServerInfoGrid" AlternationCount="1" FontFamily="Arial" GridLinesVisibility="None" MinRowHeight="20" SelectionChanged="ServerInfoGrid_SelectionChanged" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single">
+                            <DataGrid IsReadOnly="True" x:Name="ServerInfoGrid" FontFamily="Arial" GridLinesVisibility="None" MinRowHeight="20" SelectionChanged="ServerInfoGrid_SelectionChanged" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredServerList}" HorizontalScrollBarVisibility="Hidden">
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" IsReadOnly="True" CanUserResize="False">
+                                    <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" CanUserResize="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Image Source="{Binding LockImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn x:Name="ServerNameColumn" ClipboardContentBinding="{x:Null}" Header="Server Name" IsReadOnly="True" Width="*" FontFamily="Arial" Foreground="White" />
-                                    <DataGridTextColumn x:Name="MapNameColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Map" IsReadOnly="True" Width="100" FontFamily="Arial" Foreground="#FF98ABAE"/>
-                                    <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Players" FontFamily="Arial" IsReadOnly="True" Width="68" Foreground="#FF98ABAE"/>
-                                    <DataGridTextColumn x:Name="PingColumn" Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Header="Ping" IsReadOnly="True" Width="48" FontFamily="Arial" Foreground="#FF88A4A8" SortMemberPath=""/>
+                                    <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" FontFamily="Arial" Foreground="White" />
+                                    <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding MapName}" Header="Map" Width="100" FontFamily="Arial" Foreground="#FF98ABAE"/>
+                                    <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" FontFamily="Arial" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort"/>
+                                    <DataGridTextColumn x:Name="PingColumn" Binding="{Binding Ping}" Header="Ping" Width="48" FontFamily="Arial" Foreground="#FF88A4A8" SortMemberPath="PingSort"/>
                                 </DataGrid.Columns>
-                                <DataGrid.BindingGroup>
-                                    <BindingGroup/>
-                                </DataGrid.BindingGroup>
                             </DataGrid>
                         </Border>
                         <Border Grid.Row="5" x:Name="MessageBox_Border" BorderThickness="1">
