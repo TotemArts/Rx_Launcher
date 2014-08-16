@@ -16,6 +16,7 @@ using System.Net;
 using System;
 using System.Windows.Threading;
 using System.ComponentModel;
+using FirstFloor.ModernUI.Windows.Controls;
 
 
 namespace LauncherTwo
@@ -38,7 +39,7 @@ namespace LauncherTwo
             //    return UnlockedTemplate;
         }
     }
-    public partial class MainWindow : Window
+    public partial class MainWindow : ModernWindow
     {
         public const bool SHOW_DEBUG = false;
 
@@ -119,8 +120,6 @@ namespace LauncherTwo
 
             string Title = "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion();
             this.Title = Title;
-            TitleText.Content = Title;
-            
         }
 
         private void TickThreadFunc()
