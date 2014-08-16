@@ -7,7 +7,7 @@
     xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
     xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
-    mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="6 6 6 6" SnapsToDevicePixels="True" UseLayoutRounding="True" KeyDown="Window_KeyDown"
+    mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="6 -6 6 6" SnapsToDevicePixels="True" UseLayoutRounding="True" KeyDown="Window_KeyDown"
     Style="{StaticResource BlankWindow}"
     Icon="Icon_Silver.ico"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -17,6 +17,7 @@
 
     <!-- BYRONS TEST RESOURCE -->
     <Window.Resources>
+        <SolidColorBrush x:Key="WindowText" Color="{DynamicResource ServerListFontColor}"/>
         <Color x:Key="WindowBackgroundColor">#FF12171A</Color>
 
         <FontFamily x:Key="Font Awesome">/Renegade X Launcher;component/Resources/#FontAwesome</FontFamily>
