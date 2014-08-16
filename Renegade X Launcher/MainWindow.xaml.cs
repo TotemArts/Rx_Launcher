@@ -46,7 +46,6 @@ namespace LauncherTwo
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
         public const int TICK_RATE = 1; // Once per second.
-        private bool isOpen = false;
         public static readonly int MAX_PLAYER_COUNT = 64;
         public static MainWindow Instance { get; private set; }
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
