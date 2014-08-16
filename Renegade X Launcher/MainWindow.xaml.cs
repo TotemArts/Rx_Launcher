@@ -431,47 +431,6 @@ namespace LauncherTwo
             return messageText;
         }
 
-        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if (e.ClickCount == 2)
-                {
-                    ToggleMaximization();
-                }
-                else
-                {
-                    DragMove();
-                }
-            }
-        }
-
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
-
-        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleMaximization();
-        }
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-        private void ToggleMaximization()
-        {
-            if (WindowState == WindowState.Maximized)
-            {
-                WindowState = WindowState.Normal;
-            }
-            else
-            {
-                WindowState = WindowState.Maximized;
-            }
-        }
-
         protected override void OnClosed(System.EventArgs e)
         {
             base.OnClosed(e);
