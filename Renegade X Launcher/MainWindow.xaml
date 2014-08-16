@@ -1071,20 +1071,20 @@
                                 <Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="pack://siteoforigin:,,,/Resources/___map-pic-cnc-goldrush.png"/>
                             </Border>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3" Text="Server Name:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
-                                <TextBlock x:Name="SD_Name" TextWrapping="Wrap" Margin="3" Foreground="White"/>
+                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Server Name:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
+                                <TextBlock x:Name="SD_Name" TextWrapping="Wrap" Margin="3,1" Foreground="White"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3" Text="IP:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
-                                <TextBlock x:Name="SD_IP" TextWrapping="Wrap" Margin="3" Foreground="White"/>
+                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="IP:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
+                                <TextBlock x:Name="SD_IP" TextWrapping="Wrap" Margin="3,1" Foreground="White"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3" Text="Server Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
-                                <TextBlock x:Name="SD_ServerVersion" TextWrapping="Wrap" Margin="3" Foreground="#FF6C6C6C" FontSize="9"/>
+                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Server Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
+                                <TextBlock x:Name="SD_ServerVersion" TextWrapping="Wrap" Margin="3,1" Foreground="#FF6C6C6C" FontSize="9"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3" Text="Game Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
-                                <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Margin="3" Foreground="#FF6C6C6C" FontSize="9"/>
+                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Game Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
+                                <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Margin="3,1" Foreground="#FF6C6C6C" FontSize="9"/>
                             </StackPanel>
                             <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" VerticalAlignment="Bottom" Background="#FF061923" FontSize="24" Foreground="White" Click="Join_Server_Btn_Click" Focusable="False">
                                 <Button.BorderBrush>
