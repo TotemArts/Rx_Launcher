@@ -907,7 +907,7 @@
     <!-- END RESOURCE -->
         <Border x:Name="WindowInnerBorder" BorderBrush="#FFF7FCFF" BorderThickness="1">
             <Border.Background>
-                <ImageBrush ImageSource="pack://siteoforigin:,,,/Resources/rx_Background.png"/>
+                <ImageBrush ImageSource="pack://siteoforigin:,,,/Resources/rx_Background.png" Stretch="UniformToFill"/>
             </Border.Background>
             <Grid x:Name="WindowInner">
                 <Grid.RowDefinitions>
