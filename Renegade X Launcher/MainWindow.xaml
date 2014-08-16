@@ -1032,7 +1032,7 @@
                                     <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" Foreground="White" />
                                     <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding MapName}" Header="Map" Width="100" Foreground="#FF98ABAE"/>
                                     <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort"/>
-                                    <DataGridTextColumn x:Name="PingColumn" Binding="{Binding Ping}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort"/>
+                                    <DataGridTextColumn x:Name="PingColumn" Binding="{Binding PingString}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>

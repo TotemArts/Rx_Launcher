@@ -1,9 +1,9 @@
 Launcher fixes:
-- Servers that do not ping sucessfully (ping is less that 1) should display their ping as a dash (-)
 - Now that window is resizable, it should have a minimum size set that doesn't obstruct any UI elements.
 - Background image should scale to fit, not stretch with aspect ratio.
 - Fix focus after (automatic and manual) server list refresh. (Why is focus lost?)
 
+X- Servers that do not ping sucessfully (ping is less that 1) should display their ping as a dash (-)
 X- Highlighted servers text is unreadable when the window is not in focus
 X- F5 should trigger refresh
 X- Make pings update asynchronously. (i.e. show server list before pings are determined.)
