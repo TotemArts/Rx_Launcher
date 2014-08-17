@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:FirstFloor.ModernUI.Windows.Controls;assembly=FirstFloor.ModernUI"
-                    xmlns:modernui="clr-namespace:FirstFloor.ModernUI;assembly=FirstFloor.ModernUI"
+                    xmlns:mui="clr-namespace:FirstFloor.ModernUI;assembly=FirstFloor.ModernUI"
+                    xmlns:muicontrols="clr-namespace:FirstFloor.ModernUI.Windows.Controls;assembly=FirstFloor.ModernUI"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
@@ -11,7 +11,104 @@
         <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernWindowEx.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="RXWindow" TargetType="controls:ModernWindow">
+    <Style x:Key="TitleBarButtonGrid" TargetType="{x:Type Grid}">
+        <Setter Property="Width" Value="9"/>
+        <Setter Property="Height" Value="9"/>
+        <Setter Property="SnapsToDevicePixels" Value="False"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+    </Style>
+    <Style x:Key="TitleBarButtonPath" TargetType="{x:Type Path}">
+        <Setter Property="Width" Value="9"/>
+        <Setter Property="Height" Value="9"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="SnapsToDevicePixels" Value="False"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"/>
+    </Style>
+    <Style x:Key="MinimizeTitleBarButton" TargetType="UserControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Button
+                        Style="{StaticResource SystemButton}"
+                        Command="{Binding Source={x:Static SystemCommands.MinimizeWindowCommand}}"
+                        ToolTip="{x:Static mui:Resources.Minimize}">
+                        <Grid Style="{StaticResource TitleBarButtonGrid}">
+                            <Path
+                                Style="{StaticResource TitleBarButtonPath}"
+                                Data="M0,8 L8,8"
+                                StrokeThickness="2"
+                                />
+                        </Grid>
+                    </Button>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="RestoreTitleBarButton" TargetType="UserControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Button
+                        Style="{StaticResource SystemButton}"
+                        Command="{Binding Source={x:Static SystemCommands.RestoreWindowCommand}}"
+                        ToolTip="{x:Static mui:Resources.Restore}">
+                        <Grid Style="{StaticResource TitleBarButtonGrid}">
+                            <Path
+                                Style="{StaticResource TitleBarButtonPath}"
+                                Data="M2,0.5 L8.5,0.5 L8.5,7 M0.5,3.5 L6.5,3.5 M0.5,2.5 L6.5,2.5 L6.5,8.5 L0.5,8.5 Z"
+                                StrokeThickness="1"
+                                />
+                        </Grid>
+                    </Button>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Button
+                        Style="{StaticResource SystemButton}"
+                        Command="{Binding Source={x:Static SystemCommands.MaximizeWindowCommand}}"
+                        ToolTip="{x:Static mui:Resources.Maximize}">
+                        <Grid Style="{StaticResource TitleBarButtonGrid}">
+                            <Path
+                                Style="{StaticResource TitleBarButtonPath}"
+                                Data="M0,2 L9,2 L9,9 L0,9 Z"
+                                StrokeThickness="2"
+                                />
+                        </Grid>
+                    </Button>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="CloseTitleBarButton" TargetType="UserControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Button
+                        Style="{StaticResource SystemCloseButton}"
+                        Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"
+                        ToolTip="{x:Static mui:Resources.Close}">
+                        <Grid Style="{StaticResource TitleBarButtonGrid}">
+                            <Path
+                                Style="{StaticResource TitleBarButtonPath}"
+                                Data="M0,0 L8,7 M8,0 L0,7"
+                                Width="8" Height="7"
+                                StrokeThickness="1.5"
+                                />
+                        </Grid>
+                    </Button>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="RXWindow" TargetType="muicontrols:ModernWindow">
         <Style.Resources>
             <GridLengthConverter x:Key="glc" />
             <sys:Double x:Key="CaptionHeight">24</sys:Double>
@@ -21,12 +118,12 @@
         <Setter Property="IsTitleVisible" Value="True" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome CornerRadius="0" GlassFrameThickness="1" UseAeroCaptionButtons="False" NonClientFrameEdges="None" CaptionHeight="{DynamicResource CaptionHeight}" ResizeBorderThickness="0"/>
+                <WindowChrome CornerRadius="0" GlassFrameThickness="1" UseAeroCaptionButtons="False" NonClientFrameEdges="None" CaptionHeight="{DynamicResource CaptionHeight}"/>
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="controls:ModernWindow">
+                <ControlTemplate TargetType="muicontrols:ModernWindow">
                     <ControlTemplate.Resources>
                         <Style x:Key="ModernWindowTitle" TargetType="TextBlock">
                             <Setter Property="FontSize" Value="10"/>
@@ -90,40 +187,10 @@
 
                                         <!-- window system buttons-->
                                         <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top" WindowChrome.IsHitTestVisibleInChrome="True">
-                                            <Button Command="{Binding Source={x:Static SystemCommands.MinimizeWindowCommand}}" ToolTip="{x:Static modernui:Resources.Minimize}" Style="{StaticResource SystemButton}">
-                                                <Button.Content>
-                                                    <Grid Width="13" Height="12" RenderTransform="1,0,0,1,0,1">
-                                                        <Path Data="M0,6 L8,6 Z" Width="8" Height="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                              Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" StrokeThickness="2"  />
-                                                    </Grid>
-                                                </Button.Content>
-                                            </Button>
-                                            <Grid Margin="1,0,1,0">
-                                                <Button x:Name="Restore" Command="{Binding Source={x:Static SystemCommands.RestoreWindowCommand}}" ToolTip="{x:Static modernui:Resources.Restore}" Style="{StaticResource SystemButton}" Visibility="Hidden" >
-                                                    <Button.Content>
-                                                        <Grid Width="13" Height="12" UseLayoutRounding="True" RenderTransform="1,0,0,1,.5,.5">
-                                                            <Path Data="M2,0 L8,0 L8,6 M0,3 L6,3 M0,2 L6,2 L6,8 L0,8 Z" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" StrokeThickness="1"  />
-                                                        </Grid>
-                                                    </Button.Content>
-                                                </Button>
-                                                <Button x:Name="Maximize" Command="{Binding Source={x:Static SystemCommands.MaximizeWindowCommand}}" ToolTip="{x:Static modernui:Resources.Maximize}" Style="{StaticResource SystemButton}" >
-                                                    <Button.Content>
-                                                        <Grid Width="13" Height="12">
-                                                            <Path Data="M0,1 L9,1 L9,8 L0,8 Z" Width="9" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" StrokeThickness="2"  />
-                                                        </Grid>
-                                                    </Button.Content>
-                                                </Button>
-                                            </Grid>
-                                            <Button Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}" ToolTip="{x:Static modernui:Resources.Close}" Style="{StaticResource SystemCloseButton}" >
-                                                <Button.Content>
-                                                    <Grid Width="13" Height="12" RenderTransform="1,0,0,1,0,1">
-                                                        <Path Data="M0,0 L8,7 M8,0 L0,7 Z" Width="8" Height="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                              Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" StrokeThickness="1.5"  />
-                                                    </Grid>
-                                                </Button.Content>
-                                            </Button>
+                                            <UserControl Name="MinimizeTitleBarButton" Style="{StaticResource MinimizeTitleBarButton}"/>
+                                            <UserControl Name="MaximizeTitleBarButton" Style="{StaticResource MaximizeTitleBarButton}"/>
+                                            <UserControl Name="RestoreTitleBarButton" Style="{StaticResource RestoreTitleBarButton}"/>
+                                            <UserControl Name="CloseTitleBarButton" Style="{StaticResource CloseTitleBarButton}"/>
                                         </StackPanel>
                                     </Grid>
 
@@ -145,13 +212,13 @@
                             <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderActive}" />
                         </Trigger>
                         <Trigger Property="WindowState" Value="Maximized">
-                            <Setter TargetName="Maximize" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="Restore" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="RestoreTitleBarButton" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="MaximizeTitleBarButton" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="LayoutRoot" Property="Margin" Value="7" />
                         </Trigger>
                         <Trigger Property="WindowState" Value="Normal">
-                            <Setter TargetName="Maximize" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="Restore" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="RestoreTitleBarButton" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="MaximizeTitleBarButton" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
