@@ -39,7 +39,7 @@ namespace LauncherTwo
             //    return UnlockedTemplate;
         }
     }
-    public partial class MainWindow : ModernWindow
+    public partial class MainWindow : RXWindow
     {
         public const bool SHOW_DEBUG = false;
 

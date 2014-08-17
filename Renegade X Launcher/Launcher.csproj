@@ -123,6 +123,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RenXWebLinks.cs" />
+    <Compile Include="RXWindow.xaml.cs">
+      <DependentUpon>RXWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
@@ -161,8 +164,8 @@
       <SubType>Designer</SubType>
     </DesignData>
     <Page Include="RXWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>

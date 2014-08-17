@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mui="clr-namespace:FirstFloor.ModernUI;assembly=FirstFloor.ModernUI"
                     xmlns:muicontrols="clr-namespace:FirstFloor.ModernUI.Windows.Controls;assembly=FirstFloor.ModernUI"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:local="clr-namespace:LauncherTwo">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/Button.xaml" />
@@ -108,17 +109,25 @@
         </Setter>
     </Style>
 
-    <Style x:Key="RXWindow" TargetType="muicontrols:ModernWindow">
+    <Style TargetType="local:RXWindow">
         <Style.Resources>
             <GridLengthConverter x:Key="glc" />
-            <sys:Double x:Key="CaptionHeight">24</sys:Double>
             <GridLength x:Key="CaptionHeightGridLength">24</GridLength>
         </Style.Resources>
+        <Style.Triggers>
+            <Trigger Property="WindowState" Value="Normal">
+                <Setter Property="WindowChrome.WindowChrome">
+                    <Setter.Value>
+                        <WindowChrome CornerRadius="0" GlassFrameThickness="1" UseAeroCaptionButtons="False" NonClientFrameEdges="None" CaptionHeight="0" ResizeBorderThickness="6"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
         <Setter Property="Padding" Value="8" />
         <Setter Property="IsTitleVisible" Value="True" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome CornerRadius="0" GlassFrameThickness="1" UseAeroCaptionButtons="False" NonClientFrameEdges="None" CaptionHeight="{DynamicResource CaptionHeight}"/>
+                <WindowChrome CornerRadius="0" GlassFrameThickness="1" UseAeroCaptionButtons="False" NonClientFrameEdges="None" CaptionHeight="0" ResizeBorderThickness="0"/>
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
@@ -159,16 +168,22 @@
                                     <ContentPresenter Grid.Row="1" Margin="{TemplateBinding Padding}" />
 
                                     <!-- title bar -->
-                                    <Grid>
+                                    <Grid Background="Transparent"><!-- This must be transparent. Simply setting no background will break movement of the window when clicking the topmost few pixels in full screen mode. -->
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="96" />
                                         </Grid.ColumnDefinitions>
+                                        <Grid.InputBindings>
+                                            <MouseBinding MouseAction="RightClick" Command="{Binding Source={x:Static local:RXWindow.ShowSystemMenuUnderMouseCommand}}"/>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding Source={x:Static local:RXWindow.DragMoveCommand}}"/>
+                                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding Source={x:Static local:RXWindow.ToggleMaximizedCommand}}"/>
+                                        </Grid.InputBindings>
 
                                         <Image Grid.Column="0" Height="18" Width="18" Margin="3" Source="{TemplateBinding Icon}" WindowChrome.IsHitTestVisibleInChrome="True">
                                             <Image.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick" Command="{Binding Source={x:Static local:RXWindow.ShowSystemMenuUnderIconCommand}}"/>
                                                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"/>
                                             </Image.InputBindings>
                                         </Image>

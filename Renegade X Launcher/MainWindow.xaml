@@ -1,4 +1,4 @@
-﻿<mui:ModernWindow
+﻿<local:RXWindow
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,12 +6,18 @@
     xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
     xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="6 3 6 6" SnapsToDevicePixels="True" UseLayoutRounding="True" KeyDown="Window_KeyDown"
-    Style="{StaticResource RXWindow}"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:LauncherTwo"
+    Style="{StaticResource {x:Type local:RXWindow}}"
+    mc:Ignorable="d"
+    x:Class="LauncherTwo.MainWindow"
+    Padding="6 3 6 6"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
+    KeyDown="Window_KeyDown"
     Icon="Icon_Silver.ico"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000"
     Title="{Binding TitleValue}">
 
 
@@ -1134,4 +1140,4 @@
             </Grid>
         </Grid>
     </Border>
-</mui:ModernWindow>
+</local:RXWindow>
