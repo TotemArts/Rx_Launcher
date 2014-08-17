@@ -912,8 +912,8 @@
         </Border.Background>
         <Grid x:Name="WindowInner">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" x:Name="Header" Background="#FF0B1A22">
                 <Grid.ColumnDefinitions>
@@ -923,23 +923,23 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="auto" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
+                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
                     <Button.Foreground>
                         <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                     </Button.Foreground>
                 </Button>
-                <Label Grid.Column="1" x:Name="SD_Username" HorizontalAlignment="Left" Height="auto" Content="Player Name" FontSize="18" Background="{x:Null}">
+                <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" HorizontalAlignment="Left" Height="30" Content="Player Name" FontSize="18" Background="{x:Null}">
                     <Label.Foreground>
                         <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                     </Label.Foreground>
                 </Label>
-                <Image Grid.Column="2" Height="auto" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
-                <Button Grid.Column="3" Margin="3,6,6,6"  x:Name="SD_LaunchGameBtn" Width="94" Height="auto" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click">
+                <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
+                <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click">
                     <Button.Foreground>
                         <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                     </Button.Foreground>
                 </Button>
-                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="auto" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click">
+                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click">
                     <Button.Foreground>
                         <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
                     </Button.Foreground>
