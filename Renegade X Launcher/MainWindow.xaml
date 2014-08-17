@@ -3,11 +3,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:LauncherTwo"
     xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
     xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
-    mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="6 -6 6 6" SnapsToDevicePixels="True" UseLayoutRounding="True" KeyDown="Window_KeyDown"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="6 3 6 6" SnapsToDevicePixels="True" UseLayoutRounding="True" KeyDown="Window_KeyDown"
     Style="{StaticResource RXWindow}"
     Icon="Icon_Silver.ico"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -18,7 +18,6 @@
 
     <!-- BYRONS TEST RESOURCE -->
     <Window.Resources>
-        <FontFamily x:Key="Font Awesome">/Renegade X Launcher;component/Resources/#FontAwesome</FontFamily>
         <Style x:Key="DataHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="#9910171B" />
             <Setter Property="FontStyle" Value="Normal" />

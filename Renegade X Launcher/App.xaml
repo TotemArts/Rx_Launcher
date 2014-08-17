@@ -32,6 +32,7 @@
                 <Setter Property="FrameworkElement.Margin" Value="{StaticResource ContentMargin}"/>
             </Style>
 
+            <FontFamily x:Key="Font Awesome">/Renegade X Launcher;component/Resources/#FontAwesome</FontFamily>
             <SolidColorBrush x:Key="WindowText" Color="#FF98ABAE"/>
             <Color x:Key="RenX_Window_Background_Color">#B2010304</Color>
             <Color x:Key="RenX_Window_Border_Color">#CC65787D</Color>
