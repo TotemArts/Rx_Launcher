@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/CheckBox.xaml" />
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/DataGrid.xaml" />
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/Slider.xaml" />
+                <ResourceDictionary Source="RXWindow.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Color x:Key="AccentColor">#515a60</Color>
@@ -31,6 +32,7 @@
                 <Setter Property="FrameworkElement.Margin" Value="{StaticResource ContentMargin}"/>
             </Style>
 
+            <SolidColorBrush x:Key="WindowText" Color="#FF98ABAE"/>
             <Color x:Key="RenX_Window_Background_Color">#B2010304</Color>
             <Color x:Key="RenX_Window_Border_Color">#CC65787D</Color>
 

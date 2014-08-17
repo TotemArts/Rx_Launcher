@@ -56,6 +56,8 @@ namespace LauncherTwo
 
         string messageText = "";
 
+        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion(); } }
+
         const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
         const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
         const string MESSAGE_IDLE = "Welcome back commander.";
@@ -116,9 +118,6 @@ namespace LauncherTwo
             //Background.WorkerSupportsCancellation = true;
             //Background.WorkerReportsProgress = false;
             //Background.DoWork += new System.ComponentModel.DoWorkEventHandler(TickThreadFunc);
-
-            string Title = "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion();
-            this.Title = Title;
         }
 
         private void TickThreadFunc()

@@ -8,18 +8,16 @@
     xmlns:Themes1="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
     mc:Ignorable="d" x:Class="LauncherTwo.MainWindow" Padding="6 -6 6 6" SnapsToDevicePixels="True" UseLayoutRounding="True" KeyDown="Window_KeyDown"
-    Style="{StaticResource BlankWindow}"
+    Style="{StaticResource RXWindow}"
     Icon="Icon_Silver.ico"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000">
+        d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000"
+    Title="{Binding TitleValue}">
 
 
 
     <!-- BYRONS TEST RESOURCE -->
     <Window.Resources>
-        <SolidColorBrush x:Key="WindowText" Color="{DynamicResource ServerListFontColor}"/>
-        <Color x:Key="WindowBackgroundColor">#FF12171A</Color>
-
         <FontFamily x:Key="Font Awesome">/Renegade X Launcher;component/Resources/#FontAwesome</FontFamily>
         <Style x:Key="DataHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="#9910171B" />
@@ -31,7 +29,6 @@
         <Style x:Key="DataGridStyle" TargetType="{x:Type DataGridRowHeader}">
             <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
-        <Color x:Key="ServerListFontColor">#FF98ABAE</Color>
         <SolidColorBrush x:Key="SliderThumb.Static.Foreground" Color="#FFE5E5E5"/>
         <SolidColorBrush x:Key="SliderThumb.MouseOver.Background" Color="#FFDCECFC"/>
         <SolidColorBrush x:Key="SliderThumb.MouseOver.Border" Color="#FF7Eb4EA"/>
@@ -825,26 +822,6 @@
                 </MultiTrigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-        <Style x:Key="RenXWindow" TargetType="{x:Type Window}">
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Window}">
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                            <AdornerDecorator>
-                                <ContentPresenter/>
-                            </AdornerDecorator>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="ResizeMode" Value="CanResizeWithGrip">
-                    <Setter Property="Template" Value="{StaticResource WindowTemplateKey}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
         <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
         <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
         <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
@@ -923,27 +900,11 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False">
-                    <Button.Foreground>
-                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                    </Button.Foreground>
-                </Button>
-                <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" HorizontalAlignment="Left" Height="30" Content="Player Name" FontSize="18" Background="{x:Null}">
-                    <Label.Foreground>
-                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                    </Label.Foreground>
-                </Label>
+                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False" Foreground="{StaticResource WindowText}"/>
+                <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" HorizontalAlignment="Left" Height="30" Content="Player Name" FontSize="18" Background="{x:Null}" Foreground="{StaticResource WindowText}"/>
                 <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
-                <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click">
-                    <Button.Foreground>
-                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                    </Button.Foreground>
-                </Button>
-                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click">
-                    <Button.Foreground>
-                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                    </Button.Foreground>
-                </Button>
+                <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" Foreground="{StaticResource WindowText}"/>
+                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" Foreground="{StaticResource WindowText}"/>
             </Grid>
             <Grid Grid.Row="1" x:Name="ContentSplit" Margin="4">
                 <Grid.ColumnDefinitions>
@@ -1003,17 +964,9 @@
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition Width="auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Column="0" Content="&#xF002;" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Margin="6">
-                                    <Label.Foreground>
-                                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                                    </Label.Foreground>
-                                </Label>
+                                <Label Grid.Column="0" Content="&#xF002;" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Margin="6" Foreground="{StaticResource WindowText}"/>
                                 <TextBox Grid.Column="1" x:Name="sv_ServerSearch" Height="23" TextWrapping="Wrap" Width="159" Background="#199DD2FF" Foreground="White" TextChanged="sv_ServerSearch_TextChanged" Margin="6"/>
-                                <Button Grid.Column="2" x:Name="sd_Refresh" Width="25" Height="25" Content="&#xF021;" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Click="sd_Refresh_MouseDown" Margin="6">
-                                    <Button.Foreground>
-                                        <SolidColorBrush Color="{DynamicResource ServerListFontColor}"/>
-                                    </Button.Foreground>
-                                </Button>
+                                <Button Grid.Column="2" x:Name="sd_Refresh" Width="25" Height="25" Content="&#xF021;" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Click="sd_Refresh_MouseDown" Margin="6" Foreground="{StaticResource WindowText}"/>
                             </Grid>
                         </Grid>
                     </Border>
