@@ -23,6 +23,7 @@ namespace LauncherTwo
            { "Mesa",     ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_mesaii      ) },
            { "Goldrush", ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_goldrush    ) },
            { "Islands",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_island      ) },
+           { "Volcano",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_volcano      ) },
            { "Whiteout", ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_hourglassii ) }
         };
 

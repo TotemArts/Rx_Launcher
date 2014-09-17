@@ -226,11 +226,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ClanHeader.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\___map-pic-cnc-field.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -338,6 +333,9 @@
   <ItemGroup>
     <Resource Include="Resources\Checkbox_OFF.png" />
     <Resource Include="Resources\Checkbox_ON.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\___map-pic-cnc-volcano.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
