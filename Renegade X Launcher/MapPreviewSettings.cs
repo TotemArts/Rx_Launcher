@@ -69,13 +69,12 @@ namespace LauncherTwo
 
         public static string GetPrettyMapName(string theMap)
         {
+            string theMapLower = theMap.ToLower();
 
-            if (MapNames.ContainsKey(theMap))
-                return MapNames[theMap];
+            if (MapNames.ContainsKey(theMapLower))
+                return MapNames[theMapLower];
             else
-                return "Default";
-
-            
+                return theMap;
         }
     }
 }
