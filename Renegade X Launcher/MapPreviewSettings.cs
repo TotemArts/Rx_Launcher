@@ -35,6 +35,7 @@ namespace LauncherTwo
             { "cnc-mesa_ii",      "Mesa"     },
             { "cnc-goldrush",     "Goldrush" },
             { "cnc-islands",      "Islands"  },
+            { "cnc-volcano",      "Volcano"  },
             { "cnc-whiteout",     "Whiteout" }
         };
 
