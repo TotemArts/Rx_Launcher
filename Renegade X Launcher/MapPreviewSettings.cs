@@ -23,7 +23,8 @@ namespace LauncherTwo
            { "Mesa",     ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_mesaii      ) },
            { "Goldrush", ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_goldrush    ) },
            { "Islands",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_island      ) },
-           { "Volcano",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_volcano      ) },
+           { "Volcano",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_volcano     ) },
+           { "X-Mountain",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_xmountain) },
            { "Whiteout", ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_hourglassii ) }
         };
 
@@ -36,6 +37,7 @@ namespace LauncherTwo
             { "cnc-goldrush",     "Goldrush" },
             { "cnc-islands",      "Islands"  },
             { "cnc-volcano",      "Volcano"  },
+            { "cnc-xmountain",    "X-Mountain"},
             { "cnc-whiteout",     "Whiteout" }
         };
 
