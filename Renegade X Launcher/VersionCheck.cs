@@ -19,7 +19,7 @@ namespace LauncherTwo
         const string LATEST_GAMEVERSION_URL = "http://renegade-x.com/launcher_data/gameversion";
         const string LATEST_LAUNCHERVERSION_URL = "http://renegade-x.com/launcher_data/launcherversion";
         static string DownloadingURL = "";
-       
+
         public const string GAME_DOWNLOAD_URL = "http://renegade-x.com/download";
         public const string LAUNCHER_DOWNLOAD_URL = "http://renegade-x.com/download";
         static string LatestGameVersion = "";
@@ -40,7 +40,7 @@ namespace LauncherTwo
         {
             return LatestGameVersion;
         }
-        
+
         public static string GetGameVersion()
         {
             if (GameVersion == null)
@@ -69,13 +69,7 @@ namespace LauncherTwo
 
         static string ReadGameVersion()
         {
-            string FileName = string.Empty;
-            // Exe location
-            FileName += System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            // Go up one directory.
-            FileName = Directory.GetParent(FileName).FullName;
-            // Now into UDK.exe location.
-            FileName += INI_PATH;
+            string FileName = GameInstallation.GetRootPath() + INI_PATH;
 
             try
             {

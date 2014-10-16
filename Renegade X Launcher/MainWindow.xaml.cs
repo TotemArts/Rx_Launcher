@@ -31,6 +31,7 @@ namespace LauncherTwo
         public static readonly int MAX_PLAYER_COUNT = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer refreshTimer;
+        private GameInstance GameInstance;
 
         string messageText = "";
 
@@ -238,29 +239,23 @@ namespace LauncherTwo
             }
         }
 
-        private void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
+        private async void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
         {
             ServerInfo SelectedServerInfo = GetSelectedServer();
             if (SelectedServerInfo != null)
             {
+                string password = null;
                 if (GetSelectedServer().PasswordProtected)
-                    JoinPasswordServer(GetSelectedServer().IPWithPort);
-                else
-                    JoinServer(GetSelectedServer().IPWithPort);
-            }
-        }
-
-        async void JoinServer(string IP, string Password = "")
-        {
-            SetMessageboxText("Launching Renegade-X");
-            bool success = await LaunchTools.JoinServerAsync(IP, Properties.Settings.Default.Username, Password);
-            if (success)
-            {
-                SetMessageboxText(MESSAGE_IDLE);
-            }
-            else
-            {
-                SetMessageboxText(MESSAGE_CANTSTARTGAME);
+                {
+                    PasswordWindow PassWindow = new PasswordWindow();
+                    PassWindow.ShowDialog();
+                    if (!PassWindow.WantsToJoin)
+                    {
+                        return;
+                    }
+                    password = PassWindow.Password;
+                }
+                await StartGameInstance(GetSelectedServer().IPWithPort, password);
             }
         }
 
@@ -368,41 +363,44 @@ namespace LauncherTwo
             SD_Username.Content = login.m_Username;
         }
 
-        private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
+        private async Task StartGameInstance(string ipEndpoint, string password)
         {
-            SetMessageboxText("Launching Renegade-X");
-            bool success = await LaunchTools.LaunchGameAsync(Properties.Settings.Default.Username);
-            if (success)
+            try
             {
+                SetMessageboxText("The game is running.");
+
+                GameInstanceStartupParameters startupParameters = new GameInstanceStartupParameters();
+                startupParameters.Username = Properties.Settings.Default.Username;
+                startupParameters.IPEndpoint = ipEndpoint;
+                startupParameters.Password = password;
+                GameInstance = GameInstance.Start(startupParameters);
+
+                await GameInstance.Task;
+
                 SetMessageboxText(MESSAGE_IDLE);
             }
-            else
+            catch (Exception)
             {
                 SetMessageboxText(MESSAGE_CANTSTARTGAME);
             }
-        }
-
-        void JoinPasswordServer(string IP)
-        {
-            PasswordWindow PassWindow = new PasswordWindow();
-
-            PassWindow.ShowDialog();
-
-            if (PassWindow.WantsToJoin)
+            finally
             {
-                JoinServer(IP, PassWindow.Password);
+                GameInstance = null;
             }
         }
 
-        private void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
+        private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
+        {
+            await StartGameInstance(null, null);
+        }
+
+        private async void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
         {
             JoinIPWindow IPWindow = new JoinIPWindow();
-
             IPWindow.ShowDialog();
-
             if (IPWindow.WantsToJoin)
             {
-                JoinServer(IPWindow.IP, IPWindow.Pass);
+                await StartGameInstance(IPWindow.IP, IPWindow.Pass);
             }
         }
 

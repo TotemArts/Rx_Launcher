@@ -5,78 +5,70 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Net;
 
 namespace LauncherTwo
 {
-    public static class LaunchTools
+    public class GameInstanceStartupParameters
     {
-        private static string Arguments = string.Empty;
-        public static readonly string INI_PATH = "-ini:UDKGame:DefaultPlayer.Name=";
-        public static readonly string EXE_PATH = "\\Binaries\\Win32\\UDK.exe";
-        static Process LastRunprocess;
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string IPEndpoint { get; set; }
 
-        public static string GetArguments(string anIPAdress, string Username, string aPassword = "")
+        public string GetProcessPath()
         {
-            Arguments = anIPAdress;
-            if (aPassword != "")
-                Arguments += "?PASSWORD=" + aPassword;
-            Arguments += " " + INI_PATH + Username;
-            return Arguments;
+            return GameInstallation.GetRootPath() +"Binaries\\Win32\\UDK.exe";
         }
 
-        public static async Task<bool> LaunchGameWithArgumentsAsync(string Arguments)
+        public string GetProcessArguments()
+        {
+            string Arguments = "";
+            if (Username != null)
+            {
+                Arguments += IPEndpoint;
+                if (Password != null)
+                {
+                    Arguments += "?PASSWORD=" + Password;
+                }
+            }
+            Arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username;
+            return Arguments;
+        }
+    }
+
+    public class GameInstance
+    {
+        public GameInstanceStartupParameters StartupParameters { get; private set; }
+        public Task Task { get; private set; }
+
+        Process Process;
+
+        public static GameInstance Start(GameInstanceStartupParameters StartupParameters)
+        {
+            var instance = new GameInstance();
+            instance.StartupParameters = StartupParameters;
+            instance.Task = instance.StartAsync();
+            return instance;
+        }
+
+        public async Task StartAsync()
         {
             try
             {
-                Process UDKProcess = new Process();
-                LastRunprocess = UDKProcess;
-                UDKProcess.StartInfo.FileName = GetPath();
-                UDKProcess.StartInfo.Arguments = Arguments;
+                Process = new Process();
+                Process.StartInfo.FileName = StartupParameters.GetProcessPath();
+                Process.StartInfo.Arguments = StartupParameters.GetProcessArguments();
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-                UDKProcess.EnableRaisingEvents = true;
-                UDKProcess.Exited += (sender, e) => { tcs.SetResult(null); };
-                UDKProcess.Start();
+                Process.EnableRaisingEvents = true;
+                Process.Exited += (sender, e) => { tcs.SetResult(Process.ExitCode); };
+                Process.Start();
                 await tcs.Task;
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
             }
             finally
             {
-                LastRunprocess = null;
+                Process.Dispose();
+                Process = null;
             }
-        }
-
-        public static async Task<bool> LaunchGameAsync(string Username)
-        {
-            return await LaunchGameWithArgumentsAsync(INI_PATH + Username);
-        }
-
-        public static async Task<bool> JoinServerAsync(string anIPAdress, string Username, string aPassword = "")
-        {
-            Arguments = GetArguments(anIPAdress, Username, aPassword);
-            return await LaunchGameWithArgumentsAsync(Arguments);
-        }
-
-        public static bool LastRunStillRunning()
-        {
-            return LastRunprocess != null;
-        }
-
-        private static string GetPath()
-        {
-            string FileName = string.Empty; 
-            // Exe location
-            FileName += System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            // Go up one directory.
-            FileName = Directory.GetParent(FileName).FullName;
-            // Now into UDK.exe location.
-            FileName += EXE_PATH;
-
-            return FileName; 
         }
     }
 }
