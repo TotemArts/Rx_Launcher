@@ -35,6 +35,10 @@ namespace RXPatch
             {
                 var configString = File.ReadAllText(configFilePath);
                 patchInfo = JsonConvert.DeserializeObject<PatchInfo>(configString);
+                if (patchInfo == null)
+                {
+                    errors.Add("No configuration was read.");
+                }
             }
             catch (Exception e)
             {
@@ -59,7 +63,7 @@ namespace RXPatch
                 }
             }
 
-            if (patchInfo == null || errors.Count > 0)
+            if (errors.Count > 0)
             {
                 var example = new PatchInfo
                 {
