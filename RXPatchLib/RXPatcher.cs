@@ -8,19 +8,33 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-    class RXPatcher
+    public class RXPatcher
     {
-        public async Task ApplyPatch(string baseUrl, string targetPath, string workingDirPath)
+        // Do not use the system temp dir because it may be on a different volume.
+        const string BackupSubPath = "patch/backup";
+        const string DownloadSubPath = "temp/patch/download";
+        const string TempSubPath = "temp/patch";
+
+        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string workingDirPath)
         {
-            var backupPath = CreateDirPath(workingDirPath, "backup/patch");
-            var downloadPath = CreateDirPath(workingDirPath, "temp/patch/download"); // Do not use the system temp dir; the user should clear this when out of space.
-            var patchTempPath = CreateDirPath(workingDirPath, "temp/patch/patch"); // Do not use the system temp dir, as it may be on a different disk, making moves expensive.
+            var backupPath = CreateDirPath(workingDirPath, BackupSubPath);
+            var downloadPath = CreateDirPath(workingDirPath, DownloadSubPath);
+            var tempPath = CreateDirPath(workingDirPath, TempSubPath);
 
             using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
             {
-                var patcher = new DirectoryPatcher(new XdeltaPatcher(new XdeltaPatchSystem()), targetPath, backupPath, patchTempPath, patchSource);
+                var patcher = new DirectoryPatcher(new XdeltaPatcher(new XdeltaPatchSystem()), targetPath, backupPath, tempPath, patchSource);
                 await patcher.ApplyPatchAsync();
             }
+        }
+        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string workingDirPath)
+        {
+            var backupPath = CreateDirPath(workingDirPath, BackupSubPath);
+            var tempPath = CreateDirPath(workingDirPath, TempSubPath);
+
+            var patchSource = new FileSystemPatchSource(patchPath);
+            var patcher = new DirectoryPatcher(new XdeltaPatcher(new XdeltaPatchSystem()), targetPath, backupPath, tempPath, patchSource);
+            await patcher.ApplyPatchAsync();
         }
 
         private static string CreateDirPath(string workingDirPath, string subPath)

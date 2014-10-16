@@ -54,8 +54,7 @@ namespace RXPatchLibTest
             var WorkingDir = "C:\\games\\Renegade X patchtest";
             var PatchDir = "C:\\games\\Renegade X patchtest source";
 
-            var patcher = new RXPatcher();
-            await patcher.ApplyPatch("file:///" + PatchDir, TargetDir, WorkingDir);
+            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, WorkingDir);
 
             await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
@@ -86,8 +85,7 @@ namespace RXPatchLibTest
             var builder = new RXPatchBuilder();
             await builder.CreatePatchAsync(patchInfo);
 
-            var patcher = new RXPatcher();
-            await patcher.ApplyPatch("file:///" + PatchDir, TargetDir, WorkingDir);
+            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, WorkingDir);
 
             await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
