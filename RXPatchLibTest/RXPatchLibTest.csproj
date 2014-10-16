@@ -54,6 +54,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DirectoryExTest.cs" />
     <Compile Include="TemporaryDirectoryTest.cs" />
     <Compile Include="TemporaryFileTest.cs" />
     <Compile Include="DirectoryPathIteratorTest.cs" />

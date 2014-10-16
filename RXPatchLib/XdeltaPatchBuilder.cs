@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-    class XdeltaPatchBuilder
+    public class XdeltaPatchBuilder
     {
-        public int _SourceBufferSize = 2*1024*1024;
-        public int SourceBufferSize {
+        public long _SourceBufferSize = 2L * 1024 * 1024 * 1024;
+        public long SourceWindowSize {
             get { return _SourceBufferSize; }
             set { if (value < 1) throw new InvalidOperationException(); _SourceBufferSize = value; }
         }
@@ -20,10 +20,10 @@ namespace RXPatchLib
         private int _CompressionLevel = 9;
         public int CompressionLevel {
             get { return _CompressionLevel; }
-            set { if (value < 1 || value > 9) throw new InvalidOperationException(); _CompressionLevel = value; }
+            set { if (value < 0 || value > 9) throw new InvalidOperationException(); _CompressionLevel = value; }
         }
 
-        private string SecondLevelCompression = "lzma";
+        private string SecondaryLevelCompression = "lzma";
 
         private XdeltaPatchSystem PatchSystem;
 
@@ -38,9 +38,9 @@ namespace RXPatchLib
             {
                 await PatchSystem.RunCommandAsync(
                     "-e",
-                    "-B" + SourceBufferSize.ToString(),
+                    "-B" + SourceWindowSize.ToString(),
                     "-" + CompressionLevel,
-                    "-S", SecondLevelCompression,
+                    "-S", SecondaryLevelCompression,
                     "-s", oldPath,
                     "-f",
                     newPath,

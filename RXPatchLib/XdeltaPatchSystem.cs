@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-    class XdeltaPatchSystem
+    public class XdeltaPatchSystem
     {
         public string ExecutablePath = "xdelta3-3.0.8.x86-64.exe";
 

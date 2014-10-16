@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-    class DirectoryPatchBuilder : IDisposable
+    public class DirectoryPatchBuilder : IDisposable
     {
         SHA1CryptoServiceProvider CryptoProvider = new SHA1CryptoServiceProvider();
         XdeltaPatchBuilder PatchBuilder;
@@ -30,7 +30,7 @@ namespace RXPatchLib
                 return null;
 
             using (var stream = File.OpenRead(path))
-                return BitConverter.ToString(CryptoProvider.ComputeHash(stream));
+                return BitConverter.ToString(CryptoProvider.ComputeHash(stream)).Replace("-", string.Empty);
         }
 
         public async Task CreatePatchAsync(string oldRootPath, string newRootPath, string patchPath)
@@ -39,6 +39,9 @@ namespace RXPatchLib
             var newPaths = DirectoryPathIterator.GetChildPathsRecursive(newRootPath).ToArray();
 
             var instructions = new List<FilePatchInstruction>();
+
+            Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "full");
+            Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "delta");
 
             var allPaths = oldPaths.Union(newPaths).ToArray();
             foreach (var path in allPaths)
@@ -51,11 +54,11 @@ namespace RXPatchLib
 
                 if (newHash != null)
                 {
-                    File.Copy(newPath, patchPath + Path.DirectorySeparatorChar + newHash, true);
+                    File.Copy(newPath, patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash, true);
 
                     if (oldHash != null && oldHash != newHash)
                     {
-                        string deltaPath = patchPath + Path.DirectorySeparatorChar + oldHash + "_to_" + newHash;
+                        string deltaPath = patchPath + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + newHash + "_from_" + oldHash;
                         await PatchBuilder.CreatePatchAsync(oldPath, newPath, deltaPath);
                         if (new FileInfo(deltaPath).Length > new FileInfo(newPath).Length)
                         {
