@@ -26,7 +26,7 @@ namespace RXPatchLib
             var startInfo = new ProcessStartInfo(path, argumentsString);
             startInfo.UseShellExecute = false;
 
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
             using (Process Process = new Process())
             {
                 Process.EnableRaisingEvents = true;
@@ -34,8 +34,7 @@ namespace RXPatchLib
                 Process.Exited += (sender, e) => { tcs.SetResult(Process.ExitCode); };
                 Process.StartInfo = startInfo;
                 Process.Start();
-                await tcs.Task;
-                return Process.ExitCode;
+                return await tcs.Task;
             }
         }
     }

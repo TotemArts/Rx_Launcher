@@ -12,7 +12,7 @@ namespace RXPatchLibTest
         [TestMethod]
         public async Task TestWithEmptyFiles()
         {
-            var patchSystem = new XdeltaPatchSystem();
+            var patchSystem = XdeltaPatchSystemFactory.Preferred;
             var patchBuilder = new XdeltaPatchBuilder(patchSystem);
 
             using (var oldFile = new TemporaryFile())

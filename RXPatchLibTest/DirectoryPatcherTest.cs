@@ -38,7 +38,7 @@ namespace RXPatchLibTest
                 var oldHash = SHA1.Get(Encoding.UTF8.GetBytes("old"));
                 var newDeltaHash = SHA1.Get(Encoding.UTF8.GetBytes("new_delta"));
                 var newFullHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full"));
-                new XdeltaPatchBuilder(new XdeltaPatchSystem()).CreatePatchAsync(oldFile.Path, newFile.Path, Path.Combine(PatchDir.Path, "delta/" + newDeltaHash + "_from_" + oldHash)).Wait();
+                new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred).CreatePatchAsync(oldFile.Path, newFile.Path, Path.Combine(PatchDir.Path, "delta/" + newDeltaHash + "_from_" + oldHash)).Wait();
                 File.WriteAllText(Path.Combine(PatchDir.Path, "full/" + newFullHash), "new_full");
                 PatchDirFiles = DirectoryPathIterator.GetChildPathsRecursive(PatchDir.Path).ToArray();
             }
@@ -56,7 +56,7 @@ namespace RXPatchLibTest
             TargetDir = new TemporaryDirectory();
             BackupDir = new TemporaryDirectory();
             TempDir = new TemporaryDirectory();
-            FilePatcher = new XdeltaPatcher(new XdeltaPatchSystem());
+            FilePatcher = new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred);
             PatchSource = new FileSystemPatchSource(PatchDir.Path);
             DirectoryPatcher = new DirectoryPatcher(FilePatcher, TargetDir.Path, BackupDir.Path, TempDir.Path, PatchSource);
         }

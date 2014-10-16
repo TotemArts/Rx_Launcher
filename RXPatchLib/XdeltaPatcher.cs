@@ -8,7 +8,7 @@ namespace RXPatchLib
 {
     public class XdeltaPatcher
     {
-        public long _SourceBufferSize = 2L * 1024 * 1024 * 1024;
+        public long _SourceBufferSize = 512 * 1024 * 1024;
         public long SourceWindowSize
         {
             get { return _SourceBufferSize; }

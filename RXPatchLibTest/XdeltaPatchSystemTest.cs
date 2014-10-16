@@ -11,14 +11,14 @@ namespace RXPatchLibTest
         [Ignore]
         public async Task RunBuiltinTests()
         {
-            var ps = new XdeltaPatchSystem();
+            var ps = XdeltaPatchSystemFactory.Preferred;
             await ps.RunCommandAsync("test");
         }
 
         [TestMethod]
         public async Task FailedExitCodeTest()
         {
-            var ps = new XdeltaPatchSystem();
+            var ps = XdeltaPatchSystemFactory.Preferred;
             try
             {
                 await ps.RunCommandAsync("--help");
@@ -35,7 +35,7 @@ namespace RXPatchLibTest
         {
             using (var file = new TemporaryFile())
             {
-                var ps = new XdeltaPatchSystem();
+                var ps = XdeltaPatchSystemFactory.Preferred;
                 await ps.RunCommandAsync(file.Path);
             }
         }

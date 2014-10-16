@@ -11,7 +11,7 @@ namespace RXPatchLib
 {
     public class XdeltaPatchBuilder
     {
-        public long _SourceBufferSize = 2L * 1024 * 1024 * 1024;
+        public long _SourceBufferSize = 512 * 1024 * 1024;
         public long SourceWindowSize {
             get { return _SourceBufferSize; }
             set { if (value < 1) throw new InvalidOperationException(); _SourceBufferSize = value; }

@@ -12,7 +12,7 @@ namespace RXPatchLibTest
         [TestMethod]
         public async Task TestRoundtrip()
         {
-            var patchSystem = new XdeltaPatchSystem();
+            var patchSystem = XdeltaPatchSystemFactory.Preferred;
             var patchBuilder = new XdeltaPatchBuilder(patchSystem);
             var patcher = new XdeltaPatcher(patchSystem);
 

@@ -23,7 +23,7 @@ namespace RXPatchLib
 
             using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
             {
-                var patcher = new DirectoryPatcher(new XdeltaPatcher(new XdeltaPatchSystem()), targetPath, backupPath, tempPath, patchSource);
+                var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
                 await patcher.ApplyPatchAsync();
             }
         }
@@ -34,7 +34,7 @@ namespace RXPatchLib
             var tempPath = CreateTempPath(applicationDirPath);
 
             var patchSource = new FileSystemPatchSource(patchPath);
-            var patcher = new DirectoryPatcher(new XdeltaPatcher(new XdeltaPatchSystem()), targetPath, backupPath, tempPath, patchSource);
+            var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
             await patcher.ApplyPatchAsync();
         }
 

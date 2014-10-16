@@ -8,7 +8,12 @@ namespace RXPatchLib
 {
     public class XdeltaPatchSystem
     {
-        public string ExecutablePath = "xdelta3-3.0.8.x86-64.exe";
+        public string ExecutablePath;
+
+        public XdeltaPatchSystem(string executablePath)
+        {
+            ExecutablePath = executablePath;
+        }
 
         public async Task RunCommandAsync(params string[] arguments)
         {
@@ -18,5 +23,12 @@ namespace RXPatchLib
                 throw new CommandExecutionException(ExecutablePath, arguments, exitCode);
             }
         }
+    }
+
+    public class XdeltaPatchSystemFactory
+    {
+        public static XdeltaPatchSystem X32 = new XdeltaPatchSystem("xdelta3-3.0.8.x86-32.exe");
+        public static XdeltaPatchSystem X64 = new XdeltaPatchSystem("xdelta3-3.0.8.x86-64.exe");
+        public static XdeltaPatchSystem Preferred = X32;//Environment.Is64BitOperatingSystem ? X64 : X32;
     }
 }

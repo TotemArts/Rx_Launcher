@@ -13,7 +13,7 @@ namespace RXPatchLib
     {
         public async Task CreatePatchAsync(PatchInfo patchInfo)
         {
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 await builder.CreatePatchAsync(patchInfo.OldPath, patchInfo.NewPath, patchInfo.PatchPath);
             }

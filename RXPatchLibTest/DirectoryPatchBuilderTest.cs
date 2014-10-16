@@ -27,7 +27,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
@@ -42,7 +42,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
 
@@ -64,7 +64,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataA);
 
@@ -87,7 +87,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataB);
@@ -112,7 +112,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), "0");
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), "1");
@@ -137,7 +137,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataA);
@@ -162,7 +162,7 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
-            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred)))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
                 File.WriteAllText(Path.Combine(oldDir.Path, "b"), DummyDataA);
