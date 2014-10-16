@@ -100,42 +100,19 @@ namespace LauncherTwo
             }
         }
 
-        public static void StartFindGameVersion()
+        public static async Task FindGameVersionAsync()
         {
-            StartDownloadData(LATEST_GAMEVERSION_URL);
+            LatestGameVersion = await new WebClient().DownloadStringTaskAsync(LATEST_GAMEVERSION_URL);
         }
 
-        public static void StartFindLauncherVersion()
+        public static async Task FindLauncherVersionAsync()
         {
-            StartDownloadData(LATEST_LAUNCHERVERSION_URL);
+            LatestLauncherVersion = await new WebClient().DownloadStringTaskAsync(LATEST_GAMEVERSION_URL);
         }
 
         public static string GetDownloadingURL()
         {
             return DownloadingURL;
-        }
-
-        static void StartDownloadData(string URL)
-        {
-            DownloadingURL = URL;
-            WebClient Client = new WebClient();
-            Client.DownloadDataCompleted += DownloadDataCompleted;
-            Uri URI = null;
-            if (Uri.TryCreate(URL, UriKind.Absolute, out URI))
-                Client.DownloadDataAsync(URI);
-        }
-
-        static void DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
-        {
-            if (e.Error == null && !e.Cancelled)
-            {
-                byte[] raw = e.Result;
-                string webData = System.Text.Encoding.UTF8.GetString(raw);
-                if (DownloadingURL == LATEST_GAMEVERSION_URL)
-                    LatestGameVersion = webData;
-                else if (DownloadingURL == LATEST_LAUNCHERVERSION_URL)
-                    LatestLauncherVersion = webData;
-            }
         }
 
         public static bool IsLauncherOutOfDate()

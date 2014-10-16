@@ -17,41 +17,19 @@ using System;
 using System.Windows.Threading;
 using System.ComponentModel;
 using FirstFloor.ModernUI.Windows.Controls;
+using System.Collections.Generic;
 
 
 namespace LauncherTwo
 {
-    public class LockTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate LockedTemplate { get; set; }
-        public DataTemplate UnlockedTemplate { get; set; }
-
-        public override DataTemplate SelectTemplate(object item,
-                      DependencyObject container)
-        {
-            if (item == null)
-                return LockedTemplate;
-            return UnlockedTemplate;
-
-            //if ((bool)item == true)
-            //    return LockedTemplate;
-            //else
-            //    return UnlockedTemplate;
-        }
-    }
     public partial class MainWindow : RXWindow
     {
         public const bool SHOW_DEBUG = false;
 
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
-        public const int TICK_RATE = 1; // Once per second.
         public static readonly int MAX_PLAYER_COUNT = 64;
-        public static MainWindow Instance { get; private set; }
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
-        Thread TickThread = null;
-        bool FoundLatestGameVersion = false;
-        bool FoundLatestLauncherVersion = false;
         private DispatcherTimer refreshTimer;
 
         string messageText = "";
@@ -82,7 +60,7 @@ namespace LauncherTwo
         public MainWindow()
         {
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
-            Instance = this;
+
             //We want the window to be in the middle of the screen. 
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
@@ -90,7 +68,7 @@ namespace LauncherTwo
             InitializeComponent();
 
             SD_GameVersion.Text = VersionCheck.GetGameVersion();
-            VersionCheck.StartFindLauncherVersion();
+            StartCheckingVersions();
 
             refreshTimer = new DispatcherTimer();
             refreshTimer.Interval = new TimeSpan(0, 0, SERVER_REFRESH_RATE);
@@ -109,70 +87,14 @@ namespace LauncherTwo
                 SD_Username.Content = Properties.Settings.Default.Username;
 
             SetMessageboxText(MESSAGE_IDLE);
-
-            TickThread = new Thread(new ThreadStart(TickThreadFunc));
-            TickThread.Start();            
-
-            PingStats();
-           // System.ComponentModel.BackgroundWorker Background = new System.ComponentModel.BackgroundWorker();
-            //Background.WorkerSupportsCancellation = true;
-            //Background.WorkerReportsProgress = false;
-            //Background.DoWork += new System.ComponentModel.DoWorkEventHandler(TickThreadFunc);
         }
 
-        private void TickThreadFunc()
+        private async Task CheckVersionsAsync()
         {
-            while (true)
-            {
-                Thread.Sleep((int)(1000.0f / TICK_RATE));
-                // Have the dispatcher call tick, so we don't have to worry about cross-thread stuff.
-                Dispatcher.Invoke(Tick);
-            }
-        }
+            Task launcherTask = VersionCheck.FindLauncherVersionAsync();
+            Task gameTask = VersionCheck.FindGameVersionAsync();
 
-        private void Tick ()
-        {
-            if (GetMessageboxText() == MESSAGE_JOINGAME && !LaunchTools.LastRunStillRunning())
-            {
-                OnGameExit();
-            }
-
-            if (!FoundLatestGameVersion && VersionCheck.GetLatestGameVersion() != "")
-                LatestGameVersionFound();
-
-            if (!FoundLatestLauncherVersion && VersionCheck.GetLatestLauncherVersion() != "")
-                LatestLauncherVersionFound();
-        }
-
-        void LatestGameVersionFound()
-        {
-            FoundLatestGameVersion = true;
-
-            if (VersionCheck.GetGameVersion() == "")
-            {
-                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersion());
-                return;
-            }
-
-            if (VersionCheck.IsGameOutOfDate())
-            {
-                ShowGameUpdateWindow();
-            }
-            else
-            {
-                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersion());
-            }
-
-            //if (SHOW_DEBUG)
-            //{
-            //    SetMessageboxText("Latest Version: " + VersionCheck.GetLatestVersion() + " ( " + VersionCheck.GetLatestVersionNumerical().ToString() + ") Game Version: " + VersionCheck.GetGameVersion() + " (" + VersionCheck.GetGameVersionNumerical().ToString() + ")");
-            //}
-        }
-
-        void LatestLauncherVersionFound()
-        {
-            FoundLatestLauncherVersion = true;
-
+            await launcherTask;
             if (VersionCheck.IsLauncherOutOfDate())
             {
                 ShowLauncherUpdateWindow();
@@ -180,9 +102,28 @@ namespace LauncherTwo
             else
             {
                 SetMessageboxText("Launcher is up to date!");
-                // If launcher is up to date, check to see if game is up to date.
-                VersionCheck.StartFindGameVersion();
             }
+
+            await gameTask;
+            if (VersionCheck.GetGameVersion() == "")
+            {
+                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersion());
+            }
+            else if (VersionCheck.IsGameOutOfDate())
+            {
+                ShowGameUpdateWindow();
+            }
+            else
+            {
+                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersion());
+            }
+        }
+
+        private void StartCheckingVersions()
+        {
+#pragma warning disable 4014
+            CheckVersionsAsync();
+#pragma warning restore 4014
         }
 
         void ShowGameUpdateWindow()
@@ -224,11 +165,6 @@ namespace LauncherTwo
             {
                 DownloadLauncherUpdate();
             }
-        }
-
-        private void OnGameExit()
-        {
-            SetMessageboxText(MESSAGE_IDLE);
         }
 
         public void RefilterServers()
@@ -276,7 +212,7 @@ namespace LauncherTwo
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
-                }   
+                }
             }
 
             if (previousSelectedServer != null)
@@ -314,39 +250,18 @@ namespace LauncherTwo
             }
         }
 
-        void PingStats()
+        async void JoinServer(string IP, string Password = "")
         {
-            Uri uri = new Uri("http://www.renegade-x.com/launcher_data/launcher_ping.html", UriKind.Absolute);
-            WebClient wc = new WebClient();
-            wc.OpenReadCompleted += new OpenReadCompletedEventHandler(OpenReadComplete);
-            wc.OpenReadAsync(uri);
-        }
-
-        void OpenReadComplete(object o, OpenReadCompletedEventArgs args)
-        {
-            WebClient wc = o as WebClient;
-            if (wc != null)
+            SetMessageboxText("Launching Renegade-X");
+            bool success = await LaunchTools.JoinServerAsync(IP, Properties.Settings.Default.Username, Password);
+            if (success)
             {
-
+                SetMessageboxText(MESSAGE_IDLE);
             }
-        }
-
-        void JoinServer(string IP, string Password = "")
-        {
-            if (LaunchTools.JoinServer(IP, Properties.Settings.Default.Username,Password))
-                {
-                    if (SHOW_DEBUG)
-                        SetMessageboxText(LaunchTools.GetArguments(IP, Properties.Settings.Default.Username, Password));
-                    else
-                        SetMessageboxText(MESSAGE_JOINGAME);
-                }
-                else
-                {
-                    if (SHOW_DEBUG)
-                        SetMessageboxText(IP);
-                    else
-                        SetMessageboxText(MESSAGE_CANTSTARTGAME);
-                }
+            else
+            {
+                SetMessageboxText(MESSAGE_CANTSTARTGAME);
+            }
         }
 
         private async Task RefreshServersAsync()
@@ -429,14 +344,6 @@ namespace LauncherTwo
             return messageText;
         }
 
-        protected override void OnClosed(System.EventArgs e)
-        {
-            base.OnClosed(e);
-            TickThread.Abort();
-
-            Application.Current.Shutdown();
-        }
-
         private void SD_ClanHeader_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ServerInfo selected = GetSelectedServer();
@@ -461,12 +368,18 @@ namespace LauncherTwo
             SD_Username.Content = login.m_Username;
         }
 
-        
-
-        private void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
+        private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
         {
-            LaunchTools.LaunchGame(Properties.Settings.Default.Username);
             SetMessageboxText("Launching Renegade-X");
+            bool success = await LaunchTools.LaunchGameAsync(Properties.Settings.Default.Username);
+            if (success)
+            {
+                SetMessageboxText(MESSAGE_IDLE);
+            }
+            else
+            {
+                SetMessageboxText(MESSAGE_CANTSTARTGAME);
+            }
         }
 
         void JoinPasswordServer(string IP)

@@ -15,27 +15,6 @@ namespace LauncherTwo
         public static readonly string EXE_PATH = "\\Binaries\\Win32\\UDK.exe";
         static Process LastRunprocess;
 
-        public static bool LaunchGame(string Username)
-        {
-            Arguments = INI_PATH + Username;
-
-            Process UDKProcess = new Process();
-            UDKProcess.StartInfo.FileName = GetPath();
-            UDKProcess.StartInfo.Arguments = Arguments;
-
-            try
-            {
-                UDKProcess.Start();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-            LastRunprocess = UDKProcess;
-            return true;
-        }
-
         public static string GetArguments(string anIPAdress, string Username, string aPassword = "")
         {
             Arguments = anIPAdress;
@@ -45,32 +24,46 @@ namespace LauncherTwo
             return Arguments;
         }
 
-        public static bool JoinServer(string anIPAdress, string Username, string aPassword = "")
+        public static async Task<bool> LaunchGameWithArgumentsAsync(string Arguments)
         {
-            Arguments = GetArguments(anIPAdress, Username, aPassword);
-
-            Process UDKProcess = new Process();
-            UDKProcess.StartInfo.FileName = GetPath();
-            UDKProcess.StartInfo.Arguments = Arguments;
-
             try
             {
+                Process UDKProcess = new Process();
+                LastRunprocess = UDKProcess;
+                UDKProcess.StartInfo.FileName = GetPath();
+                UDKProcess.StartInfo.Arguments = Arguments;
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                UDKProcess.EnableRaisingEvents = true;
+                UDKProcess.Exited += (sender, e) => { tcs.SetResult(null); };
                 UDKProcess.Start();
+                await tcs.Task;
+                return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return false;
             }
-            LastRunprocess = UDKProcess;
-            return true;
+            finally
+            {
+                LastRunprocess = null;
+            }
+        }
+
+        public static async Task<bool> LaunchGameAsync(string Username)
+        {
+            return await LaunchGameWithArgumentsAsync(INI_PATH + Username);
+        }
+
+        public static async Task<bool> JoinServerAsync(string anIPAdress, string Username, string aPassword = "")
+        {
+            Arguments = GetArguments(anIPAdress, Username, aPassword);
+            return await LaunchGameWithArgumentsAsync(Arguments);
         }
 
         public static bool LastRunStillRunning()
         {
-            if (LastRunprocess != null && !LastRunprocess.HasExited)
-                return true;
-            else return false;
+            return LastRunprocess != null;
         }
 
         private static string GetPath()
