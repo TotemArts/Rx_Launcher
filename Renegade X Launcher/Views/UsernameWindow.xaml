@@ -1,6 +1,10 @@
 ﻿<Window x:Class="LauncherTwo.Views.UsernameWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="132" Width="312" ResizeMode="NoResize" WindowStyle="None">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="132" Width="312" ResizeMode="NoResize" WindowStyle="None"
+        xmlns:local="clr-namespace:LauncherTwo"
+        WindowStartupLocation="CenterScreen"
+        FocusManager.FocusedElement="{Binding ElementName=SD_UsernameBox}"
+        >
     <Window.Resources>
         <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
     </Window.Resources>
@@ -40,6 +44,13 @@
             <TextBox.BorderBrush>
                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </TextBox.BorderBrush>
+            <TextBox.Text>
+                <Binding Path="Username" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:UsernameValidationRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
         </TextBox>
         <Button x:Name="SubmitBtn" Content="Submit" HorizontalAlignment="Right" Margin="0,15,80,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="SubmitButton_Click" IsDefault="True">
             <Button.Foreground>
@@ -49,7 +60,7 @@
                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </Button.BorderBrush>
         </Button>
-        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="80,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="CancelButton_Click" IsCancel="True">
+        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="80,15,0,0" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" IsCancel="True">
             <Button.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Button.Foreground>

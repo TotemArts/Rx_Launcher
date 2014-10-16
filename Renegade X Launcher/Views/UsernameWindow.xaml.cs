@@ -19,24 +19,24 @@ namespace LauncherTwo.Views
     /// </summary>
     public partial class UsernameWindow : Window
     {
-        public string m_Username; 
+        public string Username { get; set; }
 
         public UsernameWindow()
         {
             InitializeComponent();
-            this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-         
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
+            DataContext = this;
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            m_Username = SD_UsernameBox.Text;
-            this.Close();
+            if (Username.Contains("\"") || Username.Contains("#"))
+            {
+                MessageBox.Show("Your name may not contain any of the following characters: \" #", "Invalid name", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                DialogResult = true;
+            }
         }
     }
 }

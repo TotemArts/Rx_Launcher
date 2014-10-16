@@ -31,7 +31,7 @@ namespace LauncherTwo
                     Arguments += "?PASSWORD=" + Password;
                 }
             }
-            Arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username;
+            Arguments += " -ini:UDKGame:DefaultPlayer.Name=\"" + Username + "\"";
             return Arguments;
         }
     }

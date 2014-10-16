@@ -361,14 +361,15 @@ namespace LauncherTwo
         private void ShowUsernameBox()
         {
             UsernameWindow login = new UsernameWindow();
-            login.m_Username = Properties.Settings.Default.Username;
-            login.SD_UsernameBox.Text = Properties.Settings.Default.Username;
+            login.Username = Properties.Settings.Default.Username;
+            bool? result = login.ShowDialog();
 
-            login.ShowDialog();
-
-            Properties.Settings.Default.Username = login.m_Username;
-            Properties.Settings.Default.Save();
-            SD_Username.Content = login.m_Username;
+            if (result.HasValue && result.Value)
+            {
+                Properties.Settings.Default.Username = login.Username;
+                Properties.Settings.Default.Save();
+                SD_Username.Content = login.Username;
+            }
         }
 
         private async Task StartGameInstance(string ipEndpoint, string password)

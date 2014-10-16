@@ -145,6 +145,7 @@
     <Compile Include="Views\UpdateDownloadWindow.xaml.cs">
       <DependentUpon>UpdateDownloadWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UsernameValidationRule.cs" />
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
     </Compile>
