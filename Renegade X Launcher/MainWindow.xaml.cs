@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 namespace LauncherTwo
 {
-    public partial class MainWindow : RXWindow
+    public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
         public const bool SHOW_DEBUG = false;
 
@@ -31,11 +31,31 @@ namespace LauncherTwo
         public static readonly int MAX_PLAYER_COUNT = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer refreshTimer;
-        private GameInstance GameInstance;
+        private GameInstance _GameInstance;
+        public GameInstance GameInstance
+        {
+            get { return _GameInstance; }
+            set
+            {
+                _GameInstance = value;
+                NotifyPropertyChanged("GameInstance");
+                NotifyPropertyChanged("IsLaunchingPossible");
+            }
+        }
+
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         string messageText = "";
 
         public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion(); } }
+        public bool IsLaunchingPossible { get { return GameInstance == null; } }
 
         const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
         const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
