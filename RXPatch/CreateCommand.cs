@@ -13,6 +13,7 @@ namespace RXPatch
     class CreateCommand : ConsoleCommand
     {
         bool RemoveOutput = false;
+
         public CreateCommand()
         {
             IsCommand("create", "Create patch");

@@ -1,4 +1,5 @@
-﻿using MonoTorrent.Common;
+﻿using MonoTorrent;
+using MonoTorrent.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,17 @@ namespace RXPatchLib
             c.CreatedBy = Assembly.GetExecutingAssembly().GetName().Name;
             c.Publisher = patchInfo.Publisher;
             c.Private = patchInfo.Private;
+
+            foreach (var tierUrls in patchInfo.AnnounceUrls)
+            {
+                c.Announces.Add(new RawTrackerTier(tierUrls));
+            }
+            if (c.Announces.Count > 0 && c.Announces[0].Count > 0)
+            {
+                c.Announce = c.Announces[0][0];
+            }
+
+            c.PieceLength = 0;
 
             ITorrentFileSource fileSource = new PatchTorrentFileSource(patchInfo.Name, patchDirPath);
             c.Create(fileSource, Path.Combine(patchDirPath, patchInfo.Name + ".torrent"));
