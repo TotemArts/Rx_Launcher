@@ -898,7 +898,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" x:Name="Header" Background="#FF0B1A22">
+            <Grid Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
@@ -906,11 +906,11 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" HorizontalAlignment="Left" Width="24" Height="18" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" Focusable="False" Foreground="{StaticResource WindowText}"/>
-                <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" HorizontalAlignment="Left" Height="30" Content="Player Name" FontSize="18" Background="{x:Null}" Foreground="{StaticResource WindowText}"/>
+                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
+                <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
                 <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
-                <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" Foreground="{StaticResource WindowText}" IsEnabled="{Binding IsLaunchingPossible}"/>
-                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="24" Background="{x:Null}" BorderBrush="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" Foreground="{StaticResource WindowText}" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
             </Grid>
             <Grid Grid.Row="1" x:Name="ContentSplit" Margin="4">
                 <Grid.ColumnDefinitions>
@@ -972,7 +972,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0" Content="&#xF002;" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Margin="6" Foreground="{StaticResource WindowText}"/>
                                 <TextBox Grid.Column="1" x:Name="sv_ServerSearch" Height="23" TextWrapping="Wrap" Width="159" Background="#199DD2FF" Foreground="White" TextChanged="sv_ServerSearch_TextChanged" Margin="6"/>
-                                <Button Grid.Column="2" x:Name="sd_Refresh" Width="25" Height="25" Content="&#xF021;" Background="{x:Null}" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Click="sd_Refresh_MouseDown" Margin="6" Foreground="{StaticResource WindowText}"/>
+                                <Button Grid.Column="2" x:Name="sd_Refresh" Width="25" Height="25" Content="&#xF021;" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Click="sd_Refresh_MouseDown" Margin="6"/>
                             </Grid>
                         </Grid>
                     </Border>
@@ -1045,11 +1045,7 @@
                                 <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Game Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
                                 <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Margin="3,1" Foreground="#FF6C6C6C" FontSize="9"/>
                             </StackPanel>
-                            <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" VerticalAlignment="Bottom" Background="#FF061923" FontSize="24" Foreground="White" Click="Join_Server_Btn_Click" Focusable="False" IsEnabled="{Binding IsLaunchingPossible}">
-                                <Button.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                </Button.BorderBrush>
-                            </Button>
+                            <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                         </StackPanel>
                     </Border>
                     <Border x:Name="Info_Bot_Border" BorderThickness="1" Grid.Row="2">

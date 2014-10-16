@@ -247,4 +247,51 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <SolidColorBrush x:Key="ButtonText">Gray</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonTextHover">White</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonTextDisabled">Gray</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonBackground">#44061923</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonBackgroundHover">#199DD2FF</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonBackgroundPressed">#88061923</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonBorder">#CC65787D</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonBorderHover">#CC65787D</SolidColorBrush>
+    <SolidColorBrush x:Key="ButtonBorderPressed">#CC65787D</SolidColorBrush>
+    <CornerRadius x:Key="ButtonCornerRadius">3</CornerRadius>
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Background" Value="{DynamicResource ButtonBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="{DynamicResource ButtonText}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Chrome" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{StaticResource ButtonCornerRadius}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                        <ContentPresenter x:Name="Presenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource ButtonTextDisabled}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundHover}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderHover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ButtonTextHover}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderPressed}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ButtonTextPressed}"/>
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Chrome" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>
