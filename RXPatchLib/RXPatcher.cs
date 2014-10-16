@@ -17,9 +17,9 @@ namespace RXPatchLib
 
         public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath)
         {
-            var backupPath = CreateDirPath(applicationDirPath, BackupSubPath);
-            var downloadPath = CreateDirPath(applicationDirPath, DownloadSubPath);
-            var tempPath = CreateDirPath(applicationDirPath, TempSubPath);
+            var backupPath = CreateBackupPath(applicationDirPath);
+            var downloadPath = CreateDownloadPath(applicationDirPath);
+            var tempPath = CreateTempPath(applicationDirPath);
 
             using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
             {
@@ -27,21 +27,37 @@ namespace RXPatchLib
                 await patcher.ApplyPatchAsync();
             }
         }
+
         public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath)
         {
-            var backupPath = CreateDirPath(applicationDirPath, BackupSubPath);
-            var tempPath = CreateDirPath(applicationDirPath, TempSubPath);
+            var backupPath = CreateBackupPath(applicationDirPath);
+            var tempPath = CreateTempPath(applicationDirPath);
 
             var patchSource = new FileSystemPatchSource(patchPath);
             var patcher = new DirectoryPatcher(new XdeltaPatcher(new XdeltaPatchSystem()), targetPath, backupPath, tempPath, patchSource);
             await patcher.ApplyPatchAsync();
         }
 
-        private static string CreateDirPath(string applicationDirPath, string subPath)
+        private static string CreateBackupPath(string applicationDirPath)
         {
-            var backupPath = Path.Combine(applicationDirPath, subPath);
-            Directory.CreateDirectory(backupPath);
-            return backupPath;
+            string dirName = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture);
+            return CreateDirPath(Path.Combine(applicationDirPath, BackupSubPath, dirName));
+        }
+
+        private static string CreateDownloadPath(string applicationDirPath)
+        {
+            return CreateDirPath(Path.Combine(applicationDirPath, DownloadSubPath));
+        }
+
+        private static string CreateTempPath(string applicationDirPath)
+        {
+            return CreateDirPath(Path.Combine(applicationDirPath, TempSubPath));
+        }
+
+        private static string CreateDirPath(string path)
+        {
+            Directory.CreateDirectory(path);
+            return path;
         }
     }
 }
