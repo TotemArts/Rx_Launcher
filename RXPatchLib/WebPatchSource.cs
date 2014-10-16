@@ -41,6 +41,7 @@ namespace RXPatchLib
             }
 
             var webClient = new WebClient();
+            webClient.Proxy = null; // TODO: Support proxy
             WebClientsBySubPath[subPath] = webClient;
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
