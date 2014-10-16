@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MonoTorrent">
+      <HintPath>..\packages\MonoTorrent.0.9.0\lib\net20\MonoTorrent.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -43,14 +46,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RXPatchBuilder.cs" />
     <Compile Include="CommandExecutionException.cs" />
     <Compile Include="DirectoryEx.cs" />
     <Compile Include="DirectoryPathIterator.cs" />
     <Compile Include="DirectoryPatchBuilder.cs" />
     <Compile Include="FilePatchInstruction.cs" />
     <Compile Include="PatchCreationException.cs" />
+    <Compile Include="PatchInfo.cs" />
+    <Compile Include="PatchTorrentInfo.cs" />
     <Compile Include="TemporaryDirectory.cs" />
     <Compile Include="TemporaryFile.cs" />
+    <Compile Include="TorrentBuilder.cs" />
+    <Compile Include="TorrentFileSource.cs" />
     <Compile Include="XdeltaPatchSystem.cs" />
     <Compile Include="ProcessEx.cs" />
     <Compile Include="XdeltaPatchBuilder.cs" />
