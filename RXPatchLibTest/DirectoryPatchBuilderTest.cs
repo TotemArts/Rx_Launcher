@@ -27,8 +27,8 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);
@@ -42,10 +42,10 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
 
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);
@@ -64,10 +64,10 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataA);
 
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);
@@ -87,11 +87,11 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataB);
 
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);
@@ -112,11 +112,11 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), "0");
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), "1");
 
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);
@@ -137,11 +137,11 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataA);
 
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);
@@ -162,13 +162,13 @@ namespace RXPatchLibTest
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())
             using (var patchDir = new TemporaryDirectory())
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
             {
                 File.WriteAllText(Path.Combine(oldDir.Path, "a"), DummyDataA);
                 File.WriteAllText(Path.Combine(oldDir.Path, "b"), DummyDataA);
                 File.WriteAllText(Path.Combine(newDir.Path, "a"), DummyDataB);
                 File.WriteAllText(Path.Combine(newDir.Path, "b"), DummyDataB);
 
-                var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
                 await builder.CreatePatchAsync(oldDir.Path, newDir.Path, patchDir.Path);
                 string instructionsString = File.ReadAllText(patchDir.Path + Path.DirectorySeparatorChar + "instructions.json");
                 var instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(instructionsString);

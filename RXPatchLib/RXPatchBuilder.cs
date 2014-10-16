@@ -1,6 +1,4 @@
-﻿using MonoTorrent.Client;
-using MonoTorrent.Common;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,9 +13,10 @@ namespace RXPatchLib
     {
         public async Task CreatePatchAsync(PatchInfo patchInfo)
         {
-            var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem()));
-            await builder.CreatePatchAsync(patchInfo.OldPath, patchInfo.NewPath, patchInfo.PatchPath);
-            new PatchTorrentBuilder().CreatePatchTorrent(patchInfo.PatchPath, patchInfo.TorrentInfo);
+            using (var builder = new DirectoryPatchBuilder(new XdeltaPatchBuilder(new XdeltaPatchSystem())))
+            {
+                await builder.CreatePatchAsync(patchInfo.OldPath, patchInfo.NewPath, patchInfo.PatchPath);
+            }
         }
     }
 }

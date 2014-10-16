@@ -10,6 +10,5 @@ namespace RXPatchLib
         public string OldPath;
         public string NewPath;
         public string PatchPath;
-        public PatchTorrentInfo TorrentInfo;
     }
 }

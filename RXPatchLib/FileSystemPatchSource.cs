@@ -17,9 +17,10 @@ namespace RXPatchLib
             return Path.Combine(RootPath, subPath);
         }
 
-        public Task Load(string subPath)
+        public async Task Load(string subPath, string hash)
         {
-            return TaskExtensions.CompletedTask;
+            if (hash != null && await SHA1.GetFileHashAsync(GetSystemPath(subPath)) != hash)
+                throw new PatchSourceLoadException(subPath, hash);
         }
     }
 }

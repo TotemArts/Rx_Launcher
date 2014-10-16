@@ -71,13 +71,6 @@ namespace RXPatch
                     OldPath = Path.Combine("path", "to", "old", "files"),
                     NewPath = Path.Combine("path", "to", "new", "files"),
                     PatchPath = Path.Combine("path", "to", "place", "output", "files"),
-                    TorrentInfo = new PatchTorrentInfo
-                    {
-                        Name = "example patch",
-                        Comment = "an example patch description",
-                        Publisher = "http://example.com/",
-                        Private = true,
-                    },
                 };
                 Console.Error.WriteLine("Invalid configuration. Please specify a configuration file that looks like the following:");
                 Console.Error.WriteLine(JsonConvert.SerializeObject(example, Formatting.Indented));

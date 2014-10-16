@@ -2,13 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RXPatchLib;
 using System.Threading.Tasks;
-using MonoTorrent.Tracker;
-using MonoTorrent.Tracker.Listeners;
 using System.IO;
 using System.Collections.Generic;
-using MonoTorrent.Client;
 using System.Threading;
-using MonoTorrent.Common;
 
 namespace RXPatchLibTest
 {
@@ -48,20 +44,20 @@ namespace RXPatchLibTest
                 await RoundtripTest(OldDir, NewDir, TargetDir, PatchDir.Path, WorkingDir);
             }
         }
+
         [TestMethod]
+        [Ignore]
         public async Task Beta2to3Patch()
         {
             var NewDir = "C:\\games\\Renegade X Beta 3";
             var TargetDir = "C:\\games\\Renegade X patchtest";
             var WorkingDir = "C:\\games\\Renegade X patchtest";
             var PatchDir = "C:\\games\\Renegade X patchtest source";
-            var torrentPath = Path.Combine(PatchDir, "unnamed patch.torrent");
-            byte[] torrentData = File.ReadAllBytes(torrentPath);
 
             var patcher = new RXPatcher();
-            await patcher.ApplyPatch(torrentData, TargetDir, WorkingDir);
+            await patcher.ApplyPatch("file:///" + PatchDir, TargetDir, WorkingDir);
 
-            DirectoryAssertions.AreEquivalent(NewDir, TargetDir);
+            await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
 
         public async Task RoundtripTest(Action<string, string, string, string, string> SetupFiles)
@@ -85,29 +81,15 @@ namespace RXPatchLibTest
                 OldPath = OldDir,
                 NewPath = NewDir,
                 PatchPath = PatchDir,
-                TorrentInfo = new PatchTorrentInfo
-                {
-                    AnnounceUrls = new List<List<String>> { new List<String> { "http://192.168.56.101:6969/announce" } }
-                }
             };
 
             var builder = new RXPatchBuilder();
             await builder.CreatePatchAsync(patchInfo);
 
-            var torrentPath = Path.Combine(PatchDir, patchInfo.TorrentInfo.Name + ".torrent");
-            byte[] torrentData = File.ReadAllBytes(torrentPath);
-            /*
-            using (var Tracker = new Tracker())...
-            var listener = new HttpListener("http://localhost:6969/announce/");
-            Tracker.TimeoutInterval = new TimeSpan(50);
-            Tracker.RegisterListener(listener);
-            Tracker.Add(new InfoHashTrackable(Torrent.Load(torrentData)));
-            listener.Start();*/
-
             var patcher = new RXPatcher();
-            await patcher.ApplyPatch(torrentData, TargetDir, WorkingDir);
+            await patcher.ApplyPatch("file:///" + PatchDir, TargetDir, WorkingDir);
 
-            DirectoryAssertions.AreEquivalent(NewDir, TargetDir);
+            await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
     }
 }

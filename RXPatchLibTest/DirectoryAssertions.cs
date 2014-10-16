@@ -11,16 +11,16 @@ namespace RXPatchLibTest
 {
     class DirectoryAssertions
     {
-        public static void AreEquivalent(string expectedPath, string actualPath)
+        public static async Task IsSubsetOf(string expectedPath, string actualPath)
         {
             var expectedFiles = DirectoryPathIterator.GetChildPathsRecursive(expectedPath);
             var actualFiles = DirectoryPathIterator.GetChildPathsRecursive(actualPath);
-            CollectionAssert.AreEquivalent(expectedFiles.ToArray(), actualFiles.ToArray());
+            CollectionAssert.IsSubsetOf(expectedFiles.ToArray(), actualFiles.ToArray());
             foreach (var file in expectedFiles)
             {
-                var expectedFileContents = File.ReadAllBytes(Path.Combine(expectedPath, file));
-                var actualFileContents = File.ReadAllBytes(Path.Combine(actualPath, file));
-                CollectionAssert.AreEqual(expectedFileContents, actualFileContents, "file " + file + " is different");
+                var expectedFileContents = await SHA1.GetFileHashAsync(Path.Combine(expectedPath, file));
+                var actualFileContents = await SHA1.GetFileHashAsync(Path.Combine(actualPath, file));
+                Assert.AreEqual(expectedFileContents, actualFileContents, "file " + file + " is different");
             }
         }
     }

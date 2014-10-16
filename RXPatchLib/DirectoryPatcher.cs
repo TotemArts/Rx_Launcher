@@ -37,13 +37,17 @@ namespace RXPatchLib
         {
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
-            if (NeedsBackup)
+            if (File.Exists(targetPath))
             {
-                File.Move(targetPath, backupPath);
-            }
-            else
-            {
-                File.Delete(targetPath);
+                if (NeedsBackup)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(backupPath));
+                    File.Move(targetPath, backupPath);
+                }
+                else
+                {
+                    File.Delete(targetPath);
+                }
             }
             return TaskExtensions.CompletedTask;
         }
@@ -72,6 +76,7 @@ namespace RXPatchLib
             string tempPath = DirectoryPatcher.GetTempPath(SubPath);
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string patchPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
             await DirectoryPatcher.FilePatcher.ApplyPatchAsync(targetPath, tempPath, patchPath);
             File.Delete(targetPath);
             File.Move(tempPath, targetPath);
@@ -105,14 +110,15 @@ namespace RXPatchLib
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
-            File.Copy(newPath, tempPath); // Copy to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to be cause inconsistency when interrupted).
-            if (NeedsBackup)
+            File.Copy(newPath, tempPath); // Copy to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted).
+            if (File.Exists(targetPath))
             {
-                File.Move(targetPath, backupPath);
-            }
-            else
-            {
-                if (File.Exists(targetPath))
+                if (NeedsBackup)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(backupPath));
+                    File.Move(targetPath, backupPath);
+                }
+                else
                 {
                     File.Delete(targetPath);
                 }
@@ -189,13 +195,6 @@ namespace RXPatchLib
                 }
             }
             return action;
-        }
-
-        internal async Task<IEnumerable<IFilePatchAction>> Analyze()
-        {
-            var actions = new List<IFilePatchAction>();
-            await Analyze(action => actions.Add(action));
-            return actions;
         }
 
         public async Task ApplyPatchAsync()
