@@ -51,7 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplyCommand.cs" />
+    <Compile Include="ApplyFromWebCommand.cs" />
+    <Compile Include="ApplyFromFilesystemCommand.cs" />
     <Compile Include="CreateCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

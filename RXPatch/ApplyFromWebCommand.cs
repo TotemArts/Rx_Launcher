@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace RXPatch
 {
-    class ApplyCommand : ConsoleCommand
+    class ApplyFromWebCommand : ConsoleCommand
     {
-        public ApplyCommand()
+        public ApplyFromWebCommand()
         {
-            IsCommand("apply", "Apply patch");
-            HasAdditionalArguments(3, "<patch dir> <target dir> <temporary/working dir>");
+            IsCommand("apply_web", "Apply patch via a URL (typically HTTP or FTP)");
+            HasAdditionalArguments(3, "<patch url> <destination dir> <application dir>");
         }
 
         public override int Run(string[] remainingArguments)
@@ -22,17 +22,13 @@ namespace RXPatch
 
         private async Task<int> RunAsync(string[] remainingArguments)
         {
-            var PatchDir = remainingArguments[0];
-            var TargetDir = remainingArguments[1];
-            var WorkingDir = remainingArguments[2];
+            var patchUrl = remainingArguments[0];
+            var targetDir = remainingArguments[1];
+            var applicationDir = remainingArguments[2];
 
             var errors = new List<string>();
-            if (!Directory.Exists(PatchDir))
-            {
-                errors.Add("Patch dir does not exist.");
-            }
 
-            if (!Directory.Exists(TargetDir))
+            if (!Directory.Exists(targetDir))
             {
                 errors.Add("Target dir does not exist.");
             }
@@ -46,7 +42,7 @@ namespace RXPatch
                 return 1;
             }
 
-            await new RXPatcher().ApplyPatchFromFilesystem(PatchDir, TargetDir, WorkingDir);
+            await new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir);
 
             return 0;
         }

@@ -15,7 +15,7 @@ namespace RXPatchLibTest
         [TestMethod]
         public async Task EmptyRoundtrip()
         {
-            await RoundtripTest((OldDir, NewDir, TargetDir, PatchDir, WorkingDir) =>
+            await RoundtripTest((OldDir, NewDir, TargetDir, PatchDir, ApplicationDir) =>
             {
 
             });
@@ -24,7 +24,7 @@ namespace RXPatchLibTest
         [TestMethod]
         public async Task SimpleRoundtrip()
         {
-            await RoundtripTest((OldDir, NewDir, TargetDir, PatchDir, WorkingDir) =>
+            await RoundtripTest((OldDir, NewDir, TargetDir, PatchDir, ApplicationDir) =>
             {
                 Directory.CreateDirectory(Path.Combine(NewDir, "TestDir"));
                 File.WriteAllText(Path.Combine(NewDir, "TestDir", "TestFile"), "TestData");
@@ -38,10 +38,10 @@ namespace RXPatchLibTest
             var OldDir = "C:\\games\\Renegade X Beta 2";
             var NewDir = "C:\\games\\Renegade X Beta 3";
             var TargetDir = "C:\\games\\Renegade X patchtest";
-            var WorkingDir = "C:\\games\\Renegade X patchtest";
+            var ApplicationDir = "C:\\games\\Renegade X patchtest";
             using (var PatchDir = new TemporaryDirectory())
             {
-                await RoundtripTest(OldDir, NewDir, TargetDir, PatchDir.Path, WorkingDir);
+                await RoundtripTest(OldDir, NewDir, TargetDir, PatchDir.Path, ApplicationDir);
             }
         }
 
@@ -51,10 +51,10 @@ namespace RXPatchLibTest
         {
             var NewDir = "C:\\games\\Renegade X Beta 3";
             var TargetDir = "C:\\games\\Renegade X patchtest";
-            var WorkingDir = "C:\\games\\Renegade X patchtest";
+            var ApplicationDir = "C:\\games\\Renegade X patchtest";
             var PatchDir = "C:\\games\\Renegade X patchtest source";
 
-            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, WorkingDir);
+            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir);
 
             await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
@@ -65,15 +65,15 @@ namespace RXPatchLibTest
             using (var NewDir = new TemporaryDirectory())
             using (var TargetDir = new TemporaryDirectory())
             using (var PatchDir = new TemporaryDirectory())
-            using (var WorkingDir = new TemporaryDirectory())
+            using (var ApplicationDir = new TemporaryDirectory())
             {
-                SetupFiles(OldDir.Path, NewDir.Path, TargetDir.Path, PatchDir.Path, WorkingDir.Path);
+                SetupFiles(OldDir.Path, NewDir.Path, TargetDir.Path, PatchDir.Path, ApplicationDir.Path);
 
-                await RoundtripTest(OldDir.Path, NewDir.Path, TargetDir.Path, PatchDir.Path, WorkingDir.Path);
+                await RoundtripTest(OldDir.Path, NewDir.Path, TargetDir.Path, PatchDir.Path, ApplicationDir.Path);
             }
         }
 
-        private async Task RoundtripTest(string OldDir, string NewDir, string TargetDir, string PatchDir, string WorkingDir)
+        private async Task RoundtripTest(string OldDir, string NewDir, string TargetDir, string PatchDir, string ApplicationDir)
         {
             var patchInfo = new PatchInfo
             {
@@ -85,7 +85,7 @@ namespace RXPatchLibTest
             var builder = new RXPatchBuilder();
             await builder.CreatePatchAsync(patchInfo);
 
-            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, WorkingDir);
+            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir);
 
             await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
