@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebAPI", "SteamWebAPI-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Renegade X Launcher\Launcher.csproj", "{DF79C6AB-E013-4211-8983-C9A97984AB49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RXPatchLib", "RXPatchLib\RXPatchLib.csproj", "{E465D232-EE02-495D-8391-BFDAFE350CF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RXPatchLibTest", "RXPatchLibTest\RXPatchLibTest.csproj", "{C5F6C8DF-3CFF-4757-A4F7-FD99E8893A2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{DF79C6AB-E013-4211-8983-C9A97984AB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF79C6AB-E013-4211-8983-C9A97984AB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF79C6AB-E013-4211-8983-C9A97984AB49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E465D232-EE02-495D-8391-BFDAFE350CF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E465D232-EE02-495D-8391-BFDAFE350CF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E465D232-EE02-495D-8391-BFDAFE350CF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E465D232-EE02-495D-8391-BFDAFE350CF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5F6C8DF-3CFF-4757-A4F7-FD99E8893A2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5F6C8DF-3CFF-4757-A4F7-FD99E8893A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5F6C8DF-3CFF-4757-A4F7-FD99E8893A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5F6C8DF-3CFF-4757-A4F7-FD99E8893A2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
