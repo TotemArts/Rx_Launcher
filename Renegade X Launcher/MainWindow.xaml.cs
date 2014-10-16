@@ -52,8 +52,6 @@ namespace LauncherTwo
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        string messageText = "";
-
         public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion(); } }
         public bool IsLaunchingPossible { get { return GameInstance == null; } }
 
@@ -82,11 +80,9 @@ namespace LauncherTwo
         {
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
-            //We want the window to be in the middle of the screen. 
-            this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-
-            //The init step for the window.
             InitializeComponent();
+
+            SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
 
             SD_GameVersion.Text = VersionCheck.GetGameVersion();
             StartCheckingVersions();
@@ -106,8 +102,6 @@ namespace LauncherTwo
                 ShowUsernameBox();
             else
                 SD_Username.Content = Properties.Settings.Default.Username;
-
-            SetMessageboxText(MESSAGE_IDLE);
         }
 
         private async Task CheckVersionsAsync()
@@ -351,12 +345,6 @@ namespace LauncherTwo
         public void SetMessageboxText(string text)
         {
             MessageBoxText.Text = text;
-            messageText = text;
-        }
-
-        public string GetMessageboxText()
-        {
-            return messageText;
         }
 
         private void SD_ClanHeader_MouseDown(object sender, MouseButtonEventArgs e)

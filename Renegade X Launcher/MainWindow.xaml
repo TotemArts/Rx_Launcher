@@ -18,7 +18,8 @@
     Icon="Icon_Silver.ico"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000"
-    Title="{Binding TitleValue}">
+    Title="{Binding TitleValue}"
+    WindowStartupLocation="CenterScreen">
 
 
 
