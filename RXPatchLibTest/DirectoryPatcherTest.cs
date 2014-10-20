@@ -76,7 +76,7 @@ namespace RXPatchLibTest
             File.WriteAllText(instructionsFilename, instructionsJson);
             try
             {
-                await DirectoryPatcher.ApplyPatchAsync();
+                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create());
             }
             finally
             {

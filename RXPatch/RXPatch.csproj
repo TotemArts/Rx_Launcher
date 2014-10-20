@@ -55,6 +55,7 @@
     <Compile Include="ApplyFromFilesystemCommand.cs" />
     <Compile Include="CreateCommand.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProgressReporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryPatcherProgress.cs" />
+    <Compile Include="DirectoryPatchPhaseProgress.cs" />
+    <Compile Include="DiscreteProgress.cs" />
+    <Compile Include="ObjectEx.cs" />
     <Compile Include="RXPatchBuilder.cs" />
     <Compile Include="RXPatcher.cs" />
     <Compile Include="CommandExecutionException.cs" />

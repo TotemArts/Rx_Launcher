@@ -46,7 +46,9 @@ namespace RXPatch
                 return 1;
             }
 
-            await new RXPatcher().ApplyPatchFromFilesystem(patchDir, destinationDir, applicationDir);
+            await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
+                (progress) => new RXPatcher().ApplyPatchFromFilesystem(patchDir, destinationDir, applicationDir, progress)
+            );
 
             return 0;
         }

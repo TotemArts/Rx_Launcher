@@ -11,7 +11,6 @@ namespace RXPatchLibTest
     [TestClass]
     public class RXPatcherTest
     {
-
         [TestMethod]
         public async Task EmptyRoundtrip()
         {
@@ -54,7 +53,7 @@ namespace RXPatchLibTest
             var ApplicationDir = "C:\\games\\Renegade X patchtest";
             var PatchDir = "C:\\games\\Renegade X patchtest source";
 
-            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir);
+            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir, TestProgressHandlerFactory.Create());
 
             await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }
@@ -85,7 +84,7 @@ namespace RXPatchLibTest
             var builder = new RXPatchBuilder();
             await builder.CreatePatchAsync(patchInfo);
 
-            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir);
+            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir, TestProgressHandlerFactory.Create());
 
             await DirectoryAssertions.IsSubsetOf(NewDir, TargetDir);
         }

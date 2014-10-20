@@ -11,6 +11,7 @@ namespace RXPatchLib
 {
     interface IFilePatchAction
     {
+        long NewSize { get; }
         Task Load();
         Task Execute();
     }
@@ -20,6 +21,7 @@ namespace RXPatchLib
         private DirectoryPatcher DirectoryPatcher;
         private string SubPath;
         private bool NeedsBackup;
+        public long NewSize { get { return 0; } }
 
         public RemoveAction(DirectoryPatcher directoryPatcher, string subPath, bool needsBackup)
         {
@@ -58,12 +60,14 @@ namespace RXPatchLib
         private DirectoryPatcher DirectoryPatcher;
         private string SubPath;
         private string PatchSubPath;
+        public long NewSize { get; private set; }
 
-        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath)
+        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long newSize)
         {
             DirectoryPatcher = directoryPatcher;
             SubPath = subPath;
             PatchSubPath = patchSubPath;
+            NewSize = newSize;
         }
 
         public Task Load()
@@ -89,13 +93,15 @@ namespace RXPatchLib
         private string SubPath;
         private string PatchSubPath;
         private bool NeedsBackup;
+        public long NewSize { get; private set; }
 
-        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup)
+        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long newSize)
         {
             DirectoryPatcher = directoryPatcher;
             SubPath = subPath;
             PatchSubPath = patchSubPath;
             NeedsBackup = needsBackup;
+            NewSize = newSize;
         }
 
         public Task Load()
@@ -131,6 +137,38 @@ namespace RXPatchLib
 
     public class DirectoryPatcher
     {
+        class LoadPhase
+        {
+            DirectoryPatchPhaseProgress Progress = new DirectoryPatchPhaseProgress();
+            List<Task> Tasks = new List<Task>();
+            Action<DirectoryPatchPhaseProgress> ProgressCallback;
+
+            public LoadPhase(Action<DirectoryPatchPhaseProgress> progressCallback)
+            {
+                ProgressCallback = progressCallback;
+                Progress.State = DirectoryPatchPhaseProgress.States.Started;
+                ProgressCallback(Progress);
+            }
+
+            public async Task StartLoading(IFilePatchAction action)
+            {
+                var task = action.Load();
+                Tasks.Add(task);
+                Progress.AddItem(action.NewSize);
+                ProgressCallback(Progress);
+                await task;
+                Progress.AdvanceItem(action.NewSize);
+                ProgressCallback(Progress);
+            }
+
+            public async Task AwaitAllTasksAndFinish()
+            {
+                await Task.WhenAll(Tasks);
+                Progress.State = DirectoryPatchPhaseProgress.States.Finished;
+                ProgressCallback(Progress);
+            }
+        }
+
         internal XdeltaPatcher FilePatcher;
         internal IPatchSource PatchSource;
         string TargetPath;
@@ -150,7 +188,7 @@ namespace RXPatchLib
             PatchSource = patchSource;
         }
 
-        internal async Task Analyze(Action<IFilePatchAction> callback)
+        internal async Task Analyze(Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
             await PatchSource.Load("instructions.json");
             string headerFileContents;
@@ -161,6 +199,11 @@ namespace RXPatchLib
             }
             List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
 
+            var progress = new DirectoryPatchPhaseProgress();
+            progress.SetTotals(instructions.Count, (from i in instructions select i.NewSize).Sum()); // Using the actual file size here would be better, but this is a fast and easy approximation.
+            progress.State = DirectoryPatchPhaseProgress.States.Started;
+            progressCallback(progress);
+
             foreach (var instruction in instructions)
             {
                 string targetFilePath = Path.Combine(TargetPath, instruction.Path);
@@ -170,7 +213,12 @@ namespace RXPatchLib
                 {
                     callback(action);
                 }
+                progress.AdvanceItem(instruction.NewSize);
+                progressCallback(progress);
             }
+
+            progress.State = DirectoryPatchPhaseProgress.States.Finished;
+            progressCallback(progress);
         }
 
         private IFilePatchAction BuildFilePatchAction(FilePatchInstruction instruction, string userHash)
@@ -186,31 +234,54 @@ namespace RXPatchLib
                 else if (isOld && instruction.HasDelta)
                 {
                     string deltaFileName = Path.Combine("delta", instruction.NewHash + "_from_" + instruction.OldHash);
-                    action = new DeltaPatchAction(this, instruction.Path, deltaFileName);
+                    action = new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.NewSize);
                 }
                 else
                 {
                     string fullFileName = Path.Combine("full", instruction.NewHash);
-                    action = new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup);
+                    action = new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.NewSize);
                 }
             }
             return action;
         }
 
-        public async Task ApplyPatchAsync()
+        private static async Task Apply(List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
-            var actions = new List<IFilePatchAction>();
-            var loaders = new List<Task>();
-            await Analyze(action =>
-            {
-                loaders.Add(action.Load());
-                actions.Add(action);
-            });
-            await Task.WhenAll(loaders);
+            var progress = new DirectoryPatchPhaseProgress();
+            progress.SetTotals(actions.Count, (from a in actions select a.NewSize).Sum()); // Using the actual file size here would be better, but this is a fast and easy approximation.
+            progress.State = DirectoryPatchPhaseProgress.States.Started;
+            progressCallback(progress);
+
             foreach (var action in actions)
             {
                 await action.Execute();
+                progress.AdvanceItem(action.NewSize);
+                progressCallback(progress);
             }
+
+            progress.State = DirectoryPatchPhaseProgress.States.Finished;
+            progressCallback(progress);
+        }
+
+        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback)
+        {
+            var actions = new List<IFilePatchAction>();
+            var progress = new DirectoryPatcherProgressReport();
+            Action<Action> reportProgress = (phaseAction) => {
+                phaseAction();
+                progressCallback.Report(ObjectEx.DeepClone(progress));
+            };
+            var loadPhase = new LoadPhase(phaseProgress => reportProgress(() => progress.Load = phaseProgress));
+
+            await Analyze(action =>
+            {
+                Task ignoreWarning = loadPhase.StartLoading(action);
+                actions.Add(action);
+            }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress));
+
+            await loadPhase.AwaitAllTasksAndFinish();
+
+            await Apply(actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
         }
     }
 }

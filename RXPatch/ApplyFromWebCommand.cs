@@ -42,7 +42,9 @@ namespace RXPatch
                 return 1;
             }
 
-            await new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir);
+            await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
+                (progress) => new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress)
+            );
 
             return 0;
         }
