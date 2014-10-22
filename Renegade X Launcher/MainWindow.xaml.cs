@@ -81,27 +81,29 @@ namespace LauncherTwo
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
             InitializeComponent();
-
             SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
+            ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
             SD_GameVersion.Text = VersionCheck.GetGameVersion();
-            StartCheckingVersions();
-
-            refreshTimer = new DispatcherTimer();
-            refreshTimer.Interval = new TimeSpan(0, 0, SERVER_REFRESH_RATE);
-            refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
-            refreshTimer.Start();
-            StartRefreshingServers();
-
-            ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
-            if (Properties.Settings.Default.Username == "")
-                ShowUsernameBox();
-            else
-                SD_Username.Content = Properties.Settings.Default.Username;
+            SourceInitialized += (s, a) =>
+            {
+                StartCheckingVersions();
+
+                refreshTimer = new DispatcherTimer();
+                refreshTimer.Interval = new TimeSpan(0, 0, SERVER_REFRESH_RATE);
+                refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
+                refreshTimer.Start();
+                StartRefreshingServers();
+
+                if (Properties.Settings.Default.Username == "")
+                    ShowUsernameBox();
+                else
+                    SD_Username.Content = Properties.Settings.Default.Username;
+            };
         }
 
         private async Task CheckVersionsAsync()
@@ -147,6 +149,7 @@ namespace LauncherTwo
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersion();
             theWindow.GameVersionText.Content = VersionCheck.GetGameVersion();
             theWindow.WindowTitle.Content = "Game Update Available!";
+            theWindow.Owner = this;
             theWindow.ShowDialog();
 
             if (theWindow.WantsToUpdate)
@@ -159,6 +162,7 @@ namespace LauncherTwo
         void DownloadLauncherUpdate()
         {
             UpdateDownloadWindow theWindow = new UpdateDownloadWindow();
+            theWindow.Owner = this;
             theWindow.ShowDialog();
 
             if (theWindow.UpdateFinished)
@@ -174,6 +178,7 @@ namespace LauncherTwo
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestLauncherVersion();
             theWindow.GameVersionText.Content = VersionCheck.GetLauncherVersion();
             theWindow.WindowTitle.Content = "Launcher Update Available!";
+            theWindow.Owner = this;
             theWindow.ShowDialog();
 
             if (theWindow.WantsToUpdate)
@@ -262,6 +267,7 @@ namespace LauncherTwo
                 if (GetSelectedServer().PasswordProtected)
                 {
                     PasswordWindow PassWindow = new PasswordWindow();
+                    PassWindow.Owner = this;
                     PassWindow.ShowDialog();
                     if (!PassWindow.WantsToJoin)
                     {
@@ -362,6 +368,7 @@ namespace LauncherTwo
         {
             UsernameWindow login = new UsernameWindow();
             login.Username = Properties.Settings.Default.Username;
+            login.Owner = this;
             bool? result = login.ShowDialog();
 
             if (result.HasValue && result.Value)
@@ -406,6 +413,7 @@ namespace LauncherTwo
         private async void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
         {
             JoinIPWindow IPWindow = new JoinIPWindow();
+            IPWindow.Owner = this;
             IPWindow.ShowDialog();
             if (IPWindow.WantsToJoin)
             {

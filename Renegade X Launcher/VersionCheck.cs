@@ -111,13 +111,12 @@ namespace LauncherTwo
 
         public static bool IsLauncherOutOfDate()
         {
-            float LauncherVerFloat;
-            float LatestLauncherVerFloat;
+            Debug.Assert(LauncherVersion != null);
 
             if (LatestLauncherVersion != "" && LauncherVersion != "")
             {
-                LauncherVerFloat = GetFloatVer(LauncherVersion);
-                LatestLauncherVerFloat = GetFloatVer(LatestLauncherVersion);
+                float LauncherVerFloat = GetFloatVer(LauncherVersion);
+                float LatestLauncherVerFloat = GetFloatVer(LatestLauncherVersion);
                 if (LauncherVerFloat == -1f || LatestLauncherVerFloat == -1f)
                     return false;
                 else if (LatestLauncherVerFloat > LauncherVerFloat)
@@ -128,15 +127,12 @@ namespace LauncherTwo
 
         public static bool IsGameOutOfDate()
         {
-            GetGameVersion(); // Ensure that GameVersion is set.
-
-            float GameVerFloat;
-            float LatestGameVerFloat;
+            Debug.Assert(GameVersion != null);
 
             if (LatestGameVersion != "" && GameVersion != "")
             {
-                GameVerFloat = GetFloatVer(GameVersion);
-                LatestGameVerFloat = GetFloatVer(LatestGameVersion);
+                float GameVerFloat = GetFloatVer(GameVersion);
+                float LatestGameVerFloat = GetFloatVer(LatestGameVersion);
                 if (GameVerFloat == -1f || LatestGameVerFloat == -1f)
                     return false;
                 else if (LatestGameVerFloat > GameVerFloat)
