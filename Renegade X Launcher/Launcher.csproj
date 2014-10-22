@@ -139,6 +139,9 @@
     <Compile Include="Views\PasswordWindow.xaml.cs">
       <DependentUpon>PasswordWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ApplyUpdateWindow.xaml.cs">
+      <DependentUpon>ApplyUpdateWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UpdateAvailableWindow.xaml.cs">
       <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
     </Compile>
@@ -169,6 +172,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <DesignData Include="Views\SampleUpdateProgress.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </DesignData>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -178,6 +185,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\PasswordWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ApplyUpdateWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -305,6 +316,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RXPatchLib\RXPatchLib.csproj">
+      <Project>{e465d232-ee02-495d-8391-bfdafe350cf0}</Project>
+      <Name>RXPatchLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SteamWebAPI-master\SteamWebAPI.csproj">
       <Project>{d846d108-d95b-4488-ba01-e487da220c17}</Project>
       <Name>SteamWebAPI</Name>

@@ -18,6 +18,8 @@ using System.Windows.Threading;
 using System.ComponentModel;
 using FirstFloor.ModernUI.Windows.Controls;
 using System.Collections.Generic;
+using RXPatchLib;
+using System.IO;
 
 
 namespace LauncherTwo
@@ -148,14 +150,23 @@ namespace LauncherTwo
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersion();
             theWindow.GameVersionText.Content = VersionCheck.GetGameVersion();
-            theWindow.WindowTitle.Content = "Game Update Available!";
+            theWindow.WindowTitle.Content = "Game update available!";
             theWindow.Owner = this;
             theWindow.ShowDialog();
 
             if (theWindow.WantsToUpdate)
             {
-                System.Diagnostics.Process.Start(VersionCheck.GAME_DOWNLOAD_URL);
-                this.Close();
+                var TargetDir = GameInstallation.GetRootPath();
+                var ApplicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
+                var PatchUrl = "http://localhost/patch";
+                var PatchVersion = "Open Beta 999";
+
+                var progress = new Progress<DirectoryPatcherProgressReport>();
+                Task task = new RXPatcher().ApplyPatchFromWeb(PatchUrl, TargetDir, ApplicationDir, progress);
+
+                var window = new ApplyUpdateWindow(task, progress, PatchVersion);
+                window.Owner = this;
+                window.ShowDialog();
             }
         }
 
@@ -177,7 +188,7 @@ namespace LauncherTwo
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestLauncherVersion();
             theWindow.GameVersionText.Content = VersionCheck.GetLauncherVersion();
-            theWindow.WindowTitle.Content = "Launcher Update Available!";
+            theWindow.WindowTitle.Content = "Launcher update available!";
             theWindow.Owner = this;
             theWindow.ShowDialog();
 

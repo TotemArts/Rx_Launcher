@@ -8,9 +8,14 @@ namespace RXPatchLib
     [Serializable]
     public class DirectoryPatcherProgressReport
     {
-        public DirectoryPatchPhaseProgress Analyze = new DirectoryPatchPhaseProgress();
-        public DirectoryPatchPhaseProgress Load = new DirectoryPatchPhaseProgress();
-        public DirectoryPatchPhaseProgress Apply = new DirectoryPatchPhaseProgress();
+        private DirectoryPatchPhaseProgress _Analyze = new DirectoryPatchPhaseProgress();
+        private DirectoryPatchPhaseProgress _Load = new DirectoryPatchPhaseProgress();
+        private DirectoryPatchPhaseProgress _Apply = new DirectoryPatchPhaseProgress();
+
+        public DirectoryPatchPhaseProgress Analyze { get { return _Analyze; } set { _Analyze = value; } }
+        public DirectoryPatchPhaseProgress Load { get { return _Load; } set { _Load = value; } }
+        public DirectoryPatchPhaseProgress Apply { get { return _Apply; } set { _Apply = value; } }
+
 
         public override string ToString()
         {

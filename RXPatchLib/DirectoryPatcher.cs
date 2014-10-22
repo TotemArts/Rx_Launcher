@@ -146,7 +146,7 @@ namespace RXPatchLib
             public LoadPhase(Action<DirectoryPatchPhaseProgress> progressCallback)
             {
                 ProgressCallback = progressCallback;
-                Progress.State = DirectoryPatchPhaseProgress.States.Started;
+                Progress.State = DirectoryPatchPhaseProgress.States.Indeterminate;
                 ProgressCallback(Progress);
             }
 
@@ -163,6 +163,7 @@ namespace RXPatchLib
 
             public async Task AwaitAllTasksAndFinish()
             {
+                Progress.State = DirectoryPatchPhaseProgress.States.Started;
                 await Task.WhenAll(Tasks);
                 Progress.State = DirectoryPatchPhaseProgress.States.Finished;
                 ProgressCallback(Progress);

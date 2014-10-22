@@ -1,0 +1,36 @@
+﻿<ApplyUpdateWindow xmlns="clr-namespace:LauncherTwo.Views" xmlns:RXPatchLib="clr-namespace:RXPatchLib;assembly=RXPatchLib" HasFinished="True">
+    <ApplyUpdateWindow.ProgressReport>
+        <RXPatchLib:DirectoryPatcherProgressReport>
+            <RXPatchLib:DirectoryPatcherProgressReport.Analyze>
+                <RXPatchLib:DirectoryPatchPhaseProgress State="Finished">
+                    <RXPatchLib:DirectoryPatchPhaseProgress.Items>
+                        <RXPatchLib:DiscreteProgress Done="0" Total="1"/>
+                    </RXPatchLib:DirectoryPatchPhaseProgress.Items>
+                    <RXPatchLib:DirectoryPatchPhaseProgress.Size>
+                        <RXPatchLib:DiscreteProgress Done="0" Total="100000000"/>
+                    </RXPatchLib:DirectoryPatchPhaseProgress.Size>
+                </RXPatchLib:DirectoryPatchPhaseProgress>
+            </RXPatchLib:DirectoryPatcherProgressReport.Analyze>
+            <RXPatchLib:DirectoryPatcherProgressReport.Load>
+                <RXPatchLib:DirectoryPatchPhaseProgress State="Started">
+                    <RXPatchLib:DirectoryPatchPhaseProgress.Items>
+                        <RXPatchLib:DiscreteProgress Done="0" Total="1"/>
+                    </RXPatchLib:DirectoryPatchPhaseProgress.Items>
+                    <RXPatchLib:DirectoryPatchPhaseProgress.Size>
+                        <RXPatchLib:DiscreteProgress Done="30000" Total="100000"/>
+                    </RXPatchLib:DirectoryPatchPhaseProgress.Size>
+                </RXPatchLib:DirectoryPatchPhaseProgress>
+            </RXPatchLib:DirectoryPatcherProgressReport.Load>
+            <RXPatchLib:DirectoryPatcherProgressReport.Apply>
+                <RXPatchLib:DirectoryPatchPhaseProgress State="Unstarted">
+                    <RXPatchLib:DirectoryPatchPhaseProgress.Items>
+                        <RXPatchLib:DiscreteProgress Done="0" Total="1"/>
+                    </RXPatchLib:DirectoryPatchPhaseProgress.Items>
+                    <RXPatchLib:DirectoryPatchPhaseProgress.Size>
+                        <RXPatchLib:DiscreteProgress Done="0" Total="0"/>
+                    </RXPatchLib:DirectoryPatchPhaseProgress.Size>
+                </RXPatchLib:DirectoryPatchPhaseProgress>
+            </RXPatchLib:DirectoryPatcherProgressReport.Apply>
+        </RXPatchLib:DirectoryPatcherProgressReport>
+    </ApplyUpdateWindow.ProgressReport>
+</ApplyUpdateWindow>

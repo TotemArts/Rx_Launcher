@@ -1,0 +1,65 @@
+﻿<parent:RXWindow
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:parent="clr-namespace:LauncherTwo"
+    xmlns:local="clr-namespace:LauncherTwo.Views"
+    mc:Ignorable="d"
+    x:Class="LauncherTwo.Views.ApplyUpdateWindow"
+    Style="{StaticResource {x:Type parent:RXWindow}}"
+    Padding="12"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    d:DataContext="{d:DesignData /Views/SampleUpdateProgress.xaml}"
+    Title="Renegade X update"
+    SizeToContent="WidthAndHeight"
+    WindowStartupLocation="CenterScreen"
+    MinHeight="0"
+    MinWidth="0"
+    ResizeMode="NoResize"
+    Closing="This_Closing">
+    <Window.Resources>
+        <Style x:Key="MinimizeTitleBarButton" TargetType="UserControl"/>
+        <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
+        <Style x:Key="RestoreTitleBarButton" TargetType="UserControl"/>
+        <Style x:Key="CloseTitleBarButton" TargetType="UserControl"/>
+        <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
+        <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
+        <local:PhaseProgressPercentageConverter x:Key="PhaseProgressPercentageConverter"/>
+        <local:PhaseProgressStringConverter x:Key="PhaseProgressStringConverter"/>
+        <local:PhaseIsIndeterminateConverter x:Key="PhaseIsIndeterminateConverter"/>
+    </Window.Resources>
+    <StackPanel Orientation="Vertical">
+        <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="2" Content="{Binding StatusMessage}"/>
+        <FrameworkElement Height="10"/>
+        <Grid Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="0" Content="Validating"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="0" Content="Downloading"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="0" Content="Applying"/>
+                <ProgressBar Grid.Row="0" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
+                <ProgressBar Grid.Row="1" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Load, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
+                <ProgressBar Grid.Row="2" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Apply, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="2" Content="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressStringConverter}}"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressStringConverter}}"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}"/>
+            </Grid>
+        </Grid>
+        <Grid Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <FrameworkElement Height="10"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Close_Click" IsDefault="True" Content="Close"/>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</parent:RXWindow>

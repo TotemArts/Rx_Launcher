@@ -173,7 +173,7 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="96" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <Grid.InputBindings>
                                             <MouseBinding MouseAction="RightClick" Command="{Binding Source={x:Static local:RXWindow.ShowSystemMenuUnderMouseCommand}}"/>
@@ -202,10 +202,10 @@
 
                                         <!-- window system buttons-->
                                         <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top" WindowChrome.IsHitTestVisibleInChrome="True">
-                                            <UserControl Name="MinimizeTitleBarButton" Style="{StaticResource MinimizeTitleBarButton}"/>
-                                            <UserControl Name="MaximizeTitleBarButton" Style="{StaticResource MaximizeTitleBarButton}"/>
-                                            <UserControl Name="RestoreTitleBarButton" Style="{StaticResource RestoreTitleBarButton}"/>
-                                            <UserControl Name="CloseTitleBarButton" Style="{StaticResource CloseTitleBarButton}"/>
+                                            <UserControl Name="MinimizeTitleBarButton" Style="{DynamicResource MinimizeTitleBarButton}"/>
+                                            <UserControl Name="MaximizeTitleBarButton" Style="{DynamicResource MaximizeTitleBarButton}"/>
+                                            <UserControl Name="RestoreTitleBarButton" Style="{DynamicResource RestoreTitleBarButton}"/>
+                                            <UserControl Name="CloseTitleBarButton" Style="{DynamicResource CloseTitleBarButton}"/>
                                         </StackPanel>
                                     </Grid>
 

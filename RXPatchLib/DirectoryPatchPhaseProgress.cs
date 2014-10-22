@@ -12,13 +12,24 @@ namespace RXPatchLib
         public enum States
         {
             Unstarted,
+            Indeterminate,
             Started,
             Finished,
         }
 
-        public States State;
-        public DiscreteProgress Items;
-        public DiscreteProgress Size;
+        public States _State;
+        public DiscreteProgress _Items;
+        public DiscreteProgress _Size;
+
+        public States State { get; set; }
+        public DiscreteProgress Items { get; set; }
+        public DiscreteProgress Size { get; set; }
+
+        public DirectoryPatchPhaseProgress()
+        {
+            Items = new DiscreteProgress();
+            Size = new DiscreteProgress();
+        }
 
         public void SetTotals(long totalItems, long totalSize)
         {

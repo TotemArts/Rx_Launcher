@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace RXPatchLib
 {
     [Serializable]
-    public struct DiscreteProgress
+    public class DiscreteProgress
     {
-        public long Done;
-        public long Total;
+        public long Done { get; set; }
+        public long Total { get; set; }
 
         public double Fraction
         {
