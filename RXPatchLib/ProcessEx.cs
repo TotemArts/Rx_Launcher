@@ -25,6 +25,7 @@ namespace RXPatchLib
             string argumentsString = ToCommandLineArgumentString(arguments);
             var startInfo = new ProcessStartInfo(path, argumentsString);
             startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
 
             TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
             using (Process Process = new Process())
