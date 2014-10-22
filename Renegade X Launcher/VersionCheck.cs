@@ -7,25 +7,23 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Net;
+using Newtonsoft.Json;
 
 
 namespace LauncherTwo
 {
     public static class VersionCheck
     {
-        // Read from DefaultRenegadeX.ini
         const string INI_PATH = "\\UDKGame\\Config\\DefaultRenegadeX.ini";
         const string VERSION_KEY = "GameVersion";
-        const string LATEST_GAMEVERSION_URL = "http://renegade-x.com/launcher_data/gameversion";
-        const string LATEST_LAUNCHERVERSION_URL = "http://renegade-x.com/launcher_data/launcherversion";
-        static string DownloadingURL = "";
+        const string VERSION_URL = "http://renegade-x.com/launcher_data/version.json";
 
-        public const string GAME_DOWNLOAD_URL = "http://renegade-x.com/download";
-        public const string LAUNCHER_DOWNLOAD_URL = "http://renegade-x.com/download";
         static string LatestGameVersion = "";
         static string LatestLauncherVersion = "";
         const string LauncherVersion = "0.51";
         static string GameVersion = null;
+
+        public static string GamePatchUrl = null;
 
         public static float GetLatestGameVersionNumerical()
         {
@@ -44,8 +42,13 @@ namespace LauncherTwo
         public static string GetGameVersion()
         {
             if (GameVersion == null)
-                GameVersion = ReadGameVersion();
+                UpdateGameVersion();
             return GameVersion;
+        }
+
+        public static void UpdateGameVersion()
+        {
+            GameVersion = ReadGameVersion();
         }
 
         public static float GetLatestLauncherVersionNumerical()
@@ -94,19 +97,13 @@ namespace LauncherTwo
             }
         }
 
-        public static async Task FindGameVersionAsync()
+        public static async Task UpdateLatestVersions()
         {
-            LatestGameVersion = await new WebClient().DownloadStringTaskAsync(LATEST_GAMEVERSION_URL);
-        }
-
-        public static async Task FindLauncherVersionAsync()
-        {
-            LatestLauncherVersion = await new WebClient().DownloadStringTaskAsync(LATEST_GAMEVERSION_URL);
-        }
-
-        public static string GetDownloadingURL()
-        {
-            return DownloadingURL;
+            var versionJson = await new WebClient().DownloadStringTaskAsync(VERSION_URL);
+            var versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
+            LatestLauncherVersion = versionData["launcher"]["version"];
+            LatestGameVersion = versionData["game"]["version"];
+            GamePatchUrl = versionData["game"]["patch_url"];
         }
 
         public static bool IsLauncherOutOfDate()

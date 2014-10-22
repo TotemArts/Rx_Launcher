@@ -110,10 +110,9 @@ namespace LauncherTwo
 
         private async Task CheckVersionsAsync()
         {
-            Task launcherTask = VersionCheck.FindLauncherVersionAsync();
-            Task gameTask = VersionCheck.FindGameVersionAsync();
+            Task updateTask = VersionCheck.UpdateLatestVersions();
+            await updateTask;
 
-            await launcherTask;
             if (VersionCheck.IsLauncherOutOfDate())
             {
                 ShowLauncherUpdateWindow();
@@ -123,7 +122,6 @@ namespace LauncherTwo
                 SetMessageboxText("Launcher is up to date!");
             }
 
-            await gameTask;
             if (VersionCheck.GetGameVersion() == "")
             {
                 SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersion());
@@ -131,6 +129,7 @@ namespace LauncherTwo
             else if (VersionCheck.IsGameOutOfDate())
             {
                 ShowGameUpdateWindow();
+                SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersion());
             }
             else
             {
@@ -156,17 +155,19 @@ namespace LauncherTwo
 
             if (theWindow.WantsToUpdate)
             {
-                var TargetDir = GameInstallation.GetRootPath();
-                var ApplicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
-                var PatchUrl = "http://localhost/patch";
-                var PatchVersion = "Open Beta 999";
+                var targetDir = GameInstallation.GetRootPath();
+                var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
+                var patchUrl = VersionCheck.GamePatchUrl;
+                var patchVersion = VersionCheck.GetLatestGameVersion();
 
                 var progress = new Progress<DirectoryPatcherProgressReport>();
-                Task task = new RXPatcher().ApplyPatchFromWeb(PatchUrl, TargetDir, ApplicationDir, progress);
+                Task task = new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress);
 
-                var window = new ApplyUpdateWindow(task, progress, PatchVersion);
+                var window = new ApplyUpdateWindow(task, progress, patchVersion);
                 window.Owner = this;
                 window.ShowDialog();
+
+                VersionCheck.UpdateGameVersion();
             }
         }
 
