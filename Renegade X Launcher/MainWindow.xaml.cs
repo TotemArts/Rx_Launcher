@@ -54,7 +54,7 @@ namespace LauncherTwo
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersion(); } }
+        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName(); } }
         public bool IsLaunchingPossible { get { return GameInstance == null; } }
 
         const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
@@ -86,7 +86,7 @@ namespace LauncherTwo
             SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
-            SD_GameVersion.Text = VersionCheck.GetGameVersion();
+            SD_GameVersion.Text = VersionCheck.GetGameVersionName();
 
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
@@ -122,18 +122,18 @@ namespace LauncherTwo
                 SetMessageboxText("Launcher is up to date!");
             }
 
-            if (VersionCheck.GetGameVersion() == "")
+            if (VersionCheck.GetGameVersionName() == "")
             {
-                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersion());
+                SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersionName());
             }
             else if (VersionCheck.IsGameOutOfDate())
             {
                 ShowGameUpdateWindow();
-                SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersion());
+                SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
             }
             else
             {
-                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersion());
+                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersionName());
             }
         }
 
@@ -147,8 +147,8 @@ namespace LauncherTwo
         void ShowGameUpdateWindow()
         {
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
-            theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersion();
-            theWindow.GameVersionText.Content = VersionCheck.GetGameVersion();
+            theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersionName();
+            theWindow.GameVersionText.Content = VersionCheck.GetGameVersionName();
             theWindow.WindowTitle.Content = "Game update available!";
             theWindow.Owner = this;
             theWindow.ShowDialog();
@@ -158,7 +158,7 @@ namespace LauncherTwo
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
                 var patchUrl = VersionCheck.GamePatchUrl;
-                var patchVersion = VersionCheck.GetLatestGameVersion();
+                var patchVersion = VersionCheck.GetLatestGameVersionName();
 
                 var progress = new Progress<DirectoryPatcherProgressReport>();
                 Task task = new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress);
@@ -187,8 +187,8 @@ namespace LauncherTwo
         void ShowLauncherUpdateWindow()
         {
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
-            theWindow.LatestVersionText.Content = VersionCheck.GetLatestLauncherVersion();
-            theWindow.GameVersionText.Content = VersionCheck.GetLauncherVersion();
+            theWindow.LatestVersionText.Content = VersionCheck.GetLatestLauncherVersionName();
+            theWindow.GameVersionText.Content = VersionCheck.GetLauncherVersionName();
             theWindow.WindowTitle.Content = "Launcher update available!";
             theWindow.Owner = this;
             theWindow.ShowDialog();
@@ -240,7 +240,7 @@ namespace LauncherTwo
                     continue;
                 }
 
-                if (SameVersionOnly && VersionCheck.GetGameVersion() != "" && OFilteredServerList[i].GameVersion != VersionCheck.GetGameVersion())
+                if (SameVersionOnly && VersionCheck.GetGameVersionName() != "" && OFilteredServerList[i].GameVersion != VersionCheck.GetGameVersionName())
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
