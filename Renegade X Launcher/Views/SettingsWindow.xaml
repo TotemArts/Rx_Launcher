@@ -1,0 +1,35 @@
+﻿<parent:RXWindow
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:parent="clr-namespace:LauncherTwo"
+    xmlns:local="clr-namespace:LauncherTwo.Views"
+    x:Class="LauncherTwo.Views.SettingsWindow"
+    Style="{StaticResource {x:Type parent:RXWindow}}"
+    Padding="12"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    Title="Renegade X launcher settings"
+    SizeToContent="WidthAndHeight"
+    WindowStartupLocation="CenterScreen"
+    MinHeight="0"
+    MinWidth="0"
+    ResizeMode="NoResize">
+    <Window.Resources>
+        <Style x:Key="MinimizeTitleBarButton" TargetType="UserControl"/>
+        <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
+        <Style x:Key="RestoreTitleBarButton" TargetType="UserControl"/>
+        <Style x:Key="CloseTitleBarButton" TargetType="UserControl"/>
+        <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
+        <Color x:Key="RenX_Window_Border_Color">#CC65787D</Color>
+        <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
+        <SolidColorBrush x:Key="RenX_Window_Border_Color_Brush" Color="{DynamicResource RenX_Window_Border_Color}"/>
+    </Window.Resources>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Margin="3,0" Foreground="{DynamicResource RenXFontColorBrush}" Height="21" Width="70" Click="ApplyAndClose" IsDefault="True" Content="OK"/>
+            <Button Margin="3,0" Foreground="{DynamicResource RenXFontColorBrush}" Height="21" Width="70" Click="Cancel" IsCancel="True" Content="Cancel"/>
+        </StackPanel>
+        <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="50" MinWidth="250">
+            <CheckBox Content="Skip intro movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
+        </Border>
+    </DockPanel>
+</parent:RXWindow>

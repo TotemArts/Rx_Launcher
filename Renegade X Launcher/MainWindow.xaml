@@ -898,20 +898,14 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
-                <Label Grid.Column="1" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+            <DockPanel Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
+                <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
+                <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+                <Button DockPanel.Dock="Right" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_SettingsBtn" Width="94" Height="25" FontSize="11" Content="Settings" Click="SD_Settings_Click"/>
                 <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="pack://siteoforigin:,,,/Resources/RenX_Logo.png"/>
-                <Button Grid.Column="3" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
-                <Button Grid.Column="4" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
-            </Grid>
+            </DockPanel>
             <Grid Grid.Row="1" x:Name="ContentSplit" Margin="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

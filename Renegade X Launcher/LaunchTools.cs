@@ -14,6 +14,7 @@ namespace LauncherTwo
         public string Username { get; set; }
         public string Password { get; set; }
         public string IPEndpoint { get; set; }
+        public bool SkipIntroMovies { get; set; }
 
         public string GetProcessPath()
         {
@@ -23,13 +24,17 @@ namespace LauncherTwo
         public string GetProcessArguments()
         {
             string Arguments = "";
-            if (Username != null)
+            if (IPEndpoint != null)
             {
                 Arguments += IPEndpoint;
                 if (Password != null)
                 {
                     Arguments += "?PASSWORD=" + Password;
                 }
+            }
+            if (SkipIntroMovies)
+            {
+                Arguments += " -nomovies";
             }
             Arguments += " -ini:UDKGame:DefaultPlayer.Name=\"" + Username + "\"";
             return Arguments;

@@ -401,6 +401,7 @@ namespace LauncherTwo
                 startupParameters.Username = Properties.Settings.Default.Username;
                 startupParameters.IPEndpoint = ipEndpoint;
                 startupParameters.Password = password;
+                startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies;
                 GameInstance = GameInstance.Start(startupParameters);
 
                 await GameInstance.Task;
@@ -415,6 +416,12 @@ namespace LauncherTwo
             {
                 GameInstance = null;
             }
+        }
+
+        private void SD_Settings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow window = new SettingsWindow();
+            window.ShowDialog();
         }
 
         private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)

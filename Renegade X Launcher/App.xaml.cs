@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace LauncherTwo
 {
@@ -13,5 +7,14 @@ namespace LauncherTwo
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            if (LauncherTwo.Properties.Settings.Default.UpgradeRequired)
+            {
+                LauncherTwo.Properties.Settings.Default.Upgrade();
+                LauncherTwo.Properties.Settings.Default.UpgradeRequired = false;
+                LauncherTwo.Properties.Settings.Default.Save();
+            }
+        }
     }
 }
