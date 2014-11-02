@@ -11,7 +11,9 @@ namespace RXPatchLib
         public string Path;
         public string OldHash;
         public string NewHash;
+        public long OldSize;
         public long NewSize;
+        public long DeltaSize;
         public bool HasDelta;
     }
 }

@@ -50,7 +50,9 @@ namespace RXPatchLib
                 string newPath = newRootPath + Path.DirectorySeparatorChar + path;
                 string oldHash = GetHash(oldPath);
                 string newHash = GetHash(newPath);
+                long oldSize = File.Exists(oldPath) ? new FileInfo(oldPath).Length : 0;
                 long newSize = File.Exists(newPath) ? new FileInfo(newPath).Length : 0;
+                long deltaSize = 0;
                 bool hasDelta = false;
 
                 if (newHash != null)
@@ -67,6 +69,7 @@ namespace RXPatchLib
                         }
                         else
                         {
+                            deltaSize = new FileInfo(deltaPath).Length;
                             hasDelta = true;
                         }
                     }
@@ -77,7 +80,9 @@ namespace RXPatchLib
                     Path = path,
                     OldHash = oldHash,
                     NewHash = newHash,
+                    OldSize = oldSize,
                     NewSize = newSize,
+                    DeltaSize = deltaSize,
                     HasDelta = hasDelta,
                 });
             }

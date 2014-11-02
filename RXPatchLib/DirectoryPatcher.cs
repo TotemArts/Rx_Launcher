@@ -11,7 +11,7 @@ namespace RXPatchLib
 {
     interface IFilePatchAction
     {
-        long NewSize { get; }
+        long PatchSize { get; }
         Task Load();
         Task Execute();
     }
@@ -21,7 +21,7 @@ namespace RXPatchLib
         private DirectoryPatcher DirectoryPatcher;
         private string SubPath;
         private bool NeedsBackup;
-        public long NewSize { get { return 0; } }
+        public long PatchSize { get { return 0; } }
 
         public RemoveAction(DirectoryPatcher directoryPatcher, string subPath, bool needsBackup)
         {
@@ -60,14 +60,14 @@ namespace RXPatchLib
         private DirectoryPatcher DirectoryPatcher;
         private string SubPath;
         private string PatchSubPath;
-        public long NewSize { get; private set; }
+        public long PatchSize { get; private set; }
 
-        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long newSize)
+        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long patchSize)
         {
             DirectoryPatcher = directoryPatcher;
             SubPath = subPath;
             PatchSubPath = patchSubPath;
-            NewSize = newSize;
+            PatchSize = patchSize;
         }
 
         public Task Load()
@@ -93,15 +93,15 @@ namespace RXPatchLib
         private string SubPath;
         private string PatchSubPath;
         private bool NeedsBackup;
-        public long NewSize { get; private set; }
+        public long PatchSize { get; private set; }
 
-        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long newSize)
+        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long patchSize)
         {
             DirectoryPatcher = directoryPatcher;
             SubPath = subPath;
             PatchSubPath = patchSubPath;
             NeedsBackup = needsBackup;
-            NewSize = newSize;
+            PatchSize = patchSize;
         }
 
         public Task Load()
@@ -154,10 +154,10 @@ namespace RXPatchLib
             {
                 var task = action.Load();
                 Tasks.Add(task);
-                Progress.AddItem(action.NewSize);
+                Progress.AddItem(action.PatchSize);
                 ProgressCallback(Progress);
                 await task;
-                Progress.AdvanceItem(action.NewSize);
+                Progress.AdvanceItem(action.PatchSize);
                 ProgressCallback(Progress);
             }
 
@@ -201,7 +201,7 @@ namespace RXPatchLib
             List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
 
             var progress = new DirectoryPatchPhaseProgress();
-            progress.SetTotals(instructions.Count, (from i in instructions select i.NewSize).Sum()); // Using the actual file size here would be better, but this is a fast and easy approximation.
+            progress.SetTotals(instructions.Count, (from i in instructions select i.OldSize).Sum()); // Using the actual file size here would be better, but this is a fast and easy approximation.
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
@@ -214,7 +214,7 @@ namespace RXPatchLib
                 {
                     callback(action);
                 }
-                progress.AdvanceItem(instruction.NewSize);
+                progress.AdvanceItem(instruction.OldSize);
                 progressCallback(progress);
             }
 
@@ -235,7 +235,7 @@ namespace RXPatchLib
                 else if (isOld && instruction.HasDelta)
                 {
                     string deltaFileName = Path.Combine("delta", instruction.NewHash + "_from_" + instruction.OldHash);
-                    action = new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.NewSize);
+                    action = new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize);
                 }
                 else
                 {
@@ -249,14 +249,14 @@ namespace RXPatchLib
         private static async Task Apply(List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
             var progress = new DirectoryPatchPhaseProgress();
-            progress.SetTotals(actions.Count, (from a in actions select a.NewSize).Sum()); // Using the actual file size here would be better, but this is a fast and easy approximation.
+            progress.SetTotals(actions.Count, (from a in actions select a.PatchSize).Sum());
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
             foreach (var action in actions)
             {
                 await action.Execute();
-                progress.AdvanceItem(action.NewSize);
+                progress.AdvanceItem(action.PatchSize);
                 progressCallback(progress);
             }
 
