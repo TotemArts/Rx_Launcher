@@ -81,7 +81,7 @@ namespace LauncherTwo
                     else if (line.StartsWith(VERSION_NUMBER_PREFIX))
                     {
                         versionNumber = int.Parse(line
-                            .Replace(VERSION_PREFIX, "")
+                            .Replace(VERSION_NUMBER_PREFIX, "")
                             .Replace("\"", ""));
                     }
                 }
