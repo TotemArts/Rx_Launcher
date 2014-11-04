@@ -129,6 +129,7 @@ namespace LauncherTwo
             else if (VersionCheck.IsGameOutOfDate())
             {
                 ShowGameUpdateWindow();
+                SD_GameVersion.Text = VersionCheck.GetGameVersionName();
                 SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
             }
             else
