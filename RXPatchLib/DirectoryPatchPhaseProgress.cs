@@ -54,6 +54,7 @@ namespace RXPatchLib
             switch (State)
             {
                 case States.Unstarted: return "not started";
+                case States.Indeterminate: return "indeterminate";
                 case States.Started: return string.Format("{0}/{1} B ({2}); item {3} of {4}", Size.Done, Size.Total, Size.Total != 0 ? Size.Fraction.ToString("P0") : "? %", Items.Done, Items.Total);
                 case States.Finished: return "finished";
                 default: throw new Exception();
