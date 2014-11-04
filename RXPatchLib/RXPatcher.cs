@@ -12,8 +12,8 @@ namespace RXPatchLib
     {
         // Do not use the system temp dir because it may be on a different volume.
         const string BackupSubPath = "patch/backup";
-        const string DownloadSubPath = "temp/patch/download";
-        const string TempSubPath = "temp/patch";
+        const string DownloadSubPath = "patch/download"; // Note that this directory will be automatically emptied after patching.
+        const string TempSubPath = "patch/apply"; // Note that this directory will be automatically emptied after patching.
 
         public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress)
         {
@@ -25,6 +25,8 @@ namespace RXPatchLib
             {
                 var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
                 await patcher.ApplyPatchAsync(progress);
+                DirectoryEx.DeleteContents(downloadPath);
+                DirectoryEx.DeleteContents(tempPath);
             }
         }
 
