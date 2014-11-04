@@ -16,7 +16,7 @@ namespace LauncherTwo
         public static readonly RoutedCommand ToggleMaximizedCommand = new RoutedCommand();
 
         [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+        private static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
         public RXWindow()
         {
