@@ -37,7 +37,7 @@ namespace RXPatchLibTest
             var OldDir = "C:\\games\\Renegade X Beta 2";
             var NewDir = "C:\\games\\Renegade X Beta 3";
             var TargetDir = "C:\\games\\Renegade X patchtest";
-            var ApplicationDir = "C:\\games\\Renegade X patchtest";
+            var ApplicationDir = "C:\\games\\Renegade X patchtest\\patch";
             using (var PatchDir = new TemporaryDirectory())
             {
                 await RoundtripTest(OldDir, NewDir, TargetDir, PatchDir.Path, ApplicationDir);
@@ -50,7 +50,7 @@ namespace RXPatchLibTest
         {
             var NewDir = "C:\\games\\Renegade X Beta 3";
             var TargetDir = "C:\\games\\Renegade X patchtest";
-            var ApplicationDir = "C:\\games\\Renegade X patchtest";
+            var ApplicationDir = "C:\\games\\Renegade X patchtest\\patch";
             var PatchDir = "C:\\games\\Renegade X patchtest source";
 
             await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir, TestProgressHandlerFactory.Create());
