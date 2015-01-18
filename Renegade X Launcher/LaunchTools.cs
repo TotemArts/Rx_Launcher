@@ -60,7 +60,7 @@ namespace LauncherTwo
         public EngineInstanceStartupParameters StartupParameters { get; protected set; }
         public Task Task { get; protected set; }
 
-        public static EngineInstance Start<T> (T StartupParameters) where T : EngineInstanceStartupParameters
+        public static EngineInstance Start (EngineInstanceStartupParameters StartupParameters)
         {
             var instance = new EngineInstance();
             instance.StartupParameters = StartupParameters;

@@ -403,7 +403,7 @@ namespace LauncherTwo
                 startupParameters.IPEndpoint = ipEndpoint;
                 startupParameters.Password = password;
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies;
-                GameInstance = EngineInstance.Start<GameInstanceStartupParameters>(startupParameters);
+                GameInstance = EngineInstance.Start(startupParameters);
 
                 await GameInstance.Task;
 
@@ -426,7 +426,7 @@ namespace LauncherTwo
                 SetMessageboxText("The game is running.");
 
                 EditorInstanceStartupParameters startupParameters = new EditorInstanceStartupParameters();
-                GameInstance = EngineInstance.Start <EditorInstanceStartupParameters>(startupParameters);
+                GameInstance = EngineInstance.Start(startupParameters);
 
                 await GameInstance.Task;
 
