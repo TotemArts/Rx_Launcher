@@ -33,8 +33,8 @@ namespace LauncherTwo
         public static readonly int MAX_PLAYER_COUNT = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer refreshTimer;
-        private GameInstance _GameInstance;
-        public GameInstance GameInstance
+        private EngineInstance _GameInstance;
+        public EngineInstance GameInstance
         {
             get { return _GameInstance; }
             set
@@ -403,7 +403,30 @@ namespace LauncherTwo
                 startupParameters.IPEndpoint = ipEndpoint;
                 startupParameters.Password = password;
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies;
-                GameInstance = GameInstance.Start(startupParameters);
+                GameInstance = EngineInstance.Start<GameInstanceStartupParameters>(startupParameters);
+
+                await GameInstance.Task;
+
+                SetMessageboxText(MESSAGE_IDLE);
+            }
+            catch (Exception)
+            {
+                SetMessageboxText(MESSAGE_CANTSTARTGAME);
+            }
+            finally
+            {
+                GameInstance = null;
+            }
+        }
+
+        private async Task StartEditorInstance()
+        {
+            try
+            {
+                SetMessageboxText("The game is running.");
+
+                EditorInstanceStartupParameters startupParameters = new EditorInstanceStartupParameters();
+                GameInstance = EngineInstance.Start <EditorInstanceStartupParameters>(startupParameters);
 
                 await GameInstance.Task;
 
@@ -428,6 +451,11 @@ namespace LauncherTwo
         private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
         {
             await StartGameInstance(null, null);
+        }
+
+        private async void SD_LaunchEditor_Click (object sender, RoutedEventArgs e)
+        {
+            await StartEditorInstance();
         }
 
         private async void SD_ConnectIP_Click(object sender, RoutedEventArgs e)

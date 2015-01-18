@@ -9,19 +9,33 @@ using System.Net;
 
 namespace LauncherTwo
 {
-    public class GameInstanceStartupParameters
+    public abstract class EngineInstanceStartupParameters
+    {
+        public string GetProcessPath ()
+        {
+            return GameInstallation.GetRootPath() + "Binaries\\Win32\\UDK.exe";
+        }
+
+        public abstract string GetProcessArguments ();
+
+    }
+
+    public class EditorInstanceStartupParameters : EngineInstanceStartupParameters
+    {
+        public override string GetProcessArguments ()
+        {
+            return " editor";
+        }
+    }
+
+    public class GameInstanceStartupParameters : EngineInstanceStartupParameters
     {
         public string Username { get; set; }
         public string Password { get; set; }
         public string IPEndpoint { get; set; }
         public bool SkipIntroMovies { get; set; }
 
-        public string GetProcessPath()
-        {
-            return GameInstallation.GetRootPath() +"Binaries\\Win32\\UDK.exe";
-        }
-
-        public string GetProcessArguments()
+        public override string GetProcessArguments ()
         {
             string Arguments = "";
             if (IPEndpoint != null)
@@ -41,22 +55,20 @@ namespace LauncherTwo
         }
     }
 
-    public class GameInstance
+    public class EngineInstance
     {
-        public GameInstanceStartupParameters StartupParameters { get; private set; }
-        public Task Task { get; private set; }
+        public EngineInstanceStartupParameters StartupParameters { get; protected set; }
+        public Task Task { get; protected set; }
 
-        Process Process;
-
-        public static GameInstance Start(GameInstanceStartupParameters StartupParameters)
+        public static EngineInstance Start<T> (T StartupParameters) where T : EngineInstanceStartupParameters
         {
-            var instance = new GameInstance();
+            var instance = new EngineInstance();
             instance.StartupParameters = StartupParameters;
             instance.Task = instance.StartAsync();
             return instance;
         }
 
-        public async Task StartAsync()
+        public async Task StartAsync ()
         {
             try
             {
@@ -75,5 +87,7 @@ namespace LauncherTwo
                 Process = null;
             }
         }
+
+        protected Process Process;
     }
 }
