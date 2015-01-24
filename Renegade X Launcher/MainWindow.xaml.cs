@@ -403,7 +403,7 @@ namespace LauncherTwo
                 startupParameters.Username = Properties.Settings.Default.Username;
                 startupParameters.IPEndpoint = ipEndpoint;
                 startupParameters.Password = password;
-                startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies;
+                startupParameters.SkipIntroMovies = false; // Properties.Settings.Default.SkipIntroMovies;
                 GameInstance = EngineInstance.Start(startupParameters);
 
                 await GameInstance.Task;
