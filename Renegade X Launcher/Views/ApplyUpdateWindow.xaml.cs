@@ -90,14 +90,14 @@ namespace LauncherTwo.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value as DirectoryPatchPhaseProgress == null) return "Unknown";
+            if (value as DirectoryPatchPhaseProgress == null) return "unknown";
             var progress = (DirectoryPatchPhaseProgress)value;
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
-                return "...";
+                return "not started";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Finished)
-                return "Finished";
+                return "finished";
             else if (progress.Size.Total == 0)
-                return "...";
+                return "pending";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
