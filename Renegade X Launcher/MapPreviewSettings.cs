@@ -25,7 +25,10 @@ namespace LauncherTwo
            { "Islands",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_island      ) },
            { "Volcano",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_volcano     ) },
            { "X-Mountain",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_xmountain) },
-           { "Whiteout", ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_hourglassii ) }
+           { "Whiteout", ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_hourglassii ) },
+           { "Canyon",   ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_canyon      ) },
+           { "Complex",  ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_complex     ) },
+           { "Under",    ConvertBitmapToSouce ( Properties.Resources.___map_pic_cnc_under       ) },
         };
 
         private static Dictionary<string, string> MapNames = new Dictionary<string, string>()
@@ -38,7 +41,10 @@ namespace LauncherTwo
             { "cnc-islands",      "Islands"  },
             { "cnc-volcano",      "Volcano"  },
             { "cnc-xmountain",    "X-Mountain"},
-            { "cnc-whiteout",     "Whiteout" }
+            { "cnc-whiteout",     "Whiteout" },
+            { "cnc-canyon",       "Canyon"   },
+            { "cnc-complex",      "Complex"  },
+            { "cnc-under",        "Under"    },
         };
 
 

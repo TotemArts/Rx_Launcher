@@ -367,6 +367,15 @@
   <ItemGroup>
     <None Include="Resources\___map-pic-cnc-walls.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\___map-pic-cnc-canyon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\___map-pic-cnc-complex.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\___map-pic-cnc-under.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

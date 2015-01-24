@@ -166,4 +166,13 @@
   <data name="___map_pic_cnc_xmountain" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\___map-pic-cnc-xmountain.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="___map_pic_cnc_canyon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\___map-pic-cnc-canyon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="___map_pic_cnc_complex" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\___map-pic-cnc-complex.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="___map_pic_cnc_under" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\___map-pic-cnc-under.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
