@@ -1,4 +1,5 @@
 ﻿
+using System.IO;
 namespace LauncherTwo
 {
     static class GameInstallation
@@ -15,6 +16,11 @@ namespace LauncherTwo
                 launcherPath = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../..");
             }
             return launcherPath + "\\";
+        }
+
+        public static bool IsRootPathPlausible()
+        {
+            return Directory.Exists(Path.Combine(GetRootPath(), "UDKGame"));
         }
     }
 }
