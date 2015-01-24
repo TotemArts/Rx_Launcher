@@ -129,8 +129,6 @@ namespace LauncherTwo.Views
             {
                 _HasFinished = value;
                 NotifyPropertyChanged("HasFinished");
-                NotifyPropertyChanged("IsClosePossible");
-                NotifyPropertyChanged("CloseLabel");
             }
         }
         public bool IsCancellationPossible
