@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
     class WebPatchSource : IPatchSource, IDisposable
     {
-        Dictionary<string, WebClient> WebClientsBySubPath = new Dictionary<string, WebClient>();
+        Dictionary<string, Task> LoadTasks = new Dictionary<string, Task>();
         string BaseUrl;
         string DownloadPath;
 
@@ -22,8 +24,7 @@ namespace RXPatchLib
 
         public void Dispose()
         {
-            foreach (var webClient in WebClientsBySubPath)
-                webClient.Value.Dispose();
+            Debug.Assert(Task.WhenAll(LoadTasks.Values).IsCompleted);
         }
 
         public string GetSystemPath(string subPath)
@@ -31,7 +32,18 @@ namespace RXPatchLib
             return Path.Combine(DownloadPath, subPath);
         }
 
-        public async Task Load(string subPath, string hash)
+        public Task Load(string subPath, string hash, CancellationToken cancellationToken)
+        {
+            Task task;
+            if (!LoadTasks.TryGetValue(subPath, out task))
+            {
+                task = LoadNew(subPath, hash, cancellationToken);
+                LoadTasks[subPath] = task;
+            }
+            return task;
+        }
+
+        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken)
         {
             string filePath = GetSystemPath(subPath);
 
@@ -40,11 +52,23 @@ namespace RXPatchLib
                 File.Delete(filePath);
             }
 
-            var webClient = new WebClient();
-            webClient.Proxy = null; // TODO: Support proxy
-            WebClientsBySubPath[subPath] = webClient;
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-            await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
+            using (var webClient = new WebClient())
+            {
+                webClient.Proxy = null; // TODO: Support proxy
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                using (cancellationToken.Register(() => webClient.CancelAsync()))
+                {
+                    try
+                    {
+                        await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
+                    }
+                    catch (WebException)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        throw;
+                    }
+                }
+            }
             /* TODO
             if (UseProxy)
             {

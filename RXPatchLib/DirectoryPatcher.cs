@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RXPatchLib
@@ -12,7 +13,7 @@ namespace RXPatchLib
     interface IFilePatchAction
     {
         long PatchSize { get; }
-        Task Load();
+        Task Load(CancellationToken cancellationToken);
         Task Execute();
     }
 
@@ -30,7 +31,7 @@ namespace RXPatchLib
             NeedsBackup = needsBackup;
         }
 
-        public Task Load()
+        public Task Load(CancellationToken cancellationToken)
         {
             return TaskExtensions.CompletedTask;
         }
@@ -70,9 +71,9 @@ namespace RXPatchLib
             PatchSize = patchSize;
         }
 
-        public Task Load()
+        public Task Load(CancellationToken cancellationToken)
         {
-            return DirectoryPatcher.PatchSource.Load(PatchSubPath);
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken); // TODO: Check hash to avoid redownloading.
         }
 
         public async Task Execute()
@@ -104,9 +105,9 @@ namespace RXPatchLib
             PatchSize = patchSize;
         }
 
-        public Task Load()
+        public Task Load(CancellationToken cancellationToken)
         {
-            return DirectoryPatcher.PatchSource.Load(PatchSubPath);
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken); // TODO: Check hash to avoid redownloading.
         }
 
         public Task Execute()
@@ -141,10 +142,12 @@ namespace RXPatchLib
         {
             DirectoryPatchPhaseProgress Progress = new DirectoryPatchPhaseProgress();
             List<Task> Tasks = new List<Task>();
+            CancellationToken CancellationToken;
             Action<DirectoryPatchPhaseProgress> ProgressCallback;
 
-            public LoadPhase(Action<DirectoryPatchPhaseProgress> progressCallback)
+            public LoadPhase(CancellationToken cancellationToken, Action<DirectoryPatchPhaseProgress> progressCallback)
             {
+                CancellationToken = cancellationToken;
                 ProgressCallback = progressCallback;
                 Progress.State = DirectoryPatchPhaseProgress.States.Indeterminate;
                 ProgressCallback(Progress);
@@ -152,7 +155,7 @@ namespace RXPatchLib
 
             public async Task StartLoading(IFilePatchAction action)
             {
-                var task = action.Load();
+                var task = action.Load(CancellationToken);
                 Tasks.Add(task);
                 Progress.AddItem(action.PatchSize);
                 ProgressCallback(Progress);
@@ -189,9 +192,9 @@ namespace RXPatchLib
             PatchSource = patchSource;
         }
 
-        internal async Task Analyze(Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback)
+        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
-            await PatchSource.Load("instructions.json");
+            await PatchSource.Load("instructions.json", null, cancellationToken);
             string headerFileContents;
             using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var streamReader = new StreamReader(file, Encoding.UTF8))
@@ -207,6 +210,7 @@ namespace RXPatchLib
 
             foreach (var instruction in instructions)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 string targetFilePath = Path.Combine(TargetPath, instruction.Path);
                 string userHash = await SHA1.GetFileHashAsync(targetFilePath);
                 IFilePatchAction action = BuildFilePatchAction(instruction, userHash);
@@ -264,7 +268,7 @@ namespace RXPatchLib
             progressCallback(progress);
         }
 
-        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback)
+        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback, CancellationToken cancellationToken)
         {
             var actions = new List<IFilePatchAction>();
             var progress = new DirectoryPatcherProgressReport();
@@ -272,9 +276,9 @@ namespace RXPatchLib
                 phaseAction();
                 progressCallback.Report(ObjectEx.DeepClone(progress));
             };
-            var loadPhase = new LoadPhase(phaseProgress => reportProgress(() => progress.Load = phaseProgress));
+            var loadPhase = new LoadPhase(cancellationToken, phaseProgress => reportProgress(() => progress.Load = phaseProgress));
 
-            await Analyze(action =>
+            await Analyze(cancellationToken, action =>
             {
                 Task ignoreWarning = loadPhase.StartLoading(action);
                 actions.Add(action);

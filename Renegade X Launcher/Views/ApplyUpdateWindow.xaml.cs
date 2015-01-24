@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -92,13 +93,16 @@ namespace LauncherTwo.Views
             if (value as DirectoryPatchPhaseProgress == null) return "Unknown";
             var progress = (DirectoryPatchPhaseProgress)value;
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
-                return "Waiting...";
-            else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
-                return "Calculating...";
+                return "...";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Finished)
                 return "Finished";
             else if (progress.Size.Total == 0)
-                return "Waiting...";
+                return "...";
+            else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
+            {
+                var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
+                return string.Format("{0} / ~{1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
+            }
             else
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
@@ -125,6 +129,15 @@ namespace LauncherTwo.Views
             {
                 _HasFinished = value;
                 NotifyPropertyChanged("HasFinished");
+                NotifyPropertyChanged("IsClosePossible");
+                NotifyPropertyChanged("CloseLabel");
+            }
+        }
+        public bool IsCancellationPossible
+        {
+            get
+            {
+                return _ProgressReport != null ? _ProgressReport.IsCancellationPossible : false;
             }
         }
         private string _StatusMessage;
@@ -165,13 +178,17 @@ namespace LauncherTwo.Views
             {
                 _ProgressReport = value;
                 NotifyPropertyChanged("ProgressReport");
+                NotifyPropertyChanged("IsCancellationPossible");
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString)
+        private CancellationTokenSource CancellationTokenSource;
+
+        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource)
         {
             TargetVersionString = targetVersionString;
+            CancellationTokenSource = cancellationTokenSource;
             StatusMessage = "Please wait while Renegade X is being updated.";
 
             InitializeComponent();
@@ -211,6 +228,11 @@ namespace LauncherTwo.Views
         public void Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        public void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            CancellationTokenSource.Cancel();
         }
 
         private void NotifyPropertyChanged(string propertyName)

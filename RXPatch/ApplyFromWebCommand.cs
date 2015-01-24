@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace RXPatch
 {
@@ -43,7 +44,7 @@ namespace RXPatch
             }
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress)
+                (progress) => new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, new CancellationToken())
             );
 
             return 0;

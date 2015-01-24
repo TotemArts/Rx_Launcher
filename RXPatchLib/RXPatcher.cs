@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RXPatchLib
@@ -15,7 +16,7 @@ namespace RXPatchLib
         const string DownloadSubPath = "download"; // Note that this directory will be automatically emptied after patching.
         const string TempSubPath = "apply"; // Note that this directory will be automatically emptied after patching.
 
-        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress)
+        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
         {
             var backupPath = CreateBackupPath(applicationDirPath);
             var downloadPath = CreateDownloadPath(applicationDirPath);
@@ -24,20 +25,20 @@ namespace RXPatchLib
             using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
             {
                 var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-                await patcher.ApplyPatchAsync(progress);
+                await patcher.ApplyPatchAsync(progress, cancellationToken);
                 DirectoryEx.DeleteContents(downloadPath);
                 DirectoryEx.DeleteContents(tempPath);
             }
         }
 
-        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress)
+        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
         {
             var backupPath = CreateBackupPath(applicationDirPath);
             var tempPath = CreateTempPath(applicationDirPath);
 
             var patchSource = new FileSystemPatchSource(patchPath);
             var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-            await patcher.ApplyPatchAsync(progress);
+            await patcher.ApplyPatchAsync(progress, cancellationToken);
         }
 
         private static string CreateBackupPath(string applicationDirPath)

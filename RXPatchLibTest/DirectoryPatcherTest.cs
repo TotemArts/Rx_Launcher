@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Text;
+using System.Threading;
 
 namespace RXPatchLibTest
 {
@@ -76,7 +77,7 @@ namespace RXPatchLibTest
             File.WriteAllText(instructionsFilename, instructionsJson);
             try
             {
-                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create());
+                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken());
             }
             finally
             {

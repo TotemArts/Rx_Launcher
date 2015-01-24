@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RXPatchLib
@@ -6,6 +7,6 @@ namespace RXPatchLib
     public interface IPatchSource
     {
         string GetSystemPath(string subPath);
-        Task Load(string subPath, string hash = null);
+        Task Load(string subPath, string hash, CancellationToken cancellationToken);
     }
 }

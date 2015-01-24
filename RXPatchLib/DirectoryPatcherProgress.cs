@@ -26,5 +26,13 @@ namespace RXPatchLib
             };
             return string.Join("\n", from p in phases select p.Key + ": " + p.Value.ToString());
         }
+
+        public bool IsCancellationPossible
+        {
+            get
+            {
+                return Apply.State == DirectoryPatchPhaseProgress.States.Unstarted;
+            }
+        }
     }
 }

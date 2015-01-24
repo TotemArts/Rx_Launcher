@@ -55,10 +55,11 @@
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}"/>
             </Grid>
         </Grid>
-        <Grid Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid>
             <FrameworkElement Height="10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Close_Click" IsDefault="True" Content="Close"/>
+                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Cancel_Click" IsCancel="True" Content="Cancel" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>
+                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Close_Click" IsDefault="True" Content="Close" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>
         </Grid>
     </StackPanel>
