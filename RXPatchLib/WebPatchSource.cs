@@ -32,18 +32,18 @@ namespace RXPatchLib
             return Path.Combine(DownloadPath, subPath);
         }
 
-        public Task Load(string subPath, string hash, CancellationToken cancellationToken)
+        public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
             Task task;
             if (!LoadTasks.TryGetValue(subPath, out task))
             {
-                task = LoadNew(subPath, hash, cancellationToken);
+                task = LoadNew(subPath, hash, cancellationToken, progressCallback);
                 LoadTasks[subPath] = task;
             }
             return task;
         }
 
-        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken)
+        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
             string filePath = GetSystemPath(subPath);
 
@@ -51,11 +51,17 @@ namespace RXPatchLib
             {
                 File.Delete(filePath);
             }
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
             using (var webClient = new WebClient())
             {
                 webClient.Proxy = null; // TODO: Support proxy
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+                webClient.DownloadProgressChanged += (o, args) =>
+                {
+                    progressCallback(args.BytesReceived, args.TotalBytesToReceive);
+                };
+
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     try

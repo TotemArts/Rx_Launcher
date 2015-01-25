@@ -7,6 +7,49 @@ using System.Threading.Tasks;
 namespace RXPatchLib
 {
     [Serializable]
+    public class DirectoryPatchPhaseProgressItem
+    {
+        private DirectoryPatchPhaseProgress Parent;
+        private long _Done;
+        private long _Total;
+
+        public DirectoryPatchPhaseProgressItem(DirectoryPatchPhaseProgress parent)
+        {
+            Parent = parent;
+            _Done = 0;
+            _Total = 0;
+        }
+        public long Done
+        {
+            get
+            {
+                return _Done;
+            }
+            set
+            {
+                Parent.Size.Done += value - _Done;
+                _Done = value;
+            }
+        }
+        public long Total
+        {
+            get
+            {
+                return _Total;
+            }
+            set
+            {
+                Parent.Size.Total += value - _Total;
+                _Total = value;
+            }
+        }
+        public void Finish()
+        {
+            Done = Total;
+            ++Parent.Items.Done;
+        }
+    }
+    [Serializable]
     public class DirectoryPatchPhaseProgress
     {
         public enum States
@@ -18,8 +61,6 @@ namespace RXPatchLib
         }
 
         public States _State;
-        public DiscreteProgress _Items;
-        public DiscreteProgress _Size;
 
         public States State { get; set; }
         public DiscreteProgress Items { get; set; }
@@ -37,10 +78,10 @@ namespace RXPatchLib
             Size.Total = totalSize;
         }
 
-        public void AddItem(long size)
+        public DirectoryPatchPhaseProgressItem AddItem()
         {
             Items.Total += 1;
-            Size.Total += size;
+            return new DirectoryPatchPhaseProgressItem(this);
         }
 
         public void AdvanceItem(long size)

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -13,7 +14,7 @@ namespace RXPatchLib
     interface IFilePatchAction
     {
         long PatchSize { get; }
-        Task Load(CancellationToken cancellationToken);
+        Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback);
         Task Execute();
     }
 
@@ -31,7 +32,7 @@ namespace RXPatchLib
             NeedsBackup = needsBackup;
         }
 
-        public Task Load(CancellationToken cancellationToken)
+        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
             return TaskExtensions.CompletedTask;
         }
@@ -71,9 +72,9 @@ namespace RXPatchLib
             PatchSize = patchSize;
         }
 
-        public Task Load(CancellationToken cancellationToken)
+        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
-            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken); // TODO: Check hash to avoid redownloading.
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
         }
 
         public async Task Execute()
@@ -105,9 +106,9 @@ namespace RXPatchLib
             PatchSize = patchSize;
         }
 
-        public Task Load(CancellationToken cancellationToken)
+        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
-            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken); // TODO: Check hash to avoid redownloading.
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
         }
 
         public Task Execute()
@@ -117,7 +118,7 @@ namespace RXPatchLib
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
-            File.Copy(newPath, tempPath); // Copy to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted).
+            File.Copy(newPath, tempPath); // Copy to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted). Copying is also necessary because the file may be shared (moving is not allowed).
             if (File.Exists(targetPath))
             {
                 if (NeedsBackup)
@@ -155,12 +156,16 @@ namespace RXPatchLib
 
             public async Task StartLoading(IFilePatchAction action)
             {
-                var task = action.Load(CancellationToken);
+                var progressItem = Progress.AddItem();
+                progressItem.Total = action.PatchSize;
+                var task = action.Load(CancellationToken, (done, total) => {
+                    Debug.Assert(total == progressItem.Total);
+                    progressItem.Done = done;
+                    ProgressCallback(Progress);
+                });
                 Tasks.Add(task);
-                Progress.AddItem(action.PatchSize);
-                ProgressCallback(Progress);
                 await task;
-                Progress.AdvanceItem(action.PatchSize);
+                progressItem.Finish();
                 ProgressCallback(Progress);
             }
 
@@ -194,7 +199,7 @@ namespace RXPatchLib
 
         internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
-            await PatchSource.Load("instructions.json", null, cancellationToken);
+            await PatchSource.Load("instructions.json", null, cancellationToken, (done, total) => {});
             string headerFileContents;
             using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var streamReader = new StreamReader(file, Encoding.UTF8))

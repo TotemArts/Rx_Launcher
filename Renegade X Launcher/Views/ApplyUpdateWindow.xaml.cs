@@ -10,40 +10,6 @@ using System.Windows.Data;
 
 namespace LauncherTwo.Views
 {
-    public struct UnitAndScale
-    {
-        public string Unit;
-        public double Scale;
-        public int MaxSignificantDigits;
-
-        public string GetFormatted(long value)
-        {
-            var scaledValue = value * Scale;
-            var maxString = scaledValue.ToString("F" + MaxSignificantDigits);
-            return maxString.Substring(0, MaxSignificantDigits+1);
-        }
-
-        public static UnitAndScale GetPreferredByteFormat(long value)
-        {
-            if (value < 1024)
-            {
-                return new UnitAndScale { Unit = "B", Scale = 1, MaxSignificantDigits = 0 };
-            }
-            else if (value < 1024 * 1024)
-            {
-                return new UnitAndScale { Unit = "KiB", Scale = 1.0 / 1024, MaxSignificantDigits = 3 };
-            }
-            else if (value < 1024 * 1024 * 1024)
-            {
-                return new UnitAndScale { Unit = "MiB", Scale = 1.0 / (1024 * 1024), MaxSignificantDigits = 3 };
-            }
-            else
-            {
-                return new UnitAndScale { Unit = "GiB", Scale = 1.0 / (1024 * 1024 * 1024), MaxSignificantDigits = 3 };
-            }
-        }
-    }
-
     [ValueConversion(typeof(DirectoryPatchPhaseProgress), typeof(bool))]
     public class PhaseIsIndeterminateConverter : IValueConverter
     {

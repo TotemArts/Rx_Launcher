@@ -64,6 +64,7 @@
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TemporaryDirectory.cs" />
     <Compile Include="TemporaryFile.cs" />
+    <Compile Include="UnitAndScale.cs" />
     <Compile Include="WebPatchSource.cs" />
     <Compile Include="XdeltaPatcher.cs" />
     <Compile Include="XdeltaPatchSystem.cs" />

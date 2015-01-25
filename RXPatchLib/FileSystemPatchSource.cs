@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace RXPatchLib
             return Path.Combine(RootPath, subPath);
         }
 
-        public async Task Load(string subPath, string hash, CancellationToken cancellationToken)
+        public async Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
             if (hash != null && await SHA1.GetFileHashAsync(GetSystemPath(subPath)) != hash)
                 throw new PatchSourceLoadException(subPath, hash);
