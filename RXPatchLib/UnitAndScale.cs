@@ -17,14 +17,18 @@ namespace RXPatchLib
             return (value * Scale).ToString("F" + Decimals);
         }
 
-        public static UnitAndScale GetPreferredByteFormat(long value)
+        public static UnitAndScale GetPreferredByteFormat(long value, string minScale = null, string maxScale = null)
         {
             string[] scaleNames = { "B", "KiB", "MiB", "GiB" };
             int scaleIndex;
             long scaleDiv = 1;
+            bool allowedMinScale = (minScale == null);
             for (scaleIndex = 0; scaleIndex < scaleNames.Length-1; ++scaleIndex)
             {
-                if (value < 1000 * scaleDiv)
+                string scaleName = scaleNames[scaleIndex];
+                if (!allowedMinScale && scaleName == minScale)
+                    allowedMinScale = true;
+                if (allowedMinScale && value < 1000 * scaleDiv || scaleName == maxScale)
                 {
                     break;
                 }

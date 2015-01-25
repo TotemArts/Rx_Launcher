@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -56,8 +55,9 @@ namespace LauncherTwo.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value as DirectoryPatchPhaseProgress == null) return "unknown";
-            var progress = (DirectoryPatchPhaseProgress)value;
+            var progress = value as DirectoryPatchPhaseProgress;
+            if (progress == null)
+                return "unknown";
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return "not started";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Finished)
@@ -73,6 +73,70 @@ namespace LauncherTwo.Views
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 return string.Format("{0} / {1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+    }
+
+    public class DirectoryPatchPhaseProgressWithSpeed
+    {
+        private DirectoryPatchPhaseProgress _ProgressReport;
+        private SpeedComputer _SpeedComputer = new SpeedComputer();
+
+        public long BytesPerSecond
+        {
+            get
+            {
+                return _SpeedComputer.BytesPerSecond;
+            }
+        }
+
+        public DirectoryPatchPhaseProgress ProgressReport
+        {
+            get
+            {
+                return _ProgressReport;
+            }
+            set
+            {
+                _ProgressReport = value;
+                _SpeedComputer.AddSample(_ProgressReport.Size.Done);
+            }
+        }
+    }
+
+    [ValueConversion(typeof(DirectoryPatchPhaseProgress), typeof(string))]
+    public class PhaseProgressWithSpeedStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var progressWithSpeed = value as DirectoryPatchPhaseProgressWithSpeed;
+            if (progressWithSpeed == null)
+                return "unknown";
+            var progress = progressWithSpeed.ProgressReport;
+            if (progress == null)
+                return "unknown";
+            if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
+                return "not started";
+            else if (progress.State == DirectoryPatchPhaseProgress.States.Finished)
+                return "finished";
+            else if (progress.Size.Total == 0)
+                return "pending";
+            else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
+            {
+                var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
+                var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
+                return string.Format("{0} / ~{1} {2} ({3} {4}/s)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit);
+            }
+            else
+            {
+                var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
+                var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
+                return string.Format("{0} / {1} {2} ({3} {4}/s)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit);
             }
         }
 
@@ -141,10 +205,22 @@ namespace LauncherTwo.Views
             private set
             {
                 _ProgressReport = value;
+                LoadProgressWithSpeed.ProgressReport = _ProgressReport.Load;
                 NotifyPropertyChanged("ProgressReport");
+                NotifyPropertyChanged("LoadProgressWithSpeed");
                 NotifyPropertyChanged("IsCancellationPossible");
             }
         }
+
+        private DirectoryPatchPhaseProgressWithSpeed _LoadProgressWithSpeed = new DirectoryPatchPhaseProgressWithSpeed();
+        public DirectoryPatchPhaseProgressWithSpeed LoadProgressWithSpeed
+        {
+            get
+            {
+                return _LoadProgressWithSpeed;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private CancellationTokenSource CancellationTokenSource;

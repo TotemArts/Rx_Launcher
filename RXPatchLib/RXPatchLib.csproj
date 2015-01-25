@@ -61,6 +61,7 @@
     <Compile Include="PatchInfo.cs" />
     <Compile Include="PatchSourceLoadException.cs" />
     <Compile Include="SHA1.cs" />
+    <Compile Include="SpeedComputer.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TemporaryDirectory.cs" />
     <Compile Include="TemporaryFile.cs" />

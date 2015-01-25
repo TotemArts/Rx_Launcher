@@ -27,6 +27,7 @@
         <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
         <local:PhaseProgressPercentageConverter x:Key="PhaseProgressPercentageConverter"/>
         <local:PhaseProgressStringConverter x:Key="PhaseProgressStringConverter"/>
+        <local:PhaseProgressWithSpeedStringConverter x:Key="PhaseProgressWithSpeedStringConverter"/>
         <local:PhaseIsIndeterminateConverter x:Key="PhaseIsIndeterminateConverter"/>
     </Window.Resources>
     <StackPanel Orientation="Vertical">
@@ -41,8 +42,8 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="200"/>
                 </Grid.ColumnDefinitions>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="0" Content="Validating"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="0" Content="Downloading"/>
@@ -51,7 +52,7 @@
                 <ProgressBar Grid.Row="1" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Load, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
                 <ProgressBar Grid.Row="2" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Apply, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="2" Content="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressStringConverter}}"/>
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressStringConverter}}"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding LoadProgressWithSpeed, Converter={StaticResource PhaseProgressWithSpeedStringConverter}}"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}"/>
             </Grid>
         </Grid>
