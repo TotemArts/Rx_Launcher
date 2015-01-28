@@ -113,6 +113,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BannerTools.cs" />
+    <Compile Include="BitmapToImageSourceConverter.cs" />
     <Compile Include="GameInstallation.cs" />
     <Compile Include="LaunchTools.cs" />
     <Compile Include="MapPreviewSettings.cs" />
@@ -275,18 +276,18 @@
     <Resource Include="Resources\FontAwesome.otf" />
     <Resource Include="Resources\LockIcon.png" />
     <Resource Include="Resources\RenX_Logo.png" />
-    <Resource Include="Resources\___map-pic-cnc-canyon.png" />
-    <Resource Include="Resources\___map-pic-cnc-complex.png" />
-    <Resource Include="Resources\___map-pic-cnc-field.png" />
-    <Resource Include="Resources\___map-pic-cnc-goldrush.png" />
-    <Resource Include="Resources\___map-pic-cnc-hourglassii.png" />
-    <Resource Include="Resources\___map-pic-cnc-island.png" />
-    <Resource Include="Resources\___map-pic-cnc-lakeside.png" />
-    <Resource Include="Resources\___map-pic-cnc-mesaii.png" />
-    <Resource Include="Resources\___map-pic-cnc-under.png" />
-    <Resource Include="Resources\___map-pic-cnc-volcano.png" />
-    <Resource Include="Resources\___map-pic-cnc-walls.png" />
-    <Resource Include="Resources\___map-pic-cnc-xmountain.png" />
+    <None Include="Resources\___map-pic-cnc-canyon.png" />
+    <None Include="Resources\___map-pic-cnc-complex.png" />
+    <None Include="Resources\___map-pic-cnc-field.png" />
+    <None Include="Resources\___map-pic-cnc-goldrush.png" />
+    <None Include="Resources\___map-pic-cnc-hourglassii.png" />
+    <None Include="Resources\___map-pic-cnc-island.png" />
+    <None Include="Resources\___map-pic-cnc-lakeside.png" />
+    <None Include="Resources\___map-pic-cnc-mesaii.png" />
+    <None Include="Resources\___map-pic-cnc-under.png" />
+    <None Include="Resources\___map-pic-cnc-volcano.png" />
+    <None Include="Resources\___map-pic-cnc-walls.png" />
+    <None Include="Resources\___map-pic-cnc-xmountain.png" />
     <Resource Include="Resources\defaultBanner.png" />
     <Resource Include="Resources\rx_Background.png" />
   </ItemGroup>

@@ -8,6 +8,7 @@
     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:local="clr-namespace:LauncherTwo"
+    xmlns:resx="clr-namespace:LauncherTwo.Properties"
     Style="{StaticResource {x:Type local:RXWindow}}"
     mc:Ignorable="d"
     x:Class="LauncherTwo.MainWindow"
@@ -25,6 +26,7 @@
 
     <!-- BYRONS TEST RESOURCE -->
     <Window.Resources>
+        <local:BitmapToImageSourceConverter x:Key="bitmapToImageSourceConverter"/>
         <Style x:Key="DataHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="#9910171B" />
             <Setter Property="FontStyle" Value="Normal" />
@@ -1022,7 +1024,7 @@
                                 <Border.BorderBrush>
                                     <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                 </Border.BorderBrush>
-                                <Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="Resources/___map-pic-cnc-goldrush.png"/>
+                                <Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>
                             </Border>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Server Name:" Foreground="#FFFFF8F8" FontWeight="Bold"/>

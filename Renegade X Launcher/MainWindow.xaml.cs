@@ -341,7 +341,7 @@ namespace LauncherTwo
 
             ServerInfo selected = GetSelectedServer();
 
-            sv_MapPreview.Source = MapPreviewSettings.GetMapImage(selected.MapName);
+            sv_MapPreview.Source = BitmapToImageSourceConverter.Convert(MapPreviewSettings.GetMapBitmap(selected.MapName));
 
             SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
