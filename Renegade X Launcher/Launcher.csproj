@@ -238,49 +238,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\FontAwesome.otf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <None Include="Resources\rx_Background.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-field.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-goldrush.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-hourglassii.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-island.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-lakeside.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-mesaii.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-walls.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5.1 %28x86 and x64%29</ProductName>
@@ -298,31 +255,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\RenXHeader.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RenX_Logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RenXIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RenMinIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RenXMinWindowIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\RXPatchLib\RXPatchLib.csproj">
       <Project>{e465d232-ee02-495d-8391-bfdafe350cf0}</Project>
       <Name>RXPatchLib</Name>
@@ -336,52 +268,27 @@
     <Folder Include="Tools\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\defaultBanner.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RenegadeXHeader.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Icon_Silver.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\LockIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Checkbox_OFF.png" />
     <Resource Include="Resources\Checkbox_ON.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-volcano.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-xmountain.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-canyon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-complex.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\___map-pic-cnc-under.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Resource Include="Resources\FontAwesome.otf" />
+    <Resource Include="Resources\LockIcon.png" />
+    <Resource Include="Resources\RenX_Logo.png" />
+    <Resource Include="Resources\___map-pic-cnc-canyon.png" />
+    <Resource Include="Resources\___map-pic-cnc-complex.png" />
+    <Resource Include="Resources\___map-pic-cnc-field.png" />
+    <Resource Include="Resources\___map-pic-cnc-goldrush.png" />
+    <Resource Include="Resources\___map-pic-cnc-hourglassii.png" />
+    <Resource Include="Resources\___map-pic-cnc-island.png" />
+    <Resource Include="Resources\___map-pic-cnc-lakeside.png" />
+    <Resource Include="Resources\___map-pic-cnc-mesaii.png" />
+    <Resource Include="Resources\___map-pic-cnc-under.png" />
+    <Resource Include="Resources\___map-pic-cnc-volcano.png" />
+    <Resource Include="Resources\___map-pic-cnc-walls.png" />
+    <Resource Include="Resources\___map-pic-cnc-xmountain.png" />
+    <Resource Include="Resources\defaultBanner.png" />
+    <Resource Include="Resources\rx_Background.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
