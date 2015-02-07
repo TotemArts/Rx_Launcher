@@ -19,7 +19,7 @@ namespace LauncherTwo
     }
     public static class VersionCheck
     {
-        const string VERSION_URL = "http://renegade-x.com/launcher_data/version.json";
+        const string VERSION_URL = "http://renegadexgs.appspot.com/launcher/version.json";
 
         static Version LauncherVersion;
         static Version GameVersion;
