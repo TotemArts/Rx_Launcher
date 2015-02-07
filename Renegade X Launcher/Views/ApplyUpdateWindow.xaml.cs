@@ -233,7 +233,7 @@ namespace LauncherTwo.Views
 
             InitializeComponent();
 
-            DirectoryPatcherProgressReport lastReport = null;
+            DirectoryPatcherProgressReport lastReport = new DirectoryPatcherProgressReport();
             progress.ProgressChanged += (o, report) => lastReport = report;
 
             Task backgroundTask = Task.Factory.StartNew(async () =>
