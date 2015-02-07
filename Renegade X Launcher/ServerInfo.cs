@@ -60,62 +60,75 @@ namespace LauncherTwo
         {
             var NewActiveServers = new List<ServerInfo>();
 
-            //Grab the string from the RenX Website.
-            string jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RENX_ACTIVE_SERVER_JSON_URL);
-
-            //Turn it into a JSon object that we can parse.
-            var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
-
-
-            //For each object we have to try to get its components.
-            #region -= Parse JSon Collection
-
-
-            foreach (var Data in results)
+            try
             {
+                //Grab the string from the RenX Website.
+                string jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RENX_ACTIVE_SERVER_JSON_URL);
 
-                ServerInfo NewServer = new ServerInfo();
-                //SET STRINGS
-                NewServer.ServerName =  Data["Name"] ?? "Missing";
+                //Turn it into a JSon object that we can parse.
+                var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
 
-                NewServer.MapName =     Data["Current Map"] ?? "Missing";
 
-                NewServer.MapName = MapPreviewSettings.GetPrettyMapName(NewServer.MapName);
+                //For each object we have to try to get its components.
+                #region -= Parse JSon Collection
 
-                NewServer.GameVersion = Data["Game Version"] ?? "Missing";
 
-                NewServer.IPAddress =   Data["IP"] ?? "Missing";
+                foreach (var Data in results)
+                {
+                    try
+                    {
+                        ServerInfo NewServer = new ServerInfo();
+                        //SET STRINGS
+                        NewServer.ServerName = Data["Name"] ?? "Missing";
 
-                //SET INTS
-                NewServer.BotCount = Data["Bots"] ?? -1;
+                        NewServer.MapName = Data["Current Map"] ?? "Missing";
 
-                NewServer.PlayerCount = Data["Players"] ?? -1;
+                        NewServer.MapName = MapPreviewSettings.GetPrettyMapName(NewServer.MapName);
 
-                NewServer.MineLimit = Data.Variables["Mine Limit"] ?? -1;
+                        NewServer.GameVersion = Data["Game Version"] ?? "Missing";
 
-                NewServer.MaxPlayers = Data.Variables["Player Limit"] ?? -1;
+                        NewServer.IPAddress = Data["IP"] ?? "Missing";
 
-                NewServer.VehicleLimit = Data.Variables["Vehicle Limit"] ?? -1;
+                        //SET INTS
+                        NewServer.BotCount = Data["Bots"] ?? -1;
 
-                NewServer.CrateRespawnRate = Data.Variables["CrateRespawnAfterPickup"] ?? -1;
+                        NewServer.PlayerCount = Data["Players"] ?? -1;
 
-                NewServer.TimeLimit = Data.Variables["Time Limit"] ?? -1;
+                        NewServer.MineLimit = Data.Variables["Mine Limit"] ?? -1;
 
-                NewServer.Port = Data["Port"] ?? -1;
+                        NewServer.MaxPlayers = Data.Variables["Player Limit"] ?? -1;
 
-                //SET BOOLS
-                NewServer.SteamRequired = Data.Variables["bSteamRequired"] ?? false;
+                        NewServer.VehicleLimit = Data.Variables["Vehicle Limit"] ?? -1;
 
-                NewServer.PasswordProtected = Data.Variables["bPassworded"] ?? false;
+                        NewServer.CrateRespawnRate = Data.Variables["CrateRespawnAfterPickup"] ?? -1;
 
-                NewServer.AutoBalance = Data.Variables["bAutoBalanceTeams"] ?? false;
+                        NewServer.TimeLimit = Data.Variables["Time Limit"] ?? -1;
 
-                NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
+                        NewServer.Port = Data["Port"] ?? -1;
 
-                NewActiveServers.Add(NewServer);
+                        //SET BOOLS
+                        NewServer.SteamRequired = Data.Variables["bSteamRequired"] ?? false;
+
+                        NewServer.PasswordProtected = Data.Variables["bPassworded"] ?? false;
+
+                        NewServer.AutoBalance = Data.Variables["bAutoBalanceTeams"] ?? false;
+
+                        NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
+
+                        NewActiveServers.Add(NewServer);
+                    }
+                    catch
+                    {
+                        // If a server failed to parse, skip it.
+                    }
+                }
+                #endregion
             }
-            #endregion
-
+            catch
+            {
+                // If a global error occurred (e.g. connectivity/JSON parse error), clear the whole list.
+                NewActiveServers.Clear();
+            }
             ActiveServers = NewActiveServers;
         }
 

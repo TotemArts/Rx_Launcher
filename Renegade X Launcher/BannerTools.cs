@@ -19,14 +19,12 @@ namespace LauncherTwo
 
         }
 
-        public BannerInfo(string IPAddress, string WebsiteLink, ImageSource Source )
+        public BannerInfo(string WebsiteLink, ImageSource Source )
         {
-            m_IPAddress = IPAddress;
             m_WebsiteLink = WebsiteLink;
             m_BannerImageSource = Source; 
         }
 
-        public string m_IPAddress;
         public string m_WebsiteLink;
         public ImageSource m_BannerImageSource;
     }
@@ -34,11 +32,7 @@ namespace LauncherTwo
     {
         private static Dictionary<string, BannerInfo> Banners = new Dictionary<string, BannerInfo>()
         {
-            {
-                "Default", new BannerInfo( "http://www.renegade-x.com/launcher_data/images/sample_banner.png", 
-                                           "http://www.renegade-x.com/",
-                                            DownloadImage("http://www.renegade-x.com/launcher_data/images/sample_banner.png"))
-            }
+            { "Default", new BannerInfo("http://www.renegade-x.com/", new BitmapImage(new Uri("Resources/defaultBanner.png", UriKind.Relative))) }
         };
 
         public static ImageSource GetBanner(string IPAddress)
@@ -81,31 +75,37 @@ namespace LauncherTwo
 
         private static void ParseBanners()
         {
-            //Grab the string from the RenX Website.
-            string jsonText = new WebClient().DownloadString(RenXWebLinks.RENX_BANNERS_JSON_URL);
-
-            //Turn it into a JSon object that we can parse.
-            var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
-
-            foreach(var Data in results)
+            try
             {
-                BannerInfo info = new BannerInfo();
+                //Grab the string from the RenX Website.
+                string jsonText = new WebClient().DownloadString(RenXWebLinks.RENX_BANNERS_JSON_URL);
 
-                info.m_WebsiteLink = Data["Link"];
+                //Turn it into a JSon object that we can parse.
+                var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
 
-                string urlLink = Data["Banner"];
-
-                info.m_BannerImageSource = DownloadImage(urlLink);
-
-                string ipString = Data["IP"] ?? "-1";
-                string[] ips = ipString.Split(RenXWebLinks.RENX_SERVER_SETTING_SPACE_SYMBOL);
-
-                foreach( string ip in ips)
+                foreach(var Data in results)
                 {
-                    Banners.Add(ip.Replace(":7777", ""), info); 
+                    BannerInfo info = new BannerInfo();
+
+                    info.m_WebsiteLink = Data["Link"];
+
+                    string urlLink = Data["Banner"];
+
+                    info.m_BannerImageSource = DownloadImage(urlLink);
+
+                    string ipString = Data["IP"] ?? "-1";
+                    string[] ips = ipString.Split(RenXWebLinks.RENX_SERVER_SETTING_SPACE_SYMBOL);
+
+                    foreach( string ip in ips)
+                    {
+                        Banners.Add(ip.Replace(":7777", ""), info); 
+                    }
                 }
             }
-
+            catch
+            {
+                // Swallow any exceptions (usually connectivity or parse errors).
+            }
         }
 
         public static BitmapImage DownloadImage(string url)
