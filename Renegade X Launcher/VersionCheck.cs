@@ -19,8 +19,6 @@ namespace LauncherTwo
     }
     public static class VersionCheck
     {
-        const string VERSION_URL = "http://renegadexgs.appspot.com/launcher/version.json";
-
         static Version LauncherVersion;
         static Version GameVersion;
         static Version LatestLauncherVersion;
@@ -116,7 +114,7 @@ namespace LauncherTwo
         {
             try
             {
-                var versionJson = await new WebClient().DownloadStringTaskAsync(VERSION_URL);
+                var versionJson = await new WebClient().DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
                 var versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
                 LatestLauncherVersion = new Version
                 {

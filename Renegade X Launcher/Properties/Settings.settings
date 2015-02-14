@@ -14,5 +14,8 @@
     <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="VersionUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://renegadexgs.appspot.com/launcher/version.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
