@@ -27,6 +27,7 @@ namespace LauncherTwo
         static Version LatestGameVersion;
 
         public static string GamePatchUrl = null;
+        public static string LauncherPatchUrl = null;
 
         static VersionCheck()
         {
@@ -128,6 +129,7 @@ namespace LauncherTwo
                     Number = versionData["game"]["version_number"],
                 };
                 GamePatchUrl = versionData["game"]["patch_url"];
+                LauncherPatchUrl = versionData["launcher"]["patch_url"];
             }
             catch
             {

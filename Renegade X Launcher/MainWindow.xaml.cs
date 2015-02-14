@@ -175,7 +175,7 @@ namespace LauncherTwo
 
         void DownloadLauncherUpdate()
         {
-            UpdateDownloadWindow theWindow = new UpdateDownloadWindow();
+            UpdateDownloadWindow theWindow = new UpdateDownloadWindow(VersionCheck.LauncherPatchUrl);
             theWindow.Owner = this;
             theWindow.ShowDialog();
 

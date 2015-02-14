@@ -28,11 +28,6 @@ namespace LauncherTwo
         static WebClient Client;
 
 
-        const string DOWNLOAD_FILENAME = "RxLauncher_Current";
-        const string DOWNLOAD_EXTENSION = ".zip";
-        const string DOWNLOAD_URL = "http://www.renegade-x.com/launcher_data/" + DOWNLOAD_FILENAME + DOWNLOAD_EXTENSION;
-
-
         static string GetTempDirectory()
         {
             return Path.GetTempPath() + @"\RxTmp\";
@@ -45,12 +40,12 @@ namespace LauncherTwo
 
         static string GetExtractDirectory()
         {
-            return GetTempDirectory() + DOWNLOAD_FILENAME + @"\";
+            return GetTempDirectory() + @"launcher_update_extracted\";
         }
 
         static string GetSavePath()
         {
-            return GetTempDirectory() + DOWNLOAD_FILENAME + DOWNLOAD_EXTENSION;
+            return GetTempDirectory() + @"launcher_update.zip";
         }
 
         static eUpdateState GetUpdateState()
@@ -64,16 +59,16 @@ namespace LauncherTwo
             // TODO: Cancel whichever state is currently happening.
         }
 
-        public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow)
+        public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow, string url)
         {
             UpdaterWindow = aUpdaterWindow;
             if (UpdateState != eUpdateState.Downloading && UpdateState != eUpdateState.Extracting && UpdateState != eUpdateState.ReadyToInstall)
             {
-                StartDownload();
+                StartDownload(url);
             }
         }
 
-        static void StartDownload()
+        static void StartDownload(string url)
         {
             try
             {
@@ -89,7 +84,7 @@ namespace LauncherTwo
                 Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
                 Client.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(DownloadCompletedCallback);
 
-                Uri uri = new Uri(DOWNLOAD_URL);
+                Uri uri = new Uri(url);
                 Client.DownloadFileAsync(uri, GetSavePath());
             }
             catch (Exception e)
