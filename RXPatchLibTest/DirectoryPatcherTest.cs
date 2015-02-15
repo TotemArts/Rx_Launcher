@@ -30,17 +30,21 @@ namespace RXPatchLibTest
             PatchDir = new TemporaryDirectory();
 
             using (var oldFile = new TemporaryFile())
-            using (var newFile = new TemporaryFile())
+            using (var newDeltaFile = new TemporaryFile())
+            using (var newFullFile = new TemporaryFile())
             {
+                File.WriteAllText(oldFile.Path, "old");
+                File.WriteAllText(newDeltaFile.Path, "new_delta");
+                File.WriteAllText(newFullFile.Path, "new_full");
+                string oldHash = SHA1.Get(Encoding.UTF8.GetBytes("old"));
+                string newDeltaHash = SHA1.Get(Encoding.UTF8.GetBytes("new_delta"));
+                string newFullHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full"));
+
                 Directory.CreateDirectory(Path.Combine(PatchDir.Path, "delta"));
                 Directory.CreateDirectory(Path.Combine(PatchDir.Path, "full"));
-                File.WriteAllText(oldFile.Path, "old");
-                File.WriteAllText(newFile.Path, "new_delta");
-                var oldHash = SHA1.Get(Encoding.UTF8.GetBytes("old"));
-                var newDeltaHash = SHA1.Get(Encoding.UTF8.GetBytes("new_delta"));
-                var newFullHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full"));
-                new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred).CreatePatchAsync(oldFile.Path, newFile.Path, Path.Combine(PatchDir.Path, "delta/" + newDeltaHash + "_from_" + oldHash)).Wait();
-                File.WriteAllText(Path.Combine(PatchDir.Path, "full/" + newFullHash), "new_full");
+                var patchBuilder = new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred);
+                patchBuilder.CreatePatchAsync(oldFile.Path, newDeltaFile.Path, Path.Combine(PatchDir.Path, "delta/" + newDeltaHash + "_from_" + oldHash)).Wait();
+                patchBuilder.CompressAsync(newFullFile.Path, Path.Combine(PatchDir.Path, "full/" + newFullHash)).Wait();
                 PatchDirFiles = DirectoryPathIterator.GetChildPathsRecursive(PatchDir.Path).ToArray();
             }
         }

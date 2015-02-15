@@ -51,5 +51,24 @@ namespace RXPatchLib
                 throw new PatchCreationException(e);
             }
         }
+
+        public async Task CompressAsync(string newPath, string patchPath)
+        {
+            try
+            {
+                await PatchSystem.RunCommandAsync(
+                    "-e",
+                    "-B" + SourceWindowSize.ToString(),
+                    "-" + CompressionLevel,
+                    "-S", SecondaryLevelCompression,
+                    "-f",
+                    newPath,
+                    patchPath);
+            }
+            catch (CommandExecutionException e)
+            {
+                throw new PatchCreationException(e);
+            }
+        }
     }
 }

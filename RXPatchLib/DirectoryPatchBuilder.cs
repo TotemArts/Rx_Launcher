@@ -57,13 +57,14 @@ namespace RXPatchLib
 
                 if (newHash != null)
                 {
-                    File.Copy(newPath, patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash, true);
+                    string fullPath = patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash;
+                    await PatchBuilder.CompressAsync(newPath, fullPath);
 
                     if (oldHash != null && oldHash != newHash)
                     {
                         string deltaPath = patchPath + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + newHash + "_from_" + oldHash;
                         await PatchBuilder.CreatePatchAsync(oldPath, newPath, deltaPath);
-                        if (new FileInfo(deltaPath).Length > newSize)
+                        if (new FileInfo(deltaPath).Length > new FileInfo(fullPath).Length)
                         {
                             File.Delete(deltaPath);
                         }

@@ -100,9 +100,8 @@ namespace RXPatchLibTest
                 Assert.AreEqual("a", instructions[0].Path);
                 Assert.AreEqual(GetStringHash(DummyDataA), instructions[0].OldHash);
                 Assert.AreEqual(GetStringHash(DummyDataB), instructions[0].NewHash);
-                Assert.AreEqual(true, instructions[0].HasDelta);
                 Assert.IsTrue(File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + instructions[0].NewHash));
-                Assert.IsTrue(File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + instructions[0].NewHash + "_from_" + instructions[0].OldHash));
+                Assert.AreEqual(instructions[0].HasDelta, File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + instructions[0].NewHash + "_from_" + instructions[0].OldHash));
             }
         }
 
@@ -177,15 +176,13 @@ namespace RXPatchLibTest
                 Assert.AreEqual("a", instructions[0].Path);
                 Assert.AreEqual(GetStringHash(DummyDataA), instructions[0].OldHash);
                 Assert.AreEqual(GetStringHash(DummyDataB), instructions[0].NewHash);
-                Assert.AreEqual(true, instructions[0].HasDelta);
                 Assert.IsTrue(File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + instructions[0].NewHash));
-                Assert.IsTrue(File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + instructions[0].NewHash + "_from_" + instructions[0].OldHash));
+                Assert.AreEqual(instructions[0].HasDelta, File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + instructions[0].NewHash + "_from_" + instructions[0].OldHash));
                 Assert.AreEqual("b", instructions[1].Path);
                 Assert.AreEqual(GetStringHash(DummyDataA), instructions[1].OldHash);
                 Assert.AreEqual(GetStringHash(DummyDataB), instructions[1].NewHash);
-                Assert.AreEqual(true, instructions[1].HasDelta);
                 Assert.IsTrue(File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + instructions[1].NewHash));
-                Assert.IsTrue(File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + instructions[1].NewHash + "_from_" + instructions[1].OldHash));
+                Assert.AreEqual(instructions[1].HasDelta, File.Exists(patchDir.Path + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + instructions[1].NewHash + "_from_" + instructions[1].OldHash));
             }
         }
     }

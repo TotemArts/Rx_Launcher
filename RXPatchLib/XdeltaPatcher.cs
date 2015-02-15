@@ -39,5 +39,22 @@ namespace RXPatchLib
                 throw new PatchCreationException(e);
             }
         }
+
+        public async Task DecompressAsync(string patchedPath, string patchPath)
+        {
+            try
+            {
+                await PatchSystem.RunCommandAsync(
+                    "-d",
+                    "-B" + SourceWindowSize.ToString(),
+                    "-f",
+                    patchPath,
+                    patchedPath);
+            }
+            catch (CommandExecutionException e)
+            {
+                throw new PatchCreationException(e);
+            }
+        }
     }
 }

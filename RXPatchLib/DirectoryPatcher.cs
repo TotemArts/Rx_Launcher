@@ -111,14 +111,14 @@ namespace RXPatchLib
             return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
         }
 
-        public Task Execute()
+        public async Task Execute()
         {
             string tempPath = DirectoryPatcher.GetTempPath(SubPath);
             string newPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
-            File.Copy(newPath, tempPath); // Copy to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted). Copying is also necessary because the file may be shared (moving is not allowed).
+            await DirectoryPatcher.FilePatcher.DecompressAsync(tempPath, newPath); // Extract to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted). Copying is also necessary because the file may be shared (moving is not allowed).
             if (File.Exists(targetPath))
             {
                 if (NeedsBackup)
@@ -133,7 +133,6 @@ namespace RXPatchLib
             }
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
             File.Move(tempPath, targetPath);
-            return TaskExtensions.CompletedTask;
         }
     }
 
