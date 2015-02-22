@@ -156,6 +156,9 @@
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WebClientWithTimeout.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

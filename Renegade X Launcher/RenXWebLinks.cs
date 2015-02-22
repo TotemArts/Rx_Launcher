@@ -15,5 +15,6 @@ using System.Threading.Tasks;
         public const string RENX_ACTIVE_SERVER_COUNT_URL = "http://renegadexgs.appspot.com/browser_3.jsp?view=true";
         public const string RENX_ACTIVE_SERVER_JSON_URL = "http://renegadexgs.appspot.com/servers.jsp";
         public const string RENX_BANNERS_JSON_URL = "http://renegade-x.com/launcher_data/banners";
+        public const string IP_PROVIDER_URL = "http://renegadexgs.appspot.com/getip.jsp";
     }
 

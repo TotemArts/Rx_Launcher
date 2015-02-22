@@ -22,9 +22,17 @@ namespace LauncherTwo
 
     public class EditorInstanceStartupParameters : EngineInstanceStartupParameters
     {
-        public override string GetProcessArguments ()
+        public override string GetProcessArguments()
         {
-            return " editor";
+            return "editor";
+        }
+    }
+
+    public class ServerInstanceStartupParameters : EngineInstanceStartupParameters
+    {
+        public override string GetProcessArguments()
+        {
+            return "server CNC-Walls_Flying.udk?game=RenX_Game.Rx_Game?dedicated=true -nosteam";
         }
     }
 
@@ -60,7 +68,7 @@ namespace LauncherTwo
         public EngineInstanceStartupParameters StartupParameters { get; protected set; }
         public Task Task { get; protected set; }
 
-        public static EngineInstance Start (EngineInstanceStartupParameters StartupParameters)
+        public static EngineInstance Start(EngineInstanceStartupParameters StartupParameters)
         {
             var instance = new EngineInstance();
             instance.StartupParameters = StartupParameters;

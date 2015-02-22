@@ -20,6 +20,8 @@ using FirstFloor.ModernUI.Windows.Controls;
 using System.Collections.Generic;
 using RXPatchLib;
 using System.IO;
+using System.Linq;
+using System.Net.Sockets;
 
 
 namespace LauncherTwo
@@ -410,7 +412,7 @@ namespace LauncherTwo
 
                 SetMessageboxText(MESSAGE_IDLE);
             }
-            catch (Exception)
+            catch
             {
                 SetMessageboxText(MESSAGE_CANTSTARTGAME);
             }
@@ -420,22 +422,40 @@ namespace LauncherTwo
             }
         }
 
-        private async Task StartEditorInstance()
+        private void StartEditorInstance()
         {
             try
             {
-                SetMessageboxText("The game is running.");
-
                 EditorInstanceStartupParameters startupParameters = new EditorInstanceStartupParameters();
-                GameInstance = EngineInstance.Start(startupParameters);
-
-                await GameInstance.Task;
-
-                SetMessageboxText(MESSAGE_IDLE);
+                EngineInstance.Start(startupParameters);
+                SetMessageboxText("The editor was started.");
             }
-            catch (Exception)
+            catch
             {
-                SetMessageboxText(MESSAGE_CANTSTARTGAME);
+                SetMessageboxText("Error starting editor.");
+            }
+            finally
+            {
+                GameInstance = null;
+            }
+        }
+
+        private void StartServerInstance()
+        {
+            try
+            {
+                ServerInstanceStartupParameters startupParameters = new ServerInstanceStartupParameters();
+                EngineInstance.Start(startupParameters);
+                SetMessageboxText("The server was started.");
+
+                IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+                var localIps = host.AddressList.Where((a) => a.AddressFamily == AddressFamily.InterNetwork);
+                string localIPString = string.Join("\n", from ip in localIps select ip.ToString());
+                MessageBox.Show(String.Format("The server was started and will continue to run in the background. You can connect to it via LAN by pressing \"Join IP\" in the launcher, and then entering one of the IP addresses below.\n\n{0}\n\nIf you want to play over the internet, you can use the server list in the launcher or in game. Note that you likely need to forward port 7777 in your router and/or firewall to make internet games work.\n\nNote that launching the server via the launcher is intended for LAN servers, and some online functionality (such as leaderboard statistics) is disabled.", localIPString));
+            }
+            catch
+            {
+                SetMessageboxText("Error starting server.");
             }
             finally
             {
@@ -454,9 +474,14 @@ namespace LauncherTwo
             await StartGameInstance(null, null);
         }
 
-        private async void SD_LaunchEditor_Click (object sender, RoutedEventArgs e)
+        private void SD_LaunchEditor_Click(object sender, RoutedEventArgs e)
         {
-            await StartEditorInstance();
+            StartEditorInstance();
+        }
+
+        private void SD_LaunchServer_Click(object sender, RoutedEventArgs e)
+        {
+            StartServerInstance();
         }
 
         private async void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
