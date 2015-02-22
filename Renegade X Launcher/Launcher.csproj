@@ -118,7 +118,7 @@
     <Compile Include="LaunchTools.cs" />
     <Compile Include="MapPreviewSettings.cs" />
     <Compile Include="PingResult.cs" />
-    <Compile Include="PingTools.cs" />
+    <Compile Include="PingExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -131,7 +131,9 @@
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
+    <Compile Include="TaskExtensions.cs" />
     <Compile Include="TrulyObservableCollection.cs" />
+    <Compile Include="UpdateServerSelector.cs" />
     <Compile Include="URI.cs" />
     <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\SettingsWindow.xaml.cs">
