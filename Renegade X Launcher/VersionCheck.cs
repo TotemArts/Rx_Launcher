@@ -24,7 +24,7 @@ namespace LauncherTwo
         static Version LatestLauncherVersion;
         static Version LatestGameVersion;
 
-        public static string GamePatchUrl = null;
+        public static string[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
 
         static VersionCheck()
@@ -126,7 +126,7 @@ namespace LauncherTwo
                     Name = versionData["game"]["version_name"],
                     Number = versionData["game"]["version_number"],
                 };
-                GamePatchUrl = versionData["game"]["patch_url"];
+                GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
                 LauncherPatchUrl = versionData["launcher"]["patch_url"];
             }
             catch

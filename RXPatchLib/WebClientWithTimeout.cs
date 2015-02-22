@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace LauncherTwo
+namespace RXPatchLib
 {
     public class WebClientWithTimeout : WebClient
     {
@@ -9,8 +9,6 @@ namespace LauncherTwo
         /// Time in milliseconds
         /// </summary>
         public int Timeout { get; set; }
-
-        public WebClientWithTimeout() : this(60000) { }
 
         public WebClientWithTimeout(int timeout) : base()
         {

@@ -118,7 +118,6 @@
     <Compile Include="LaunchTools.cs" />
     <Compile Include="MapPreviewSettings.cs" />
     <Compile Include="PingResult.cs" />
-    <Compile Include="PingExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -157,9 +156,6 @@
     <Compile Include="UsernameValidationRule.cs" />
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WebClientWithTimeout.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

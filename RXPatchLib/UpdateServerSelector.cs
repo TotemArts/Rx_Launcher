@@ -58,6 +58,11 @@ namespace RXPatchLib
         {
             Contract.Assume(hosts.Count > 0);
 
+            if (hosts.Count == 1)
+            {
+                return 0;
+            }
+
             Task[] pingTasks = hosts.Select((host, index) => PingHost(host, index)).ToArray();
             await Task.WhenAll(pingTasks).ProceedAfter(500);
             foreach (var task in pingTasks)

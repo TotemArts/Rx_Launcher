@@ -1,7 +1,7 @@
-﻿using LauncherTwo;
+﻿using RXPatchLib;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace LauncherTest
+namespace RXPatchLibTest
 {
     [TestClass]
     public class UpdateServerSelectorTest
@@ -33,6 +33,13 @@ namespace LauncherTest
         {
             // australia.gov.au does not accept pings.
             int hostIndex = new UpdateServerSelector().SelectHostIndex(new string[] { "google.nl", "australia.gov.au" }).Result;
+            Assert.AreEqual(0, hostIndex);
+        }
+
+        [TestMethod]
+        public void TestSingleServer()
+        {
+            int hostIndex = new UpdateServerSelector().SelectHostIndex(new string[] { "google.nl" }).Result;
             Assert.AreEqual(0, hostIndex);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,14 @@ namespace RXPatchLib
                 DirectoryEx.DeleteContents(downloadPath);
                 DirectoryEx.DeleteContents(tempPath);
             }
+        }
+        public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
+        {
+            Contract.Assert(baseUrls.Length > 0);
+            var hosts = baseUrls.Select(url => new Uri(url).Host).ToArray();
+            int index = await new UpdateServerSelector().SelectHostIndex(hosts);
+            var bestHost = baseUrls[index];
+            await ApplyPatchFromWeb(bestHost, targetPath, applicationDirPath, progress, cancellationToken);
         }
 
         public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)

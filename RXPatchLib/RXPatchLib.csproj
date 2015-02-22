@@ -47,6 +47,7 @@
     <Compile Include="DirectoryPatchPhaseProgress.cs" />
     <Compile Include="DiscreteProgress.cs" />
     <Compile Include="ObjectEx.cs" />
+    <Compile Include="PingExtensions.cs" />
     <Compile Include="RXPatchBuilder.cs" />
     <Compile Include="RXPatcher.cs" />
     <Compile Include="CommandExecutionException.cs" />
@@ -66,6 +67,10 @@
     <Compile Include="TemporaryDirectory.cs" />
     <Compile Include="TemporaryFile.cs" />
     <Compile Include="UnitAndScale.cs" />
+    <Compile Include="UpdateServerSelector.cs" />
+    <Compile Include="WebClientWithTimeout.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="WebPatchSource.cs" />
     <Compile Include="XdeltaPatcher.cs" />
     <Compile Include="XdeltaPatchSystem.cs" />
