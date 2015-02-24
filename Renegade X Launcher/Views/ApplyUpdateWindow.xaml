@@ -16,6 +16,7 @@
     WindowStartupLocation="CenterScreen"
     MinHeight="0"
     MinWidth="0"
+    MaxWidth="600"
     ResizeMode="NoResize"
     Closing="This_Closing">
     <Window.Resources>
@@ -31,7 +32,7 @@
         <local:PhaseIsIndeterminateConverter x:Key="PhaseIsIndeterminateConverter"/>
     </Window.Resources>
     <StackPanel Orientation="Vertical">
-        <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="2" Content="{Binding StatusMessage}"/>
+        <TextBox Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="2" TextWrapping="Wrap" Text="{Binding StatusMessage, Mode=OneWay}" IsReadOnly="True" Background="Transparent" BorderThickness="0"/>
         <FrameworkElement Height="10"/>
         <Grid Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}">
             <Grid>

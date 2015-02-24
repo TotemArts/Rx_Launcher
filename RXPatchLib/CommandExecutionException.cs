@@ -18,9 +18,12 @@ namespace RXPatchLib
             Arguments = arguments;
             ExitCode = exitCode;
         }
-        public override string ToString()
+        public override string Message
         {
-            return "Command execution failed: " + Path + ProcessEx.ToCommandLineArgumentString(Arguments) + " exited with code " + ExitCode.ToString();
+            get
+            {
+                return "Command execution failed: " + Path + ProcessEx.ToCommandLineArgumentString(Arguments) + " exited with code " + ExitCode.ToString();
+            }
         }
     }
 }

@@ -14,9 +14,12 @@ namespace RXPatchLib
             CommandExecutionException = commandExecutionException;
         }
 
-        public override string ToString()
+        public override string Message
         {
-            return "Patch creation failed: " + CommandExecutionException.ToString();
+            get
+            {
+                return "Patch creation failed: " + CommandExecutionException.Message;
+            }
         }
     }
 }
