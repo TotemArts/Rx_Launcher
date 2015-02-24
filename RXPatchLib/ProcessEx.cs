@@ -14,7 +14,7 @@ namespace RXPatchLib
         public static string EscapeCommandLineArgument(string argument)
         {
             // According to http://msdn.microsoft.com/en-us/library/17w5ykft%28v=vs.85%29.aspx
-            return "\"" + Regex.Replace(argument, "(\\*)(\"|\\$)", "$1$1\\$2") + "\"";
+            return "\"" + Regex.Replace(argument, "(\\\\*)(\"|\\\\$)", "$1$1\\$2") + "\"";
         }
         public static string ToCommandLineArgumentString(string[] arguments)
         {

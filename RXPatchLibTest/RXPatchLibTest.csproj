@@ -64,6 +64,7 @@
     <Compile Include="RXPatcherTest.cs" />
     <Compile Include="TestProgressHandler.cs" />
     <Compile Include="UnitAndScaleTest.cs" />
+    <Compile Include="ProcessExTest.cs" />
     <Compile Include="UpdateServerSelectorTest.cs" />
     <Compile Include="XdeltaPatcherTest.cs" />
     <Compile Include="XdeltaPatchBuilderTest.cs" />
