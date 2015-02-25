@@ -22,7 +22,7 @@ namespace RXPatchLib
         {
             get
             {
-                return "Command execution failed: " + Path + ProcessEx.ToCommandLineArgumentString(Arguments) + " exited with code " + ExitCode.ToString();
+                return "Command execution failed: " + Path + " " + ProcessEx.ToCommandLineArgumentString(Arguments) + " exited with code " + ExitCode.ToString();
             }
         }
     }
