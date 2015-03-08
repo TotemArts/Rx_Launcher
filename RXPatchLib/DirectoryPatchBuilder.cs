@@ -50,8 +50,10 @@ namespace RXPatchLib
                 string newPath = newRootPath + Path.DirectorySeparatorChar + path;
                 string oldHash = GetHash(oldPath);
                 string newHash = GetHash(newPath);
-                long oldSize = File.Exists(oldPath) ? new FileInfo(oldPath).Length : 0;
                 long newSize = File.Exists(newPath) ? new FileInfo(newPath).Length : 0;
+                DateTime oldLastWriteTime = File.Exists(oldPath) ? new FileInfo(oldPath).LastWriteTimeUtc : DateTime.MinValue;
+                DateTime newLastWriteTime = File.Exists(newPath) ? new FileInfo(newPath).LastWriteTimeUtc : DateTime.MinValue;
+                long fullReplaceSize = 0;
                 long deltaSize = 0;
                 bool hasDelta = false;
 
@@ -59,6 +61,7 @@ namespace RXPatchLib
                 {
                     string fullPath = patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash;
                     await PatchBuilder.CompressAsync(newPath, fullPath);
+                    fullReplaceSize = new FileInfo(fullPath).Length;
 
                     if (oldHash != null && oldHash != newHash)
                     {
@@ -81,8 +84,9 @@ namespace RXPatchLib
                     Path = path,
                     OldHash = oldHash,
                     NewHash = newHash,
-                    OldSize = oldSize,
-                    NewSize = newSize,
+                    OldLastWriteTime = oldLastWriteTime,
+                    NewLastWriteTime = newLastWriteTime,
+                    FullReplaceSize = fullReplaceSize,
                     DeltaSize = deltaSize,
                     HasDelta = hasDelta,
                 });

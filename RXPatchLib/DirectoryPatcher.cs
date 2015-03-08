@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -136,6 +137,37 @@ namespace RXPatchLib
         }
     }
 
+    public class ModifiedTimeReplaceAction : IFilePatchAction
+    {
+        DirectoryPatcher DirectoryPatcher;
+        string SubPath;
+        DateTime LastWriteTime;
+
+        public long PatchSize
+        {
+            get { return 0; }
+        }
+
+        public ModifiedTimeReplaceAction(DirectoryPatcher directoryPatcher, string subPath, DateTime lastWriteTime)
+        {
+            DirectoryPatcher = directoryPatcher;
+            SubPath = subPath;
+            LastWriteTime = lastWriteTime;
+        }
+
+        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
+        {
+            return TaskExtensions.CompletedTask;
+        }
+
+        public Task Execute()
+        {
+            string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
+            new FileInfo(targetPath).LastWriteTimeUtc = LastWriteTime;
+            return TaskExtensions.CompletedTask;
+        }
+    }
+
     public class DirectoryPatcher
     {
         class LoadPhase
@@ -208,21 +240,20 @@ namespace RXPatchLib
             List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
 
             var progress = new DirectoryPatchPhaseProgress();
-            progress.SetTotals(instructions.Count, (from i in instructions select i.OldSize).Sum()); // Using the actual file size here would be better, but this is a fast and easy approximation.
+            var paths = instructions.Select(i => Path.Combine(TargetPath, i.Path));
+            var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
+            progress.SetTotals(instructions.Count, sizes.Sum());
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
-            foreach (var instruction in instructions)
+            foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
             {
+                var instruction = pair.Instruction;
+                var size = pair.Size;
                 cancellationToken.ThrowIfCancellationRequested();
                 string targetFilePath = Path.Combine(TargetPath, instruction.Path);
-                string userHash = await SHA1.GetFileHashAsync(targetFilePath);
-                IFilePatchAction action = BuildFilePatchAction(instruction, userHash);
-                if (action != null)
-                {
-                    callback(action);
-                }
-                progress.AdvanceItem(instruction.OldSize);
+                await BuildFilePatchAction(instruction, targetFilePath, callback);
+                progress.AdvanceItem(pair.Size);
                 progressCallback(progress);
             }
 
@@ -230,28 +261,34 @@ namespace RXPatchLib
             progressCallback(progress);
         }
 
-        private IFilePatchAction BuildFilePatchAction(FilePatchInstruction instruction, string userHash)
+        private async Task BuildFilePatchAction(FilePatchInstruction instruction, string targetFilePath, Action<IFilePatchAction> callback)
         {
-            bool isOld = userHash == instruction.OldHash;
-            bool isNew = userHash == instruction.NewHash;
-            IFilePatchAction action = null;
+            string installedHash = await SHA1.GetFileHashAsync(targetFilePath);
+            bool isOld = installedHash == instruction.OldHash;
+            bool isNew = installedHash == instruction.NewHash;
             if (!isNew)
             {
-                bool needsBackup = !isOld && userHash != null;
+                bool needsBackup = !isOld && installedHash != null;
                 if (instruction.NewHash == null)
-                    action = new RemoveAction(this, instruction.Path, needsBackup);
+                {
+                    callback(new RemoveAction(this, instruction.Path, needsBackup));
+                }
                 else if (isOld && instruction.HasDelta)
                 {
                     string deltaFileName = Path.Combine("delta", instruction.NewHash + "_from_" + instruction.OldHash);
-                    action = new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize);
+                    callback(new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize));
                 }
                 else
                 {
                     string fullFileName = Path.Combine("full", instruction.NewHash);
-                    action = new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.NewSize);
+                    callback(new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.FullReplaceSize));
                 }
             }
-            return action;
+
+            if (instruction.NewHash != null)
+            {
+                callback(new ModifiedTimeReplaceAction(this, instruction.Path, instruction.NewLastWriteTime));
+            }
         }
 
         private static async Task Apply(List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
