@@ -55,7 +55,7 @@ namespace RXPatchLib
 
             using (var webClient = new WebClient())
             {
-                webClient.Proxy = null; // TODO: Support proxy
+                webClient.Proxy = null;
 
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
@@ -64,15 +64,20 @@ namespace RXPatchLib
 
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
-                    try
+                    RetryStrategy retryStrategy = new RetryStrategy();
+                    await retryStrategy.Run(async () =>
                     {
-                        await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
-                    }
-                    catch (WebException)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        throw;
-                    }
+                        try
+                        {
+                            await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
+                            return null;
+                        }
+                        catch (WebException e)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            return e;
+                        }
+                    });
                 }
             }
             /* TODO
@@ -93,11 +98,6 @@ namespace RXPatchLib
                 SizeInKB = (int)Size / 1024;
             }
             acceptRanges = String.Compare(response.Headers["Accept-Ranges"], "bytes", true) == 0;
-
-            //create network stream
-            ns = response.GetResponseStream();
-
-            return WebClient.DownloadFileTaskAsync(subPath, GetSystemPath(subPath));
              * */
         }
     }

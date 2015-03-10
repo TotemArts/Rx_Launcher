@@ -65,6 +65,7 @@
     <Compile Include="TestProgressHandler.cs" />
     <Compile Include="UnitAndScaleTest.cs" />
     <Compile Include="ProcessExTest.cs" />
+    <Compile Include="RetryStrategyTest.cs" />
     <Compile Include="UpdateServerSelectorTest.cs" />
     <Compile Include="XdeltaPatcherTest.cs" />
     <Compile Include="XdeltaPatchBuilderTest.cs" />
