@@ -117,7 +117,13 @@ namespace LauncherTwo
 
             if (VersionCheck.IsLauncherOutOfDate())
             {
-                ShowLauncherUpdateWindow();
+                bool updateInstallPending;
+                ShowLauncherUpdateWindow(out updateInstallPending);
+                if (updateInstallPending)
+                {
+                    Close();
+                    return;
+                }
             }
             else
             {
@@ -175,7 +181,7 @@ namespace LauncherTwo
             }
         }
 
-        void DownloadLauncherUpdate()
+        void DownloadLauncherUpdate(out bool updateInstallPending)
         {
             UpdateDownloadWindow theWindow = new UpdateDownloadWindow(VersionCheck.LauncherPatchUrl);
             theWindow.Owner = this;
@@ -184,11 +190,15 @@ namespace LauncherTwo
             if (theWindow.UpdateFinished)
             {
                 SelfUpdater.ExecuteInstall();
-                this.Close();
+                updateInstallPending = true;
+            }
+            else
+            {
+                updateInstallPending = false;
             }
         }
 
-        void ShowLauncherUpdateWindow()
+        void ShowLauncherUpdateWindow(out bool updateInstallPending)
         {
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestLauncherVersionName();
@@ -199,7 +209,11 @@ namespace LauncherTwo
 
             if (theWindow.WantsToUpdate)
             {
-                DownloadLauncherUpdate();
+                DownloadLauncherUpdate(out updateInstallPending);
+            }
+            else
+            {
+                updateInstallPending = false;
             }
         }
 

@@ -35,7 +35,7 @@ namespace LauncherTwo
 
         static string GetBatPath()
         {
-            return GetTempDirectory() + "Install.bat";
+            return GetTempDirectory() + "install.bat";
         }
 
         static string GetExtractDirectory()
@@ -124,31 +124,50 @@ namespace LauncherTwo
             {
                 if (UpdateState == eUpdateState.ReadyToInstall)
                 {
-                    string InstallLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    string ExecutableName = System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    // Write .bat file
+                    string installLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    string executableName = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
-                    string Contents = "";
-                    // Give the launcher a second to exit.
-                    Contents += "TIMEOUT 1 \n";
-                    // Clean install location
-                    Contents += "rmdir \"" + InstallLocation + "\" /s /q \n";
-                    // Copy extracted files and overwrite existing launcher files.
-                    Contents += "xcopy \"" + GetExtractDirectory().TrimEnd('\\') + "\" \"" + InstallLocation + "\" /v /f /e /s /r /h /y " + "\n";
-                    // Restart launcher
-                    Contents += "start \"" + InstallLocation + "\" \"" + ExecutableName + "\" \n";
-                    // Delete temp directory.
-                    Contents += "rmdir \"" + GetTempDirectory().TrimEnd('\\') + "\" /s /q \n";
+                    string pidString = Process.GetCurrentProcess().Id.ToString();
+                    string contents = string.Join("\r\n", new string[]
+                    {
+                        "cd \"" + Path.GetTempPath() + "\"",
 
-                    File.WriteAllText(GetBatPath(), Contents);
+                        // Wait for the launcher to close.
+                        ":wait_for_close",
+                        "tasklist /FI \"PID eq " + pidString + "\" /FO csv /NH | find \"\"\"" + pidString + "\"\"\" > nul",
+                        "if not errorlevel 1 (",
+                        "    timeout /t 1 > nul",
+                        "    goto :wait_for_close",
+                        ")",
 
-                    // Execute .bat file.
+                        // Clean up possible left behind files from previous installation attempt. (If it fails, abort update.)
+                        "if exist \"" + installLocation + "_removeme\" (",
+                        "    rmdir \"" + installLocation + "_removeme\" /s /q || goto :restart",
+                        ")",
 
-                    Process InstallProc = new Process();
+                        // Move away old version. (If it fails, abort update.)
+                        "move \"" + installLocation + "\" \"" + installLocation + "_removeme\" || goto :restart",
+
+                        // Copy new version and remove old version. (These are sufficiently unlikely to fail to ignore failures.)
+                        "xcopy \"" + GetExtractDirectory().TrimEnd('\\') + "\" \"" + installLocation + "\" /v /f /e /s /r /h /y /i",
+                        "rmdir \"" + installLocation + "_removeme\" /s /q",
+
+                        // Restart launcher.
+                        ":restart",
+                        "start \"\" \"" + executableName + "\"",
+
+                        // Clean up. (This also removes this batch file!)
+                        "rmdir \"" + GetTempDirectory().TrimEnd('\\') + "\" /s /q",
+                    });
+
+                    File.WriteAllText(GetBatPath(), contents);
+
                     ProcessStartInfo startInfo = new ProcessStartInfo(GetBatPath(), "/B");
                     startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    InstallProc.StartInfo = startInfo;
-                    InstallProc.Start();
+
+                    Process process = new Process();
+                    process.StartInfo = startInfo;
+                    process.Start();
                 }
             }
             catch (Exception e)
