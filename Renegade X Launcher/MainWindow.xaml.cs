@@ -115,34 +115,42 @@ namespace LauncherTwo
             Task updateTask = VersionCheck.UpdateLatestVersions();
             await updateTask;
 
-            if (VersionCheck.IsLauncherOutOfDate())
+            if (!VersionCheck.IsLauncherOutOfDate())
             {
+                SetMessageboxText("Launcher is up to date!");
+            }
+            else
+            {
+                SetMessageboxText("Launcher is out of date!");
+
                 bool updateInstallPending;
                 ShowLauncherUpdateWindow(out updateInstallPending);
                 if (updateInstallPending)
                 {
                     Close();
-                    return;
                 }
-            }
-            else
-            {
-                SetMessageboxText("Launcher is up to date!");
+                return;
             }
 
-            if (VersionCheck.GetGameVersionName() == "")
+            if (VersionCheck.GetGameVersionName() == "Unknown")
             {
                 SetMessageboxText("Could not locate installed game version. Latest is " + VersionCheck.GetLatestGameVersionName());
             }
-            else if (VersionCheck.IsGameOutOfDate())
+            else if (!VersionCheck.IsGameOutOfDate())
             {
-                ShowGameUpdateWindow();
-                SD_GameVersion.Text = VersionCheck.GetGameVersionName();
-                SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
+                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersionName());
             }
             else
             {
-                SetMessageboxText("Game is up to date! " + VersionCheck.GetGameVersionName());
+                SetMessageboxText("Game is out of date!");
+
+                bool wasUpdated;
+                ShowGameUpdateWindow(out wasUpdated);
+                if (wasUpdated)
+                {
+                    SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
+                }
+                SD_GameVersion.Text = VersionCheck.GetGameVersionName();
             }
         }
 
@@ -153,7 +161,7 @@ namespace LauncherTwo
 #pragma warning restore 4014
         }
 
-        void ShowGameUpdateWindow()
+        void ShowGameUpdateWindow(out bool wasUpdated)
         {
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersionName();
@@ -162,7 +170,11 @@ namespace LauncherTwo
             theWindow.Owner = this;
             theWindow.ShowDialog();
 
-            if (theWindow.WantsToUpdate)
+            if (!theWindow.WantsToUpdate)
+            {
+                wasUpdated = false;
+            }
+            else
             {
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
@@ -178,6 +190,7 @@ namespace LauncherTwo
                 window.ShowDialog();
 
                 VersionCheck.UpdateGameVersion();
+                wasUpdated = true;
             }
         }
 
