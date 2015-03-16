@@ -15,7 +15,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="VersionUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://renegadexgs.appspot.com/launcher/version.json</Value>
+      <Value Profile="(Default)">http://renegade-x.com/launcher_data/version.json</Value>
     </Setting>
   </Settings>
 </SettingsFile>

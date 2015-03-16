@@ -73,7 +73,7 @@ namespace LauncherTwo.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://renegadexgs.appspot.com/launcher/version.json")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://renegade-x.com/launcher_data/version.json")]
         public string VersionUrl {
             get {
                 return ((string)(this["VersionUrl"]));
