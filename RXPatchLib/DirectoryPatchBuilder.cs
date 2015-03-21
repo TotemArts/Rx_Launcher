@@ -67,7 +67,7 @@ namespace RXPatchLib
                     {
                         string deltaPath = patchPath + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + newHash + "_from_" + oldHash;
                         await PatchBuilder.CreatePatchAsync(oldPath, newPath, deltaPath);
-                        if (new FileInfo(deltaPath).Length > new FileInfo(fullPath).Length)
+                        if (new FileInfo(deltaPath).Length >= new FileInfo(fullPath).Length)
                         {
                             File.Delete(deltaPath);
                         }
