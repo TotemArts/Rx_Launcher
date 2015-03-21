@@ -43,6 +43,7 @@ namespace RXPatchLib
                     "-S", SecondaryLevelCompression,
                     "-s", oldPath,
                     "-f",
+                    "-A", "",
                     newPath,
                     patchPath);
             }
@@ -62,6 +63,7 @@ namespace RXPatchLib
                     "-" + CompressionLevel,
                     "-S", SecondaryLevelCompression,
                     "-f",
+                    "-A", "",
                     newPath,
                     patchPath);
             }
