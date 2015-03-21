@@ -29,6 +29,6 @@ namespace RXPatchLib
     {
         public static XdeltaPatchSystem X32 = new XdeltaPatchSystem("xdelta3-3.0.8.x86-32.exe");
         public static XdeltaPatchSystem X64 = new XdeltaPatchSystem("xdelta3-3.0.8.x86-64.exe");
-        public static XdeltaPatchSystem Preferred = X32;//Environment.Is64BitOperatingSystem ? X64 : X32;
+        public static XdeltaPatchSystem Preferred = Environment.Is64BitOperatingSystem ? X64 : X32;
     }
 }
