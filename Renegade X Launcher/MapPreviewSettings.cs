@@ -44,7 +44,7 @@ namespace LauncherTwo
             { "cnc-whiteout",     "Whiteout"   },
             { "cnc-canyon",       "Canyon"     },
             { "cnc-complex",      "Complex"    },
-            { "cnc-under",        "Under"      },
+            { "cnc-underredux",   "Under"      },
         };
 
         public static Bitmap GetMapBitmap(string mapName)
