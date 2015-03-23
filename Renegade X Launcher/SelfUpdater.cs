@@ -130,7 +130,8 @@ namespace LauncherTwo
                     string pidString = Process.GetCurrentProcess().Id.ToString();
                     string contents = string.Join("\r\n", new string[]
                     {
-                        "cd \"" + Path.GetTempPath() + "\"",
+                        "pause",
+                        "cd /D \"" + Path.GetTempPath() + "\"",
 
                         // Wait for the launcher to close.
                         ":wait_for_close",
@@ -139,23 +140,18 @@ namespace LauncherTwo
                         "    timeout /t 1 > nul",
                         "    goto :wait_for_close",
                         ")",
-
                         // Clean up possible left behind files from previous installation attempt. (If it fails, abort update.)
                         "if exist \"" + installLocation + "_removeme\" (",
                         "    rmdir \"" + installLocation + "_removeme\" /s /q || goto :restart",
                         ")",
-
                         // Move away old version. (If it fails, abort update.)
                         "move \"" + installLocation + "\" \"" + installLocation + "_removeme\" || goto :restart",
-
                         // Copy new version and remove old version. (These are sufficiently unlikely to fail to ignore failures.)
                         "xcopy \"" + GetExtractDirectory().TrimEnd('\\') + "\" \"" + installLocation + "\" /v /f /e /s /r /h /y /i",
                         "rmdir \"" + installLocation + "_removeme\" /s /q",
-
                         // Restart launcher.
                         ":restart",
                         "start \"\" \"" + executableName + "\"",
-
                         // Clean up. (This also removes this batch file!)
                         "rmdir \"" + GetTempDirectory().TrimEnd('\\') + "\" /s /q",
                     });
@@ -163,7 +159,7 @@ namespace LauncherTwo
                     File.WriteAllText(GetBatPath(), contents);
 
                     ProcessStartInfo startInfo = new ProcessStartInfo(GetBatPath(), "/B");
-                    startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    //startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
                     Process process = new Process();
                     process.StartInfo = startInfo;
