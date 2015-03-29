@@ -9,6 +9,18 @@ namespace LauncherTwo
     {
         public void StartupApp(object sender, StartupEventArgs e)
         {
+            foreach (string a in e.Args)
+            {
+                if (a.StartsWith("--patch-result="))
+                {
+                    string code = a.Substring("--patch-result=".Length);
+                    if (code != "0")
+                    {
+                        MessageBox.Show(string.Format("Failed to update the launcher (code {0}).\n\nPlease close any applications related to Renegade-X and try again.", code), "Patch failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+
             if (LauncherTwo.Properties.Settings.Default.UpgradeRequired)
             {
                 LauncherTwo.Properties.Settings.Default.Upgrade();
