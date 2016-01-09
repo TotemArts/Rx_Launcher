@@ -75,16 +75,35 @@ namespace LauncherTwo
             return Value ? chkBoxOnImg : chkBoxOffImg;
         }
 
+
+        
+
+
         #region -= Filters =-
         private int filter_MaxPlayers = 64;
         private int filter_MinPlayers = 0;
         #endregion -= Filters =-
+        public bool IsCheckBoxChecked
+        {
+            get { return (bool)GetValue(IsCheckBoxCheckedProperty); }
+            set { SetValue(IsCheckBoxCheckedProperty, value); }
+        }
+
+        //Dependency property for moviecheckbox
+        public static readonly DependencyProperty IsCheckBoxCheckedProperty =
+            DependencyProperty.Register("IsCheckBoxChecked", typeof(bool),
+              typeof(MainWindow), new UIPropertyMetadata(false));
 
         public MainWindow()
         {
+            
+
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
             InitializeComponent();
+
+            
+
             SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
@@ -92,6 +111,8 @@ namespace LauncherTwo
 
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
+
+            
 
             SourceInitialized += (s, a) =>
             {
@@ -108,6 +129,9 @@ namespace LauncherTwo
                 else
                     SD_Username.Content = Properties.Settings.Default.Username;
             };
+
+            IsCheckBoxChecked = Properties.Settings.Default.SkipIntroMovies;
+
         }
 
         private async Task CheckVersionsAsync()
@@ -432,7 +456,8 @@ namespace LauncherTwo
                 startupParameters.Username = Properties.Settings.Default.Username;
                 startupParameters.IPEndpoint = ipEndpoint;
                 startupParameters.Password = password;
-                startupParameters.SkipIntroMovies = false; // Properties.Settings.Default.SkipIntroMovies;
+                //startupParameters.SkipIntroMovies = false; <-Default value
+                startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
                 GameInstance = EngineInstance.Start(startupParameters);
 
                 await GameInstance.Task;
@@ -549,6 +574,38 @@ namespace LauncherTwo
             if (e.Key == Key.F5)
             {
                 StartRefreshingServers();
+            }
+        }
+
+        /// <summary>
+        /// Event handler for the skip intro checkbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Movies_Checkbx_Checked(object sender, RoutedEventArgs e)
+        {
+            bool succes = false;
+            if (Movies_Checkbx.IsChecked.Value)//checks the current setting
+            {
+                Properties.Settings.Default.SkipIntroMovies = true;//Changes the setting
+                succes = MovieRenamer.MovieRenamerMethod();//Renames the movie
+                Properties.Settings.Default.Save();//save the settings
+                
+            }
+            else //The same in reverse
+            {
+                Properties.Settings.Default.SkipIntroMovies = false;
+                succes = MovieRenamer.MovieRenamerMethod();
+                Properties.Settings.Default.Save();
+            }
+
+            if (succes) //Output message according to check
+            {
+                SetMessageboxText("Intro movies changed.");
+            }
+            else
+            {
+                SetMessageboxText("Error while changing intro movies!.");
             }
         }
     }

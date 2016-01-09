@@ -20,7 +20,8 @@
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000"
     Title="{Binding TitleValue}"
-    WindowStartupLocation="CenterScreen">
+    WindowStartupLocation="CenterScreen"
+    x:Name="LauncherTwo">
 
 
 
@@ -903,6 +904,13 @@
             <DockPanel Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
                 <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
                 <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+                
+                <StackPanel  Orientation="Horizontal">
+                    <CheckBox x:Name="Movies_Checkbx" Height="25" Width="25" Margin="6,0,0,0"  IsChecked="{Binding ElementName=LauncherTwo, Path=IsCheckBoxChecked, Mode=TwoWay}" Click="Movies_Checkbx_Checked"
+/>
+                    <Label Content="Skip intro movies?" Height="25" FontSize="12" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+                </StackPanel>
+                
                 <Button DockPanel.Dock="Right" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchServerBtn" Width="94" Height="25" FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click"/>

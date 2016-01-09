@@ -58,7 +58,7 @@
     <ApplicationIcon>Icon_Silver.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>7B4F35A5F5FE1100D62D770DB5DD9F6AC06F250C</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>B59FC47893A472BDBE5416CC3B315F6DB76A36D5</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Launcher_TemporaryKey.pfx</ManifestKeyFile>
@@ -73,7 +73,10 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FirstFloor.ModernUI">
@@ -117,6 +120,7 @@
     <Compile Include="GameInstallation.cs" />
     <Compile Include="LaunchTools.cs" />
     <Compile Include="MapPreviewSettings.cs" />
+    <Compile Include="MovieRenamer.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -228,6 +232,8 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Launcher_1_TemporaryKey.pfx" />
+    <None Include="Launcher_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
