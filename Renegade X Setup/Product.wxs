@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Renegade X" Language="1033" Version="1.0.0.0" Manufacturer="Totem Arts" UpgradeCode="6ed3692f-e8db-4c16-815e-8360bc402301">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"/>
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate />
+
+		<Feature Id="ProductFeature" Title="Renegade_X_Setup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="RenegadeX">
+          <Directory Id="InstallLocationLauncher" Name="Launcher">
+            <Component Id="LauncherComponent" Directory="InstallLocationLauncher">
+              <RemoveFolder Id='INSTALLFOLDER' On='uninstall' />
+              
+              <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="Renegade X Launcher.exe">
+                <Shortcut Id='LauncherStartmenu' Directory='ProgramMenuDir' Name='Renegade X Launcher' Advertise='yes' />
+              </File>
+
+              <File Id="FirstFLoorDLL" Name="FirstFloor.ModernUI.dll" Source="FirstFloor.ModernUI.dll"/>
+              <File Id="NewtonsoftJsonDLL" Name="Newtonsoft.Json.dll" Source="Newtonsoft.Json.dll"/>
+              <File Id="LauncherconfigCONFIG" Name="Renegade X Launcher.exe.config" Source="Renegade X Launcher.exe.config"/>
+              <File Id="RXPatchLibDLL" Name="RXPatchLib.dll" Source="RXPatchLib.dll"/>
+              <File Id="SteamAPIDLL" Name="SteamAPI.dll" Source="SteamAPI.dll"/>
+              <File Id="UDKSeekerDLL" Name="UDKSeeker.dll" Source="UDKSeeker.dll"/>
+              <File Id="XceedWpfDatagridDLL" Name="Xceed.Wpf.DataGrid.dll" Source="Xceed.Wpf.DataGrid.dll"/>
+              <File Id="XceedWpfToolkitDLL" Name="Xceed.Wpf.Toolkit.dll" Source="Xceed.Wpf.Toolkit.dll"/>
+              <File Id="xdelta32EXE" Name="xdelta3-3.0.8.x86-32.exe" Source="xdelta3-3.0.8.x86-32.exe"/>
+              <File Id="xdelta64EXE" Name="xdelta3-3.0.8.x86-64.exe" Source="xdelta3-3.0.8.x86-64.exe"/>
+            </Component>
+          </Directory>
+          <Directory Id="InstallLocationEngine" Name="Engine"/>
+          <Directory Id="InstallLocationUDKGame" Name="UDKGame"/>
+          <Directory Id="InstallLocationBinaries" Name="Binaries"/>
+        </Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			
+		</ComponentGroup>
+	</Fragment>
+</Wix>
