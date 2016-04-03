@@ -11,7 +11,7 @@ namespace UDKSeeker
 {
     /// <summary>
     /// UdkSeeker wil seek Renegade-x maps from the given RenegadeX repository
-    /// Created by Rob Smit
+    /// Created by Rob Smit for Renegade-x With help from Jessica James (GUID extraction)
     /// </summary>
     public class UdkSeeker
     {
@@ -122,22 +122,10 @@ namespace UDKSeeker
                 {
                     return this.GetMap(Map, ServerGUID); //Return whatever the getMap functionreturns. If Status.MapSucces, all is good.
 
-                    /*if (currentStatus == Status.MapSucces)
-                    {
-                        return Status.Finished;//Return a finished seek message
-                    }
-                    else
-                    {
-                        return currentStatus;///No exception but better message
-                    }*/
-
                 }
                 catch (Exception ex)
                 {
                     //If any failure gets detected, exit and print message
-                    /*Console.WriteLine("Error while seeking... Errormessage is: \n{0}", ex.Message);
-                    Console.WriteLine("Press any key to close the application...");
-                    Console.ReadLine();*/
                     return Status.GeneralError;
 
                 }
@@ -427,7 +415,7 @@ namespace UDKSeeker
 
 
         /// <summary>
-        /// Ex
+        /// Extracts the archive to the temp folder
         /// </summary>
         /// <param name="MapLocation"></param>
         /// <returns></returns>
