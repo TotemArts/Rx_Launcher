@@ -30,6 +30,11 @@ namespace LauncherTwo
     {
         public const bool SHOW_DEBUG = false;
 
+        /// <summary>
+        /// Boolean that holds the state of the default movie.
+        /// </summary>
+        private Boolean DefaultMoviePlays = true;
+
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
         public static readonly int MAX_PLAYER_COUNT = 64;
@@ -83,16 +88,9 @@ namespace LauncherTwo
         private int filter_MaxPlayers = 64;
         private int filter_MinPlayers = 0;
         #endregion -= Filters =-
-        public bool IsCheckBoxChecked
-        {
-            get { return (bool)GetValue(IsCheckBoxCheckedProperty); }
-            set { SetValue(IsCheckBoxCheckedProperty, value); }
-        }
 
-        //Dependency property for moviecheckbox
-        public static readonly DependencyProperty IsCheckBoxCheckedProperty =
-            DependencyProperty.Register("IsCheckBoxChecked", typeof(bool),
-              typeof(MainWindow), new UIPropertyMetadata(false));
+
+        
 
         public MainWindow()
         {
@@ -101,8 +99,6 @@ namespace LauncherTwo
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
             InitializeComponent();
-
-            
 
             SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
@@ -130,7 +126,6 @@ namespace LauncherTwo
                     SD_Username.Content = Properties.Settings.Default.Username;
             };
 
-            IsCheckBoxChecked = Properties.Settings.Default.SkipIntroMovies;
 
         }
 
@@ -342,7 +337,144 @@ namespace LauncherTwo
                     }
                     password = PassWindow.Password;
                 }
-                await StartGameInstance(GetSelectedServer().IPWithPort, password);
+
+                //Is the seeker activated in the settings? Yes: launch seeker. No: launch game without seeker
+                if (Properties.Settings.Default.UseSeeker)
+                {
+                    #region Seeker
+                    this.Join_Server_Btn.IsEnabled = false;
+                    
+                    
+                    //Create new cancellation token and source
+                    CancellationTokenSource source = new CancellationTokenSource();
+                    CancellationToken token = source.Token;
+
+                    //Create the seeker object to seek maps
+                    UDKSeeker.UdkSeeker Udkseeker = new UDKSeeker.UdkSeeker("ftp://renx.constructivetyranny.com/", "Launcher", "CustomMaps199");
+                    //Get the maplist of the server
+                    UDKSeeker.JSONRotationRetriever JSON = new UDKSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
+                    List<UDKSeeker.MapItem> Maps = JSON.getMaps();
+
+                    //Prepare seekerwindow and shot it
+                    SeekerDownloadWindow seekerWindow = new SeekerDownloadWindow(source);
+                    seekerWindow.Show();
+
+                    //Create a task that will iterate through all maps in the maplist. Return the status at the end of the task
+                    //Default the status is "Finished" which means everything went according to plan
+                    //Everything else will result in an question in which the game wont start untill given permission, but all the other maps that don't throw an error will be downloaded.
+                    Task<UDKSeeker.UdkSeeker.Status> task = new Task<UDKSeeker.UdkSeeker.Status>(() =>
+                    {
+                        UDKSeeker.UdkSeeker.Status currentStatus = UDKSeeker.UdkSeeker.Status.Finished;//Status is finished untill other status gets pushed
+                        if (Maps != null && Maps.Count > 0)
+                        {
+                            
+                            foreach (UDKSeeker.MapItem Map in Maps)
+                            {
+                                UDKSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Map.Map, Map.GUID);//Seek a map
+                                if (Status != UDKSeeker.UdkSeeker.Status.MapSucces)
+                                {
+                                    currentStatus = Status;
+                                    Console.WriteLine("Could not download all the maps on the server. It may be possible you can't play all the maps.\nContinue downloading the other maps? (Y/N)");
+
+                                }
+                            }
+                        }
+                        else//something wrong with the maplist? (No JSON) Show maplisterror
+                        {
+                            currentStatus = UDKSeeker.UdkSeeker.Status.MaplistError;
+                            Dispatcher.Invoke(() => seekerWindow.Status = currentStatus.ToString());
+                        }
+                        return currentStatus;
+                    }, token);
+
+
+                    //Task<UDKSeeker.UdkSeeker.Status> task = new Task<UDKSeeker.UdkSeeker.Status>(() => Udkseeker.SeekAll("195.154.167.80:7779"), token);
+
+                    //Create another cancellationsource for the UI task
+                    CancellationTokenSource source2 = new CancellationTokenSource();
+                    CancellationToken token2 = source2.Token;
+                    //Task to update the statuswindow of the seeker
+                    Task task2 = new Task(() =>
+                    {
+                        while (!source.IsCancellationRequested && task.Status == TaskStatus.Running)
+                        {
+                            seekerWindow.initProgressBar(Udkseeker.TotalAmountOfBytes);
+                            seekerWindow.Status = "Downloading: " + Udkseeker.currMap;// + " Downloaded: " + ((Udkseeker.getBytes()/1024)/1024).ToString() + "MB";
+                            seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
+                            Thread.Sleep(1000);
+                        }
+                        Dispatcher.Invoke(() => this.Join_Server_Btn.IsEnabled = true);
+                    });
+
+                    //Start both tasks and download all maps
+                    task.Start();
+                    task2.Start();
+
+
+                    //Wait for the seeker to finish
+                    await task;
+                    
+                    
+                    //If the seeker returned "Finished", everything went according to plan->Start the game & end other tasks
+                    if (task.Result == UDKSeeker.UdkSeeker.Status.Finished)
+                    {
+                        //Clean up tasks and windows
+                        task.Dispose();
+                        source2.Cancel();
+                        //task2.Dispose();
+                        seekerWindow.Close();
+
+                        seekerWindow = null;
+                        Udkseeker = null;
+
+                        await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start game
+                        this.Join_Server_Btn.IsEnabled = true;
+                    }
+                    else//Something went wrong, ask if game needs to be started anyway
+                    {
+                        seekerWindow.ToggleProgressBar();
+                        seekerWindow.Status = task.Result.ToString();
+                        task.Dispose();
+                        source2.Cancel();
+
+                        string sMessageBoxText = "Not all maps have been downloaded... Launch the game anyway?";
+                        string sCaption = "Renegade X Seeker";
+
+                        MessageBoxButton btnMessageBox = MessageBoxButton.YesNo;
+                        MessageBoxImage icnMessageBox = MessageBoxImage.Question;
+
+                        MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+                        switch (rsltMessageBox)
+                        {
+                            case MessageBoxResult.Yes:
+                                seekerWindow.Close();
+
+                                seekerWindow = null;
+                                Udkseeker = null;
+                                await StartGameInstance(GetSelectedServer().IPWithPort, password);
+                                this.Join_Server_Btn.IsEnabled = true;
+                                break;
+                            case MessageBoxResult.No:
+                                seekerWindow.Close();
+                                seekerWindow = null;
+                                Udkseeker = null;
+                                this.Join_Server_Btn.IsEnabled = true;
+                                break;
+                            default:
+                                seekerWindow.Close();
+                                seekerWindow = null;
+                                Udkseeker = null;
+                                this.Join_Server_Btn.IsEnabled = true;
+                                break;
+                        }                        
+                    }
+                    #endregion
+                }
+                else
+                {
+                    await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start game
+                }
+
             }
         }
 
@@ -394,7 +526,22 @@ namespace LauncherTwo
 
             ServerInfo selected = GetSelectedServer();
 
-            sv_MapPreview.Source = BitmapToImageSourceConverter.Convert(MapPreviewSettings.GetMapBitmap(selected.MapName));
+            //Original mappreview code
+            //sv_MapPreview.Source = BitmapToImageSourceConverter.Convert(MapPreviewSettings.GetMapBitmap(selected.MapName));
+
+
+            //Movie mappreview code
+            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/" + selected.MapName + ".wmv"))
+            {
+                this.DefaultMoviePlays = false;
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/" + selected.MapName + ".wmv");
+            }
+            else if (!this.DefaultMoviePlays)
+            {
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/Default.wmv");
+                this.DefaultMoviePlays = true;
+            }
+
 
             SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
@@ -458,6 +605,11 @@ namespace LauncherTwo
                 startupParameters.Password = password;
                 //startupParameters.SkipIntroMovies = false; <-Default value
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
+
+
+                
+
+
                 GameInstance = EngineInstance.Start(startupParameters);
 
                 await GameInstance.Task;
@@ -577,36 +729,40 @@ namespace LauncherTwo
             }
         }
 
+
         /// <summary>
-        /// Event handler for the skip intro checkbox
+        /// Event handler for rewinding previewmovies on movie end
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Movies_Checkbx_Checked(object sender, RoutedEventArgs e)
+        /// <param name="args"></param>
+        void MediaEndedHandler(object sender, RoutedEventArgs args)
         {
-            bool succes = false;
-            if (Movies_Checkbx.IsChecked.Value)//checks the current setting
-            {
-                Properties.Settings.Default.SkipIntroMovies = true;//Changes the setting
-                succes = MovieRenamer.MovieRenamerMethod();//Renames the movie
-                Properties.Settings.Default.Save();//save the settings
-                
-            }
-            else //The same in reverse
-            {
-                Properties.Settings.Default.SkipIntroMovies = false;
-                succes = MovieRenamer.MovieRenamerMethod();
-                Properties.Settings.Default.Save();
-            }
-
-            if (succes) //Output message according to check
-            {
-                SetMessageboxText("Intro movies changed.");
-            }
-            else
-            {
-                SetMessageboxText("Error while changing intro movies!.");
-            }
+            var PreviewMovie = (sender as MediaElement);
+            PreviewMovie.Position = System.TimeSpan.Zero;
+            //myMedia.Play();
         }
+
+        private void SD_UpdateGame_Click(object sender, RoutedEventArgs e)
+        {
+            SetMessageboxText("Game is out of date!");
+
+            bool wasUpdated;
+            ShowGameUpdateWindow(out wasUpdated);
+            if (wasUpdated)
+            {
+                SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
+            }
+            SD_GameVersion.Text = VersionCheck.GetGameVersionName();
+        }
+
+        private void SD_OpenSettingWindow(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow window = new SettingsWindow();
+            window.Show();
+
+            
+        }
+
+        
     }
 }

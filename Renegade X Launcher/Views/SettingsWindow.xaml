@@ -28,8 +28,16 @@
             <Button Margin="3,0" Foreground="{DynamicResource RenXFontColorBrush}" Height="21" Width="70" Click="ApplyAndClose" IsDefault="True" Content="OK"/>
             <Button Margin="3,0" Foreground="{DynamicResource RenXFontColorBrush}" Height="21" Width="70" Click="Cancel" IsCancel="True" Content="Cancel"/>
         </StackPanel>
-        <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="50" MinWidth="250">
-            <CheckBox Content="Skip intro movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
+        <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="100" MinWidth="250">
+            <StackPanel>
+                <CheckBox Content="Skip intro movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
+                <CheckBox Content="Use UDKSeeker" IsChecked="{Binding Settings.UseSeeker}"/>
+                <Separator Height="5" Margin="2"/>
+                <Button x:Name="BT_Verify" Content="&#8635; Verify Game Integrity" Height="21" Width="140"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Verify_Click"/>
+            </StackPanel>
+            
+            
         </Border>
+        
     </DockPanel>
 </parent:RXWindow>

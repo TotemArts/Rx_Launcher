@@ -17,6 +17,7 @@ namespace LauncherTwo
         }
 
         public abstract string GetProcessArguments ();
+        
 
     }
 
@@ -68,16 +69,23 @@ namespace LauncherTwo
             //End Fix
             return Arguments;
         }
+
     }
 
     public class EngineInstance
     {
         public EngineInstanceStartupParameters StartupParameters { get; protected set; }
+        public String IPEndpoint = "";
         public Task Task { get; protected set; }
 
         public static EngineInstance Start(EngineInstanceStartupParameters StartupParameters)
         {
+            var ipHack  = (GameInstanceStartupParameters)StartupParameters;
+          
             var instance = new EngineInstance();
+            instance.IPEndpoint = ipHack.IPEndpoint;
+            ipHack = null;
+
             instance.StartupParameters = StartupParameters;
             instance.Task = instance.StartAsync();
             return instance;
@@ -95,6 +103,7 @@ namespace LauncherTwo
                 Process.Exited += (sender, e) => { tcs.SetResult(Process.ExitCode); };
                 Process.Start();
                 await tcs.Task;
+
             }
             finally
             {

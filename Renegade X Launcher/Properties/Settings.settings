@@ -17,5 +17,8 @@
     <Setting Name="VersionUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://renegade-x.com/launcher_data/version.json</Value>
     </Setting>
+    <Setting Name="UseSeeker" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -904,16 +904,28 @@
             <DockPanel Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
                 <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
                 <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
-                
-                <StackPanel  Orientation="Horizontal">
-                    <CheckBox x:Name="Movies_Checkbx" Height="25" Width="25" Margin="6,0,0,0"  IsChecked="{Binding ElementName=LauncherTwo, Path=IsCheckBoxChecked, Mode=TwoWay}" Click="Movies_Checkbx_Checked"
-/>
-                    <Label Content="Skip intro movies?" Height="25" FontSize="12" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+
+                <!-- <StackPanel  Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="Movies_Checkbx" Height="25" Width="25" Margin="6,0,0,0"  IsChecked="{Binding ElementName=LauncherTwo, Path=IsCheckBoxChecked, Mode=TwoWay}" Click="Movies_Checkbx_Checked" />
+                        <Label Content="Skip intro movies?" Height="25" FontSize="12" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="Seeker_Checkbx" Height="25" Width="25" Margin="6,0,0,0"  IsChecked="{Binding ElementName=LauncherTwo, Path=IsSeekerCheckBoxChecked, Mode=TwoWay}" Click="Seeker_Checkbx_Checked" />
+                        <Label Content="Use MapSeeker?" Height="25" FontSize="12" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
+                    </StackPanel> 
                 </StackPanel>
-                
-                <Button DockPanel.Dock="Right" Margin="3,6,6,6" x:Name="SD_JoinIPBtn" Width="94" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button Margin="3" x:Name="SD_ForceUpdateBtn" Width="94" Height="25" FontSize="11" Content="Recheck game" Click="SD_UpdateGame_Click"/>-->
+
+                <Button DockPanel.Dock="Right" Margin="3,3,6,3" x:Name="SD_SettingsBtn" Width="60" Height="25" FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center">
+
+                    
+                </Button>
+                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_JoinIPBtn" Width="50" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchServerBtn" Width="94" Height="25" FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click"/>
+
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchEditorBtn" Width="94" Height="25" FontSize="11" Content="Launch Editor" Click="SD_LaunchEditor_Click"/>-->
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_SettingsBtn" Width="94" Height="25" FontSize="11" Content="Settings" Click="SD_Settings_Click"/>-->
                 <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="Resources/RenX_Logo.png"/>
@@ -1033,7 +1045,12 @@
                                 <Border.BorderBrush>
                                     <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                 </Border.BorderBrush>
-                                <Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>
+
+                                <MediaElement x:Name="sv_MapPreviewVid" Width="314" Height ="157" Source="Vids\Default.wmv" MediaEnded="MediaEndedHandler" Volume="0">
+
+                                </MediaElement>
+                                
+                                <!--<Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>-->
                             </Border>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Server Name:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
@@ -1051,7 +1068,7 @@
                                 <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Game Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
                                 <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Margin="3,1" Foreground="#FF6C6C6C" FontSize="9"/>
                             </StackPanel>
-                            <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                            <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Background="#44061923"/>
                         </StackPanel>
                     </Border>
                     <Border x:Name="Info_Bot_Border" BorderThickness="1" Grid.Row="2">

@@ -11,6 +11,7 @@ namespace LauncherTwo.Views
 {
     public class Settings : INotifyPropertyChanged
     {
+        #region SkipIntroMovies Setting
         private bool _SkipIntroMovies;
         public bool SkipIntroMovies
         {
@@ -24,6 +25,23 @@ namespace LauncherTwo.Views
                 NotifyPropertyChanged("SkipIntroMovies");
             }
         }
+        #endregion
+
+        #region UseSeeker Setting
+        private bool _UseSeeker;
+        public bool UseSeeker
+        {
+            get
+            {
+                return _UseSeeker;
+            }
+            set
+            {
+                _UseSeeker = value;
+                NotifyPropertyChanged("UseSeeker");
+            }
+        }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -34,7 +52,12 @@ namespace LauncherTwo.Views
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+
+
     }
+
+
     public partial class SettingsWindow : RXWindow
     {
         public Settings Settings { get; set; }
@@ -44,13 +67,40 @@ namespace LauncherTwo.Views
             Settings = new Settings
             {
                 SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies,
+                UseSeeker = Properties.Settings.Default.UseSeeker,
             };
             InitializeComponent();
+
+            this.Settings.PropertyChanged += Settings_ChangeMovies;
+        }
+
+        private void Settings_ChangeMovies(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "SkipIntroMovies")
+            {
+                bool succes = false;
+                succes = MovieRenamer.MovieRenamerMethod(Settings.SkipIntroMovies);
+               /* if (Properties.Settings.Default.SkipIntroMovies)//checks the current setting
+                {
+                    Properties.Settings.Default.SkipIntroMovies = true;//Changes the setting
+                    succes = MovieRenamer.MovieRenamerMethod();//Renames the movie
+                    Properties.Settings.Default.Save();//save the settings
+
+                }
+                else //The same in reverse
+                {
+                    Properties.Settings.Default.SkipIntroMovies = false;
+                    
+                    Properties.Settings.Default.Save();
+                }*/
+            }
+
         }
 
         public void ApplyAndClose(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.SkipIntroMovies = Settings.SkipIntroMovies;
+            Properties.Settings.Default.UseSeeker = Settings.UseSeeker;
             Properties.Settings.Default.Save();
             Close();
         }
@@ -59,5 +109,28 @@ namespace LauncherTwo.Views
         {
             Close();
         }
+
+
+        private void Verify_Click(object sender, RoutedEventArgs e)
+        {
+            var targetDir = GameInstallation.GetRootPath();
+            var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
+            var patchUrls = VersionCheck.GamePatchUrls;
+            var patchVersion = VersionCheck.GetLatestGameVersionName();
+
+            var progress = new Progress<DirectoryPatcherProgressReport>();
+            var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+            Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
+
+            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource);
+            window.Owner = this;
+            window.ShowDialog();
+
+            VersionCheck.UpdateGameVersion();
+        }
     }
+
+    
+
+
 }

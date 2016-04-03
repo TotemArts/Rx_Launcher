@@ -15,6 +15,7 @@ namespace LauncherTwo
             {
                 launcherPath = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../..");
                 //launcherPath = "C:\\Program Files (x86)\\Renegade X";
+                //launcherPath = "D:\\Program Files (x86)\\Renegade X";
             }
             return launcherPath + "\\";
         }
