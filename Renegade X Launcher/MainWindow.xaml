@@ -920,7 +920,7 @@
 
                 <Button DockPanel.Dock="Right" Margin="3,3,6,3" x:Name="SD_SettingsBtn" Width="60" Height="25" FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center">
 
-                    
+
                 </Button>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_JoinIPBtn" Width="50" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
@@ -1049,26 +1049,14 @@
                                 <MediaElement x:Name="sv_MapPreviewVid" Width="314" Height ="157" Source="Vids\Default.wmv" MediaEnded="MediaEndedHandler" Volume="0">
 
                                 </MediaElement>
-                                
+
                                 <!--<Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>-->
                             </Border>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Server Name:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
-                                <TextBlock x:Name="SD_Name" TextWrapping="Wrap" Margin="3,1" Foreground="White"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="IP:" Foreground="#FFFFF8F8" FontWeight="Bold"/>
-                                <TextBlock x:Name="SD_IP" TextWrapping="Wrap" Margin="3,1" Foreground="White"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Server Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
-                                <TextBlock x:Name="SD_ServerVersion" TextWrapping="Wrap" Margin="3,1" Foreground="#FF6C6C6C" FontSize="9"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock TextWrapping="Wrap" Margin="3,1" Text="Game Version:" Foreground="#FF7E7E7E" FontWeight="Bold" FontSize="9"/>
-                                <TextBlock x:Name="SD_GameVersion" TextWrapping="Wrap" Margin="3,1" Foreground="#FF6C6C6C" FontSize="9"/>
-                            </StackPanel>
-                            <Button x:Name="Join_Server_Btn" Content="Join Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Background="#44061923"/>
+                            <Button x:Name="Join_Server_Btn" Content="Select a Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Foreground="#FFB0B0B0">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#5935BAFF" Opacity="0.5"/>
+                                </Button.Background>
+                            </Button>
                         </StackPanel>
                     </Border>
                     <Border x:Name="Info_Bot_Border" BorderThickness="1" Grid.Row="2">
@@ -1089,39 +1077,70 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                                <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
+                                    <Label x:Name="SD_Name" Content="" Foreground="#BF35BAFF" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
                                     <Label Content="Game Length:" Foreground="White"/>
                                     <Label x:Name="SD_GameLength" Content="" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                                     <Label Content="Player Limit:" Foreground="White"/>
                                     <Label x:Name="SD_PlayerLimit" Content="" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                                <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                                     <Label Content="Vehicle Limit:" Foreground="White"/>
                                     <Label x:Name="SD_VehicleLimit" Content="" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                                     <Label Content="Mine Limit:" Foreground="White"/>
                                     <Label x:Name="SD_MineLimit" Content="" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
                                     <Image x:Name="Crates_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
                                     <Label Content="Crates" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
                                     <Image x:Name="Autobalance_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
                                     <Label Content="Auto Balance" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
+                                <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal">
                                     <Image x:Name="Steam_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
                                     <Label Content="Steam Required" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
                                     <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
                                     <Label Content="Infantry Only" Foreground="White"/>
                                 </StackPanel>
+                                <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                    <Label Content="Address:" Foreground="Gray"/>
+                                    <Label x:Name="SD_IP" Content="" HorizontalAlignment="Center" Foreground="Gray"/>
+                                </StackPanel>
+                                <Grid x:Name="SD_VersionMismatch" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
+                                        <Label Content="Version Mismatch - Unable to Join" Foreground="Red" HorizontalAlignment="Center" FontWeight="ExtraBold"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                        <Label Content="Server Version:" Foreground="Red"/>
+                                        <Label x:Name="SD_ServerVersion" Content="" Foreground="Red" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                        <Label Content="Your Version:" Foreground="Red"/>
+                                        <Label x:Name="SD_GameVersion" Content="" Foreground="Red" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Grid>
                                 <!-- <Border BorderThickness="1" Margin="2" Grid.Row="7" d:IsHidden="True">
                                         <Border.BorderBrush>
                                             <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>

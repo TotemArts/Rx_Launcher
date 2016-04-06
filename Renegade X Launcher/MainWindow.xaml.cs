@@ -62,7 +62,7 @@ namespace LauncherTwo
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName(); } }
-        public bool IsLaunchingPossible { get { return GameInstance == null; } }
+        public bool IsLaunchingPossible { get { return GameInstance == null && SD_VersionMismatch.Visibility == Visibility.Hidden; } }
 
         const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
         const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
@@ -103,7 +103,7 @@ namespace LauncherTwo
             SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
-            SD_GameVersion.Text = VersionCheck.GetGameVersionName();
+            SD_GameVersion.Content = VersionCheck.GetGameVersionName();
 
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
@@ -169,7 +169,7 @@ namespace LauncherTwo
                 {
                     SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
                 }
-                SD_GameVersion.Text = VersionCheck.GetGameVersionName();
+                SD_GameVersion.Content = VersionCheck.GetGameVersionName();
             }
         }
 
@@ -542,22 +542,35 @@ namespace LauncherTwo
                 this.DefaultMoviePlays = true;
             }
 
-
             SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
 
-            SD_Name.Text = selected.ServerName;
-            SD_IP.Text = selected.IPWithPort;
+            SD_Name.Content = selected.ServerName;
+            SD_IP.Content = selected.IPWithPort;
             SD_GameLength.Content = selected.TimeLimit.ToString();
             SD_MineLimit.Content = selected.MineLimit.ToString();
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
-            SD_ServerVersion.Text = selected.GameVersion;
+            SD_ServerVersion.Content = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
 
             Autobalance_Checkbx.Source = GetChkBxImg(selected.AutoBalance);
             Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);
             Crates_Checkbx.Source = GetChkBxImg(selected.SpawnCrates);
             InfantryOnly_Checkbx.Source = GetChkBxImg(selected.VehicleLimit <= 0);
+
+            // Set version mismatch message visibility and join button opacity
+            if (VersionCheck.GetGameVersionName() == selected.GameVersion)
+            {
+                SD_VersionMismatch.Visibility = Visibility.Hidden;
+                this.Join_Server_Btn.Background.Opacity = 1.0;
+                this.Join_Server_Btn.Content = "Join Server";
+            }
+            else
+            {
+                SD_VersionMismatch.Visibility = Visibility.Visible;
+                this.Join_Server_Btn.Background.Opacity = 0.5;
+                this.Join_Server_Btn.Content = "Server Version Mismatch";
+            }
 
             ServerInfoGrid.UpdateLayout();
         }
@@ -752,7 +765,6 @@ namespace LauncherTwo
             {
                 SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
             }
-            SD_GameVersion.Text = VersionCheck.GetGameVersionName();
         }
 
         private void SD_OpenSettingWindow(object sender, RoutedEventArgs e)
