@@ -29,6 +29,7 @@ namespace LauncherTwo
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
         public const bool SHOW_DEBUG = false;
+        public bool version_mismatch = false;
 
         /// <summary>
         /// Boolean that holds the state of the default movie.
@@ -62,7 +63,7 @@ namespace LauncherTwo
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName(); } }
-        public bool IsLaunchingPossible { get { return GameInstance == null && SD_VersionMismatch.Visibility == Visibility.Hidden; } }
+        public bool IsLaunchingPossible { get { return GameInstance == null && version_mismatch == false; } }
 
         const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
         const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
@@ -561,12 +562,14 @@ namespace LauncherTwo
             // Set version mismatch message visibility and join button opacity
             if (VersionCheck.GetGameVersionName() == selected.GameVersion)
             {
+                version_mismatch = false;
                 SD_VersionMismatch.Visibility = Visibility.Hidden;
                 this.Join_Server_Btn.Background.Opacity = 1.0;
                 this.Join_Server_Btn.Content = "Join Server";
             }
             else
             {
+                version_mismatch = true;
                 SD_VersionMismatch.Visibility = Visibility.Visible;
                 this.Join_Server_Btn.Background.Opacity = 0.5;
                 this.Join_Server_Btn.Content = "Server Version Mismatch";
