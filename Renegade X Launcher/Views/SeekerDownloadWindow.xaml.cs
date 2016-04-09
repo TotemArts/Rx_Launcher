@@ -22,6 +22,7 @@ namespace LauncherTwo.Views
     {
         
         private CancellationTokenSource token;
+        private long sizeOfFile;
 
         internal string Status
         {
@@ -82,12 +83,25 @@ namespace LauncherTwo.Views
 
         public void initProgressBar(long sizeOfFile)
         {
+            this.sizeOfFile = sizeOfFile;
+            Dispatcher.Invoke(new Action(() => { this.ProgressPercentage.Content = "0%";}));
             Dispatcher.Invoke(new Action(() => { this.ProgressBar.Maximum = sizeOfFile; }));
         }
 
         public void updateProgressBar(long currentAmount)
         {
-            Dispatcher.Invoke(new Action(() => { this.ProgressBar.Value = currentAmount; })); 
+            Dispatcher.Invoke(new Action(() => { this.ProgressBar.Value = currentAmount; }));
+            Dispatcher.Invoke(new Action(() => 
+            {
+                if (this.sizeOfFile != 0)
+                {
+                    this.ProgressPercentage.Content = (int)currentAmount / (this.sizeOfFile / 100) + "%";
+                }
+                else
+                {
+                    this.ProgressPercentage.Content = "0%";
+                }
+            }));
         }
 
         

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using Newtonsoft.Json;
 
-namespace UDKSeeker
+namespace CustomContentSeeker
 {
     public class JSONRotationRetriever
     {
@@ -19,8 +19,6 @@ namespace UDKSeeker
         {
             String[] ServerAddressAndPort = ServerAddress.Split(':');
             String GUIDJsonResponse;
-
-            
 
             using (WebClient GUIDJsonRequest = new WebClient())
             {

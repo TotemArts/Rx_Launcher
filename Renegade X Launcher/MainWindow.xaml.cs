@@ -351,10 +351,10 @@ namespace LauncherTwo
                     CancellationToken token = source.Token;
 
                     //Create the seeker object to seek maps
-                    UDKSeeker.UdkSeeker Udkseeker = new UDKSeeker.UdkSeeker("ftp://renx.constructivetyranny.com/", "Launcher", "CustomMaps199");
+                    CustomContentSeeker.UdkSeeker Udkseeker = new CustomContentSeeker.UdkSeeker("ftp://renx.constructivetyranny.com/", "Launcher", "CustomMaps199");
                     //Get the maplist of the server
-                    UDKSeeker.JSONRotationRetriever JSON = new UDKSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
-                    List<UDKSeeker.MapItem> Maps = JSON.getMaps();
+                    CustomContentSeeker.JSONRotationRetriever JSON = new CustomContentSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
+                    List<CustomContentSeeker.MapItem> Maps = JSON.getMaps();
 
                     //Prepare seekerwindow and shot it
                     SeekerDownloadWindow seekerWindow = new SeekerDownloadWindow(source);
@@ -363,16 +363,16 @@ namespace LauncherTwo
                     //Create a task that will iterate through all maps in the maplist. Return the status at the end of the task
                     //Default the status is "Finished" which means everything went according to plan
                     //Everything else will result in an question in which the game wont start untill given permission, but all the other maps that don't throw an error will be downloaded.
-                    Task<UDKSeeker.UdkSeeker.Status> task = new Task<UDKSeeker.UdkSeeker.Status>(() =>
+                    Task<CustomContentSeeker.UdkSeeker.Status> task = new Task<CustomContentSeeker.UdkSeeker.Status>(() =>
                     {
-                        UDKSeeker.UdkSeeker.Status currentStatus = UDKSeeker.UdkSeeker.Status.Finished;//Status is finished untill other status gets pushed
+                        CustomContentSeeker.UdkSeeker.Status currentStatus = CustomContentSeeker.UdkSeeker.Status.Finished;//Status is finished untill other status gets pushed
                         if (Maps != null && Maps.Count > 0)
                         {
                             
-                            foreach (UDKSeeker.MapItem Map in Maps)
+                            foreach (CustomContentSeeker.MapItem Map in Maps)
                             {
-                                UDKSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Map.Map, Map.GUID);//Seek a map
-                                if (Status != UDKSeeker.UdkSeeker.Status.MapSucces)
+                                CustomContentSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Map.Map, Map.GUID);//Seek a map
+                                if (Status != CustomContentSeeker.UdkSeeker.Status.MapSucces)
                                 {
                                     currentStatus = Status;
                                     Console.WriteLine("Could not download all the maps on the server. It may be possible you can't play all the maps.\nContinue downloading the other maps? (Y/N)");
@@ -382,14 +382,12 @@ namespace LauncherTwo
                         }
                         else//something wrong with the maplist? (No JSON) Show maplisterror
                         {
-                            currentStatus = UDKSeeker.UdkSeeker.Status.MaplistError;
+                            currentStatus = CustomContentSeeker.UdkSeeker.Status.MaplistError;
                             Dispatcher.Invoke(() => seekerWindow.Status = currentStatus.ToString());
                         }
                         return currentStatus;
                     }, token);
 
-
-                    //Task<UDKSeeker.UdkSeeker.Status> task = new Task<UDKSeeker.UdkSeeker.Status>(() => Udkseeker.SeekAll("195.154.167.80:7779"), token);
 
                     //Create another cancellationsource for the UI task
                     CancellationTokenSource source2 = new CancellationTokenSource();
@@ -417,12 +415,12 @@ namespace LauncherTwo
                     
                     
                     //If the seeker returned "Finished", everything went according to plan->Start the game & end other tasks
-                    if (task.Result == UDKSeeker.UdkSeeker.Status.Finished)
+                    if (task.Result == CustomContentSeeker.UdkSeeker.Status.Finished)
                     {
                         //Clean up tasks and windows
                         task.Dispose();
                         source2.Cancel();
-                        //task2.Dispose();
+                        //task2.Dispose(); <-Might be the cause of crash. Needs testing
                         seekerWindow.Close();
 
                         seekerWindow = null;

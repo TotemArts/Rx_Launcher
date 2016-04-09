@@ -49,7 +49,8 @@
 
         </StackPanel>
 
-        <ProgressBar x:Name="ProgressBar" HorizontalAlignment="center" Height="10" VerticalAlignment="center" Width="200" Grid.Column="0" Grid.Row="2" IsIndeterminate="False" Minimum="0" Maximum="100"/>
+        <ProgressBar x:Name="ProgressBar" HorizontalAlignment="center" Height="15" VerticalAlignment="center" Width="200" Grid.Column="0" Grid.Row="2" IsIndeterminate="False" Minimum="0" Maximum="100"/>
+        <Label x:Name="ProgressPercentage" HorizontalAlignment="center" Margin="0,1,0,0" Content="0%" Foreground="#FF061923" Grid.Column="0" Grid.Row="2" FontStyle="Italic" FontSize="10" FontFamily="Arial" FontWeight="Bold"/>
         <StackPanel Grid.Column="0" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="center">
 
             <Button x:Name="ContinueBtn" Content="Continue" HorizontalAlignment="Center" Margin="15,15,15,15" Grid.Row="3" VerticalAlignment="Top" Width="70" Background="#FF061923" Click="Continue_Click" Visibility="Collapsed">

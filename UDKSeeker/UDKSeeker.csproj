@@ -7,8 +7,8 @@
     <ProjectGuid>{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UDKSeeker</RootNamespace>
-    <AssemblyName>UDKSeeker</AssemblyName>
+    <RootNamespace>CustomContentSeeker</RootNamespace>
+    <AssemblyName>CustomContentSeeker</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

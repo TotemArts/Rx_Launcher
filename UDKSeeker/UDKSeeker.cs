@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.IO.Compression;
 
-namespace UDKSeeker
+namespace CustomContentSeeker
 {
     /// <summary>
     /// UdkSeeker wil seek Renegade-x maps from the given RenegadeX repository
@@ -69,7 +69,7 @@ namespace UDKSeeker
         /// <returns></returns>
         public Status SeekAll(String serverAddress)
         {
-            JSONRotationRetriever JSONretriever = new UDKSeeker.JSONRotationRetriever(serverAddress); //<-TestIP
+            JSONRotationRetriever JSONretriever = new CustomContentSeeker.JSONRotationRetriever(serverAddress); //<-TestIP
             var Maps = JSONretriever.getMaps();
             if (Maps != null)
             {

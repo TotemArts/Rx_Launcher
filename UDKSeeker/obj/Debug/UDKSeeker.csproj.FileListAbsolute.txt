@@ -12,3 +12,8 @@ D:\Users\Rob\OneDrive\Programming\RenX Launcher\UDKSeeker\bin\Debug\Newtonsoft.J
 D:\Users\Rob\OneDrive\Programming\RenX Launcher\UDKSeeker\obj\Debug\UDKSeeker.csprojResolveAssemblyReference.cache
 D:\Users\Rob\OneDrive\Programming\RenX Launcher\UDKSeeker\obj\Debug\UDKSeeker.dll
 D:\Users\Rob\OneDrive\Programming\RenX Launcher\UDKSeeker\obj\Debug\UDKSeeker.pdb
+D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\bin\Debug\CustomContentSeeker.dll
+D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\bin\Debug\CustomContentSeeker.pdb
+D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\obj\Debug\UDKSeeker.csprojResolveAssemblyReference.cache
+D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\obj\Debug\CustomContentSeeker.dll
+D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\obj\Debug\CustomContentSeeker.pdb
