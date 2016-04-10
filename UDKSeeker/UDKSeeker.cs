@@ -133,9 +133,9 @@ namespace CustomContentSeeker
         }
 
         /// <summary>
-        /// Get the DUI of a UDK file
+        /// Get the GUID of a UDK file
         /// </summary>
-        /// <param name="FilePath"Path to the UDK file to get the GUID from</param>
+        /// <param name="FilePath">Path to the UDK file to get the GUID from</param>
         /// <returns>A string with the GUId or null if no udk file was found</returns>
         private String GetGUID(String FilePath)
         {
