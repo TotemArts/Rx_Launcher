@@ -120,10 +120,11 @@ namespace CustomContentSeeker
                 //Trying to search for the map on the repository (According to the server GUID)
                 try
                 {
-                    return this.GetMap(Map, ServerGUID); //Return whatever the getMap functionreturns. If Status.MapSucces, all is good.
+                    //Return whatever the getMap functionreturns. If Status.MapSucces, all is good.
+                    return this.GetMap(Map, ServerGUID); 
 
                 }
-                catch (Exception ex)
+                catch
                 {
                     //If any failure gets detected, exit and print message
                     return Status.GeneralError;
@@ -230,8 +231,6 @@ namespace CustomContentSeeker
         /// <param name="ServerGuid">The GUID of the map to download</param>
         private Status GetMap(string Map, string ServerGuid)
         {
-            
-            //ServerGuid = "315B1F59495A8A973CCF52A8B30BFA0E";
             String MapToDownload = null;
             Console.WriteLine("Searching for map {0} on {1}", Map, this.ftpAddress);
             List<string> dirs = this.ShowDir(new Uri(this.ftpAddress));
@@ -276,6 +275,7 @@ namespace CustomContentSeeker
                 if (!Directory.Exists(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//"))
                     Directory.CreateDirectory(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//");
 
+                //Create a temp file to save the map in
                 FileStream newFile = new FileStream(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//tmp.rxmap", FileMode.Create);
                 DownloadedBytes = 0;
 
@@ -283,6 +283,7 @@ namespace CustomContentSeeker
                 byte[] buffer = new byte[4096];
 
                 this.status = Status.Downloading;
+                //Download the map
                 while (true)
                 {
                     bytesRead = responseStream.Read(buffer, 0, buffer.Length);
@@ -292,36 +293,29 @@ namespace CustomContentSeeker
 
                     newFile.Write(buffer, 0, bytesRead);
                     DownloadedBytes += bytesRead;
-                    //Console.Clear();
-                    Console.WriteLine("Downloading map {0}, please stand by...", Map);
-                    Console.WriteLine("Progress: " + TotalAmountOfBytes + "/" + DownloadedBytes);
                 }
+                //Download complete, close the file.
                 newFile.Close();
                 this.status = Status.Finished;
-                
-
-                Console.WriteLine("Download complete!");
-
+                //close the connection to the repository
                 response.Close();
-                Console.WriteLine("Extracting...");
 
-
-
+                //Extract the map
                 if (this.Extract(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//tmp.rxmap"))
                 {
-                    Console.WriteLine("Extracting done!");
+                    //Succes
                     return Status.MapSucces;
                 }
                 else
                 {
-                    Console.WriteLine("Something went wrong while extracting the map...");
+                    //Error while extracting
                     return Status.ExtractError;
                 }
             }
             else
             {
+                //Map not found 
                 this.status = Status.MapNotFoundError;
-                Console.WriteLine("Map {0} not found on {1}...", Map, this.ftpAddress);
                 return Status.MapNotFoundError;
             }
         }
@@ -352,6 +346,13 @@ namespace CustomContentSeeker
             return dirs;
         }
 
+        /// <summary>
+        /// Searches a repository for the desired map 
+        /// </summary>
+        /// <param name="ServerGuid">The GUID of the map to search</param>
+        /// <param name="Map">Name of the map</param>
+        /// <param name="address">Repository address</param>
+        /// <returns>String with the maplocation on the repository</returns>
         private String SearchMap(string ServerGuid, string Map, Uri address)
         {
             List<string> dirs = this.ShowDir(address);
@@ -373,6 +374,14 @@ namespace CustomContentSeeker
             return returnDir;
         }
 
+
+        /// <summary>
+        /// WIP NOT WORKING: Searches the whole repository (All maps)
+        /// </summary>
+        /// <param name="ServerGuid">The GUID of the map to search</param>
+        /// <param name="Map">Name of the map</param>
+        /// <param name="address">Repository address</param>
+        /// <returns>String with the maplocation on the repository</returns>
         private String SearchMapRecursive(string ServerGuid, string Map, Uri address)
         {
             List<string> dirs = this.ShowDir(address);
@@ -423,7 +432,6 @@ namespace CustomContentSeeker
         {
 
             string zipPath = MapLocation;
-            //string extractPath = this.renXDir + "..//..//..//..//";
 
             if (!Directory.Exists(this.renXDir + "..//..//..//..//" + "UDKSeekerTempExtracted//"))
                 Directory.CreateDirectory(this.renXDir + "..//..//..//..//" + "UDKSeekerTempExtracted//");
@@ -439,7 +447,7 @@ namespace CustomContentSeeker
                 Directory.Delete(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//", true);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }

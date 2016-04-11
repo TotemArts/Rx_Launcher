@@ -84,15 +84,16 @@ namespace LauncherTwo.Views
         public void initProgressBar(long sizeOfFile)
         {
             this.sizeOfFile = sizeOfFile;
-            Dispatcher.Invoke(new Action(() => { this.ProgressPercentage.Content = "0%";}));
-            Dispatcher.Invoke(new Action(() => { this.ProgressBar.Maximum = sizeOfFile; }));
+            Dispatcher.Invoke(new Action(() => {
+                this.ProgressPercentage.Content = "0%";
+                this.ProgressBar.Maximum = sizeOfFile;
+            }));
         }
 
         public void updateProgressBar(long currentAmount)
         {
-            Dispatcher.Invoke(new Action(() => { this.ProgressBar.Value = currentAmount; }));
-            Dispatcher.Invoke(new Action(() => 
-            {
+            Dispatcher.Invoke(new Action(() => {
+                this.ProgressBar.Value = currentAmount; 
                 if (this.sizeOfFile != 0)
                 {
                     this.ProgressPercentage.Content = (int)currentAmount / (this.sizeOfFile / 100) + "%";

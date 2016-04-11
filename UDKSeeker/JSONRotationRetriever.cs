@@ -10,9 +10,6 @@ namespace CustomContentSeeker
 {
     public class JSONRotationRetriever
     {
-        private readonly static String repositoryAdress = "ftp://renx.constructivetyranny.com/";
-        private readonly static String ftpUsername = "Launcher";
-        private readonly static String ftpPassword = "CustomMaps199";
         private List<MapItem> Maps = new List<MapItem>();
 
         public JSONRotationRetriever(String ServerAddress)
