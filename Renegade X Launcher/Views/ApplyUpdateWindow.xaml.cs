@@ -225,11 +225,26 @@ namespace LauncherTwo.Views
 
         private CancellationTokenSource CancellationTokenSource;
 
-        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource)
+        /// <summary>
+        /// Initializes the updatewindow
+        /// </summary>
+        /// <param name="patchTask">The update task</param>
+        /// <param name="progress"></param>
+        /// <param name="targetVersionString">The version to update to</param>
+        /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
+        /// <param name="StatusMessage">Windowmessage</param>
+        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, String StatusMessage)
         {
             TargetVersionString = targetVersionString;
             CancellationTokenSource = cancellationTokenSource;
-            StatusMessage = "Please wait while Renegade X is being updated.";
+            if (StatusMessage == null)
+            {
+                this.StatusMessage = "Please wait while Renegade X is being updated.";
+            }
+            else
+            {
+                this.StatusMessage = StatusMessage;
+            }
 
             InitializeComponent();
 
@@ -273,6 +288,7 @@ namespace LauncherTwo.Views
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
             CancellationTokenSource.Cancel();
+            this.StatusMessage = "Operation cancelled by User";
         }
 
         private void NotifyPropertyChanged(string propertyName)

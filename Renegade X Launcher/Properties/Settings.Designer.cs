@@ -91,5 +91,17 @@ namespace LauncherTwo.Properties {
                 this["UseSeeker"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Installed {
+            get {
+                return ((bool)(this["Installed"]));
+            }
+            set {
+                this["Installed"] = value;
+            }
+        }
     }
 }

@@ -55,7 +55,14 @@ namespace LauncherTwo
 
         public static string GetLatestGameVersionName()
         {
-            return LatestGameVersion.Name;
+            if (LatestGameVersion != null)
+            {
+                return LatestGameVersion.Name;
+            }
+            else
+            {
+                return "Open Beta 5.16";
+            }
         }
 
         public static void UpdateGameVersion()

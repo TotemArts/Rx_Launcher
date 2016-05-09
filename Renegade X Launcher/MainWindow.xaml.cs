@@ -69,6 +69,9 @@ namespace LauncherTwo
         const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
         const string MESSAGE_IDLE = "Welcome back commander.";
 
+        const string MESSAGE_INSTALL = "It looks like this is the first time you're running Renegade X or your installation is corrupted.\nDo you wish to install the game?";
+        const string MESSAGE_NOT_INSTALLED = "You will not be able to play the game until the installation is finished!\nThis message will continue to appear untill installation is succesfull.";
+
         private BitmapImage chkBoxOnImg;
         private BitmapImage chkBoxOffImg;
         public BitmapImage GetChkBxImg (bool Value)
@@ -121,10 +124,59 @@ namespace LauncherTwo
                 refreshTimer.Start();
                 StartRefreshingServers();
 
-                if (Properties.Settings.Default.Username == "")
-                    ShowUsernameBox();
+                if (VersionCheck.GetGameVersionName() == "Unknown")
+                {
+                    Properties.Settings.Default.Installed = false;
+                    Properties.Settings.Default.Save();
+                    #region PrimaryStartupInstallation
+                    //Show the dialog that asks to install the game
+                    ModernDialog firstInstallDialog = new ModernDialog();
+                    firstInstallDialog.Title = "Installation";
+                    firstInstallDialog.Content = MESSAGE_INSTALL;
+                    firstInstallDialog.Buttons = new Button[] { firstInstallDialog.YesButton, firstInstallDialog.NoButton };
+                    firstInstallDialog.ShowDialog();
+                    if (firstInstallDialog.DialogResult.Value == true)
+                    {
+                        VersionCheck.GetLatestGameVersionName();
+
+                        var targetDir = GameInstallation.GetRootPath();
+                        var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
+                        var patchUrls = VersionCheck.GamePatchUrls;
+                        var patchVersion = VersionCheck.GetLatestGameVersionName();
+
+                        var progress = new Progress<DirectoryPatcherProgressReport>();
+                        var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+                        Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
+
+                        var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, "Please wait while Renegade X is being installed.");
+                        window.Owner = this;
+                        window.ShowDialog();
+                        if (window.DialogResult == true)
+                        {
+
+                            VersionCheck.UpdateGameVersion();
+                            Properties.Settings.Default.Installed = true;
+                            Properties.Settings.Default.Save();
+                            ShowUsernameBox();
+                        }
+                    }
+                    else
+                    {
+                        //Show dialog that the game is not playable untill installation is completed
+                        ModernDialog notInstalledDialog = new ModernDialog();
+                        notInstalledDialog.Title = "Installation";
+                        notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
+                        notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
+                        notInstalledDialog.ShowDialog();
+                    }
+                    #endregion PrimaryStartupInstallation
+                }
                 else
+                {
+                    Properties.Settings.Default.Installed = true;
+                    Properties.Settings.Default.Save();
                     SD_Username.Content = Properties.Settings.Default.Username;
+                }
             };
 
 
@@ -205,7 +257,7 @@ namespace LauncherTwo
                 var cancellationTokenSource = new CancellationTokenSource();
                 Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-                var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource);
+                var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, null);
                 window.Owner = this;
                 window.ShowDialog();
 
