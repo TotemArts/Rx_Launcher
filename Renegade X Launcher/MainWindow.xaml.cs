@@ -403,10 +403,10 @@ namespace LauncherTwo
                     CancellationToken token = source.Token;
 
                     //Create the seeker object to seek maps
-                    CustomContentSeeker.UdkSeeker Udkseeker = new CustomContentSeeker.UdkSeeker("ftp://renx.constructivetyranny.com/", "Launcher", "CustomMaps199");
+                    CustomContentSeeker.UdkSeeker Udkseeker = new CustomContentSeeker.UdkSeeker("ftp://renx.tyrant.gg/", "Launcher", "CustomMaps199");
                     //Get the maplist of the server
                     CustomContentSeeker.JSONRotationRetriever JSON = new CustomContentSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
-                    List<CustomContentSeeker.MapItem> Maps = JSON.getMaps();
+                    List<CustomContentSeeker.Level> Levels = JSON.getMaps();
 
                     //Prepare seekerwindow and shot it
                     SeekerDownloadWindow seekerWindow = new SeekerDownloadWindow(source);
@@ -418,12 +418,12 @@ namespace LauncherTwo
                     Task<CustomContentSeeker.UdkSeeker.Status> task = new Task<CustomContentSeeker.UdkSeeker.Status>(() =>
                     {
                         CustomContentSeeker.UdkSeeker.Status currentStatus = CustomContentSeeker.UdkSeeker.Status.Finished;//Status is finished untill other status gets pushed
-                        if (Maps != null && Maps.Count > 0)
+                        if (Levels != null && Levels.Count > 0)
                         {
                             
-                            foreach (CustomContentSeeker.MapItem Map in Maps)
+                            foreach (CustomContentSeeker.Level Level in Levels)
                             {
-                                CustomContentSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Map.Map, Map.GUID);//Seek a map
+                                CustomContentSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Level.Name, Level.GUID);//Seek a map
                                 if (Status != CustomContentSeeker.UdkSeeker.Status.MapSucces)
                                 {
                                     currentStatus = Status;

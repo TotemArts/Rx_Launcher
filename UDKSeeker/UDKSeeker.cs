@@ -53,7 +53,7 @@ namespace CustomContentSeeker
             this.ftpAddress = ftpAddress;
             this.username = username;
             this.password = password;
-            //this.renXDir = "C:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\";
+            //this.renXDir = "C:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
             this.renXDir = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../.." + "\\UDKGame\\CookedPC\\Maps\\RenX\\");
         }
 
@@ -75,8 +75,8 @@ namespace CustomContentSeeker
             {
                 foreach (var Map in Maps)
                 {
-                    currMap = Map.Map;
-                    if (Seek(Map.Map, Map.GUID) != Status.Finished)
+                    currMap = Map.Name;
+                    if (Seek(Map.Name, Map.GUID) != Status.Finished)
                     {
                         //Console.WriteLine("Could not download all the maps on the server. It may be possible you can't play all the maps.\nContinue downloading the other maps? (Y/N)");
                         //StatusLabelContent.Content = "Could not download all maps, continue anyway?";
@@ -124,7 +124,7 @@ namespace CustomContentSeeker
                     return this.GetMap(Map, ServerGUID); 
 
                 }
-                catch
+                catch(Exception ex)
                 {
                     //If any failure gets detected, exit and print message
                     return Status.GeneralError;
