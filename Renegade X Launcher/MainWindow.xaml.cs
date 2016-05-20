@@ -28,6 +28,8 @@ namespace LauncherTwo
 {
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
+        private readonly string MAP_REPO_ADRESS = "ftp://launcher-repo.renegade-x.com";
+
         public const bool SHOW_DEBUG = false;
         public bool version_mismatch = false;
 
@@ -71,6 +73,8 @@ namespace LauncherTwo
 
         const string MESSAGE_INSTALL = "It looks like this is the first time you're running Renegade X or your installation is corrupted.\nDo you wish to install the game?";
         const string MESSAGE_NOT_INSTALLED = "You will not be able to play the game until the installation is finished!\nThis message will continue to appear untill installation is succesfull.";
+
+
 
         private BitmapImage chkBoxOnImg;
         private BitmapImage chkBoxOffImg;
@@ -403,7 +407,7 @@ namespace LauncherTwo
                     CancellationToken token = source.Token;
 
                     //Create the seeker object to seek maps
-                    CustomContentSeeker.UdkSeeker Udkseeker = new CustomContentSeeker.UdkSeeker("ftp://renx.tyrant.gg/", "Launcher", "CustomMaps199");
+                    CustomContentSeeker.UdkSeeker Udkseeker = new CustomContentSeeker.UdkSeeker(MAP_REPO_ADRESS, "Launcher", "CustomMaps199");
                     //Get the maplist of the server
                     CustomContentSeeker.JSONRotationRetriever JSON = new CustomContentSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
                     List<CustomContentSeeker.Level> Levels = JSON.getMaps();

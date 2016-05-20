@@ -21,7 +21,7 @@ namespace CustomContentSeeker
                 try
                 {
                     //GUIDJsonResponse = GUIDJsonRequest.DownloadString(new Uri("http://renegadexgs.appspot.com/serverGUIDs.jsp?ip=" + ServerAddressAndPort[0] + "&port=" + ServerAddressAndPort[1]));
-                    String GUIDJsonResponse = GUIDJsonRequest.DownloadString(new Uri("http://serverlist.renegade-x.com/server.json?ip=" + ServerAddressAndPort[0] + "&port=" + ServerAddressAndPort[1]));
+                    String GUIDJsonResponse = GUIDJsonRequest.DownloadString(new Uri("http://serverlist.renegade-x.com/server.jsp?ip=" + ServerAddressAndPort[0] + "&port=" + ServerAddressAndPort[1]));
                     Content = JsonConvert.DeserializeObject<ServerContent>(GUIDJsonResponse);
                 }
                 catch
