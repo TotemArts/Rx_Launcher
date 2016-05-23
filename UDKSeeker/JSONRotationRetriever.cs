@@ -12,6 +12,11 @@ namespace CustomContentSeeker
     {
         private ServerContent Content;
 
+        /// <summary>
+        /// Gets the JSON for a specific serveraddress and puts the parsed data in the class to use.
+        /// </summary>
+        /// <param name="ServerAddress">String containing the server address</param>
+        /// <example>JSONRotationRetriever retriever = new JSONRotationRetriever("127.0.0.1:80");</example>
         public JSONRotationRetriever(String ServerAddress)
         {
             String[] ServerAddressAndPort = ServerAddress.Split(':');
