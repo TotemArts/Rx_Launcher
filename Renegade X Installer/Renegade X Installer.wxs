@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Renegade X" Language="1033" Version="1.0.0.0" Manufacturer="Totem Arts" UpgradeCode="7491f5a4-2fd2-4190-9bb6-f65caea89da5">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Totem Arts"/>
+  
+	<Product Id="*" 
+           Name="Renegade X"
+           Language="1033" 
+           Version="1.0.0.0"
+           Manufacturer="Totem Arts" 
+           UpgradeCode="7491f5a4-2fd2-4190-9bb6-f65caea89da5">
+           
+    
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Manufacturer="Totem Arts"/>
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes" />
 
-		<Feature Id="ProductFeature" Title="Renegade X Installer" Level="1">
+		<Feature Id="ProductFeature" Title="Renegade X" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="PreviewVidComponents" />
-    
+      <ComponentGroupRef Id="PreviewVidComponents" />    
 		</Feature>
+    <UI>
+      <UIRef Id="WixUI_Mondo" />
+    </UI>
 	</Product>
   
   
 
   <Fragment>
-    <Icon Id="icon.ico" SourceFile="Launcher/Icon_Silver.ico"/>
-    <Property Id="ARPPRODUCTICON" Value="Icon_Silver.ico" />
+    <!--<Icon Id="icon.ico" SourceFile="Launcher/Icon_Silver.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="Icon_Silver.ico" /> -->
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="RenegadeXTest">
