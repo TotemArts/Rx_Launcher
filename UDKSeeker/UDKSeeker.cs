@@ -53,7 +53,7 @@ namespace CustomContentSeeker
             this.ftpAddress = ftpAddress;
             this.username = username;
             this.password = password;
-            //this.renXDir = "C:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
+            //this.renXDir = "D:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
             this.renXDir = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../.." + "\\UDKGame\\CookedPC\\Maps\\RenX\\");
         }
 

@@ -28,7 +28,7 @@ namespace LauncherTwo
 {
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
-        private readonly string MAP_REPO_ADRESS = "ftp://launcher-repo.renegade-x.com";
+        private readonly string MAP_REPO_ADRESS = "ftp://launcher-repo.renegade-x.com/";
 
         public const bool SHOW_DEBUG = false;
         public bool version_mismatch = false;
