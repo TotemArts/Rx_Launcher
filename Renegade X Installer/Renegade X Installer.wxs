@@ -4,7 +4,7 @@
 	<Product Id="*" 
            Name="Renegade X"
            Language="1033" 
-           Version="Open Beta 5.17"
+           Version="0.5.6.0"
            Manufacturer="Totem Arts" 
            UpgradeCode="7491f5a4-2fd2-4190-9bb6-f65caea89da5">
            
@@ -24,7 +24,9 @@
     <UI>
       <UIRef Id="WixUI_Mondo" />
     </UI>
-	</Product>
+
+    <WixVariable Id="WixUIDialogBmp" Value="SetupImages\Dialog.bmp" />
+  </Product>
   
   
 
