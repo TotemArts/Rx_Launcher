@@ -1,0 +1,4 @@
+D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\bin\Release\CustomContentSeeker.dll
+D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\bin\Release\CustomContentSeeker.pdb
+D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\obj\Release\CustomContentSeeker.dll
+D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\obj\Release\CustomContentSeeker.pdb
