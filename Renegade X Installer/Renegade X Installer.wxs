@@ -26,6 +26,7 @@
     </UI>
 
     <WixVariable Id="WixUIDialogBmp" Value="SetupImages\Dialog.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="SetupImages\Dialog2.bmp" />
   </Product>
   
   
@@ -53,7 +54,7 @@
 				<!-- TODO: Insert files, registry keys, and other resources here. -->
 
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="Launcher/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
-           <!--<Shortcut Id='LauncherStartmenu' Directory='ProgramMenuDir' Name='Renegade X Launcher' Advertise='no' />-->
+           <Shortcut Id='LauncherStartmenu' Directory='ProgramFilesFolder' Name='Renegade X Launcher' Advertise='no' />
          </File>
 
          <File Id="FirstFLoorDLL" Name="FirstFloor.ModernUI.dll" Source="Launcher/FirstFloor.ModernUI.dll" DiskId='1' Vital="yes"/>
