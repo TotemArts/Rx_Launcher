@@ -152,7 +152,7 @@ namespace LauncherTwo
                         var cancellationTokenSource = new System.Threading.CancellationTokenSource();
                         Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-                        var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, "Please wait while Renegade X is being installed.");
+                        var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
                         window.Owner = this;
                         window.ShowDialog();
                         if (window.DialogResult == true)
@@ -261,7 +261,7 @@ namespace LauncherTwo
                 var cancellationTokenSource = new CancellationTokenSource();
                 Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-                var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, null);
+                var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
                 window.Owner = this;
                 window.ShowDialog();
 

@@ -225,6 +225,13 @@ namespace LauncherTwo.Views
 
         private CancellationTokenSource CancellationTokenSource;
 
+        public enum UpdateWindowType
+        {
+            Install,
+            Update,
+            Verify
+        }
+
         /// <summary>
         /// Initializes the updatewindow
         /// </summary>
@@ -232,19 +239,31 @@ namespace LauncherTwo.Views
         /// <param name="progress"></param>
         /// <param name="targetVersionString">The version to update to</param>
         /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
-        /// <param name="StatusMessage">Windowmessage</param>
-        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, String StatusMessage)
+        /// <param name="isInstall">Is this the first install</param>
+        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
         {
             TargetVersionString = targetVersionString;
             CancellationTokenSource = cancellationTokenSource;
-            if (StatusMessage == null)
+            String Status = "updated";
+
+            switch (type)
             {
-                this.StatusMessage = "Please wait while Renegade X is being updated.";
+                case UpdateWindowType.Install:
+                    Status = "installed";
+                    break;
+                case UpdateWindowType.Update:
+                    Status = "updated";
+                    break;
+                case UpdateWindowType.Verify:
+                    Status = "verified";
+                    break;
+                default:
+                    Status = "updated";
+                    break;
             }
-            else
-            {
-                this.StatusMessage = StatusMessage;
-            }
+
+            this.StatusMessage = string.Format("Please wait while Renegade X is being {0} .", Status);
+            
 
             InitializeComponent();
 
@@ -262,11 +281,12 @@ namespace LauncherTwo.Views
                 try
                 {
                     await patchTask; // Collect exceptions.
-                    StatusMessage = string.Format("Renegade X was successfully updated to version {0}.", TargetVersionString);
+                    this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", Status, TargetVersionString);
+                    
                 }
                 catch (Exception exception)
                 {
-                    StatusMessage = string.Format("Renegade X could not be updated. The following exception occurred:\n\n{0}", exception.Message);
+                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", Status, exception.Message);
                 }
                 HasFinished = true;
             });

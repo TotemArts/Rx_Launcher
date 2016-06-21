@@ -122,7 +122,7 @@ namespace LauncherTwo.Views
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
             Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, "Please wait while Renegade X is being verified.");
+            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Verify);
             window.Owner = this;
             window.ShowDialog();
 
