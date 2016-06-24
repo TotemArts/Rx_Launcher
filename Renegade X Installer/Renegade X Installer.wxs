@@ -22,7 +22,8 @@
       <ComponentGroupRef Id="PreviewVidComponents" />    
 		</Feature>
     <UI>
-      <UIRef Id="WixUI_Mondo" />
+       <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+      <UIRef Id="WixUI_InstallDir"/>
     </UI>
 
     <WixVariable Id="WixUIDialogBmp" Value="SetupImages\Dialog.bmp" />
@@ -37,11 +38,12 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="RenegadeXTest">
-          <Directory Id="InstallLocationLauncher" Name="Launcher"/>
+          <Directory Id="InstallLocationLauncher" Name="Launcher">
+            <Directory Id="InstallLocationPreviewVids" Name="PreviewVids"/>
+          </Directory>
           <Directory Id="InstallLocationEngine" Name="Engine"/>
           <Directory Id="InstallLocationUDKGame" Name="UDKGame"/>
-          <Directory Id="InstallLocationBinaries" Name="Binaries"/>
-		      <Directory Id="InstallLocationPreviewVids" Name="PreviewVids"/>
+          <Directory Id="InstallLocationBinaries" Name="Binaries"/>	      
         </Directory>
       </Directory>
     </Directory>
