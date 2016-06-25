@@ -28,13 +28,15 @@
 
     <WixVariable Id="WixUIDialogBmp" Value="SetupImages\Dialog.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="SetupImages\Dialog2.bmp" />
+  
+    <Icon Id="Icon" SourceFile="Launcher/Icon_Silver.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="Icon" />
   </Product>
   
   
 
   <Fragment>
-    <!--<Icon Id="icon.ico" SourceFile="Launcher/Icon_Silver.ico"/>
-    <Property Id="ARPPRODUCTICON" Value="Icon_Silver.ico" /> -->
+    
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="RenegadeXTest">
