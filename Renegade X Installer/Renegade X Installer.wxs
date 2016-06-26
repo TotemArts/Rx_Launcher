@@ -6,7 +6,7 @@
            Language="1033" 
            Version="0.5.6.0"
            Manufacturer="Totem Arts" 
-           UpgradeCode="7491f5a4-2fd2-4190-9bb6-f65caea89da5">
+           UpgradeCode="{74FC8E14-0C0B-42C8-86CF-565781E1A849}">
            
     
     <Package InstallerVersion="200" 
@@ -54,7 +54,7 @@
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallLocationLauncher">
 			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-			 <Component Id="ProductComponent" Guid="698A84A3-22B2-4995-9A46-C8CE5F271C0F"> 
+			 <Component Id="ProductComponent" Guid="{74FC8E14-0C0B-42C8-86CF-565781E1A849}"> 
 				<!-- TODO: Insert files, registry keys, and other resources here. -->
 
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
@@ -81,7 +81,7 @@
   
     <Fragment>  
       <ComponentGroup Id="PreviewVidComponents" Directory="InstallLocationPreviewVids">
-        <Component Id ="PreviewVidComponent" Guid="A17D90D7-27F7-4784-919A-B39FE6871696">
+        <Component Id ="PreviewVidComponent" Guid="{52C23DCC-81CD-4E12-A80B-49709267DE35}">
             <File Id="filDE5FF965729966CA817755E989A336AC"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Canyon_day.wmv" />
             <File Id="filB8F2D3D0A25E74B7FF1EE53DDF9C1489"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Canyon_Night.wmv" />
             <File Id="filB4B9BC9B120DF2E7BCC2262D749709E3"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Eyes.wmv" />
