@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -240,6 +241,8 @@ namespace LauncherTwo.Views
         /// <param name="targetVersionString">The version to update to</param>
         /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
         /// <param name="isInstall">Is this the first install</param>
+        
+        
         public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
         {
             TargetVersionString = targetVersionString;

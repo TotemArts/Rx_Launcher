@@ -13,7 +13,6 @@ D:\Users\Rob\OneDrive\Programming\RenX Launcher\UDKSeeker\obj\Release\UDKSeeker.
 D:\Users\Rob\OneDrive\Programming\RenX Launcher\UDKSeeker\obj\Release\UDKSeeker.pdb
 D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\bin\Release\CustomContentSeeker.dll
 D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\bin\Release\CustomContentSeeker.pdb
-D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\obj\Release\UDKSeeker.csprojResolveAssemblyReference.cache
 D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\obj\Release\CustomContentSeeker.dll
 D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\obj\Release\CustomContentSeeker.pdb
 D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\bin\Release\CustomContentSeeker.dll
