@@ -4,7 +4,8 @@ WIX installer script for Renegade-X by Totem Arts
 For blamage or help: Ask for Schmitz.
 -->
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"> 
+
   <!--Define the product information-->
 	<Product Id="*" 
            Name="Renegade X"
@@ -18,15 +19,18 @@ For blamage or help: Ask for Schmitz.
              Compressed="yes" 
              InstallScope="perMachine" 
              Manufacturer="Totem Arts"/>
+    
     <!--Message when trying to install an older version of the launchersetup-->
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    
     <!--Bool to determine if the setup files should be embedded in the msi, or be their own standalone cab files.-->
 		<MediaTemplate EmbedCab="yes" />
 
     <!--Determine which features are going to be installed and what component belong to that feature-->
 		<Feature Id="ProductFeature" Title="Renegade X" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="PreviewVidComponents" />    
+      <ComponentGroupRef Id="PreviewVidComponents" />  
+      <ComponentGroupRef Id="StartMenuShortcut"/>
 		</Feature>
     
     <!--Determine the install UI and reference (This is available in WIX itself)-->
@@ -40,8 +44,8 @@ For blamage or help: Ask for Schmitz.
     <WixVariable Id="WixUIBannerBmp" Value="SetupImages/Dialog2.bmp" />
     
     <!--Determine the icon seen when checking programlist-->
-    <Icon Id="Icon" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
-    <Property Id="ARPPRODUCTICON" Value="Icon" />
+    <Icon Id="SetupIcon" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="SetupIcon" />
   </Product>
   
   
@@ -49,6 +53,7 @@ For blamage or help: Ask for Schmitz.
   <Fragment>
     <!--Defines the folders this installer can use. CAPITOL folders are default Windows paths. Id=Handler to use within this document; Name=the actual name of the folder when created-->
     <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="DesktopFolder" Name="Desktop"/>
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="RenegadeXTest">
           <Directory Id="InstallLocationLauncher" Name="Launcher">
@@ -59,7 +64,10 @@ For blamage or help: Ask for Schmitz.
           <Directory Id="InstallLocationBinaries" Name="Binaries"/>	      
         </Directory>
       </Directory>
-    </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Renegade X Test"/>
+      </Directory>
+    </Directory>   
   </Fragment>
 
   <!--Fragment containing most of the vital components-->
@@ -69,7 +77,7 @@ For blamage or help: Ask for Schmitz.
 			<!--The productcomponens contains all the main Launcher files-->
 			 <Component Id="ProductComponent" Guid="{74FC8E14-0C0B-42C8-86CF-565781E1A849}"> 
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
-           <Shortcut Id='LauncherStartmenu' Directory='ProgramFilesFolder' Name='Renegade X Launcher' Advertise='no' />
+          <!-- <Shortcut Id='LauncherStartmenu' Directory='DesktopFolder' Name='Renegade X Launcher' WorkingDirectory='InstallLocationLauncher' Advertise='no' />-->
          </File>
          <File Id="FirstFLoorDLL" Name="FirstFloor.ModernUI.dll" Source="../Renegade X Launcher/bin/Release/FirstFloor.ModernUI.dll" DiskId='1' Vital="yes"/>
          <File Id="NewtonsoftJsonDLL" Name="Newtonsoft.Json.dll" Source="../Renegade X Launcher/bin/Release/Newtonsoft.Json.dll" DiskId='1' Vital="yes"/>
@@ -82,10 +90,21 @@ For blamage or help: Ask for Schmitz.
          <File Id="xdelta32EXE" Name="xdelta3-3.0.8.x86-32.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.0.8.x86-32.exe" DiskId='1' Vital="yes"/>
          <File Id="xdelta64EXE" Name="xdelta3-3.0.8.x86-64.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.0.8.x86-64.exe" DiskId='1' Vital="yes"/>
         
-         <!--Create folders the Launcher can use to install the game-->
+         <!--Create the default UDK folders the Launcher can use to install the game-->
          <CreateFolder Directory="InstallLocationEngine"/>
          <CreateFolder Directory="InstallLocationUDKGame"/>
          <CreateFolder Directory="InstallLocationBinaries"/>
+
+         <!--Set the registry keys for all the to be deleted folders -->
+         <!--<RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>-->
+         
+         <!--<util:RemoveFolderEx Id="RemoveLocationEngine" On="uninstall" Property="InstallLocationEngine"/>
+         <util:RemoveFolderEx Id="RemoveLocationUDKGame" On="uninstall" Property="InstallLocationUDKGame"/>
+         <util:RemoveFolderEx Id="RemoveMajor" On="uninstall" Property="InstallLocationBinaries"/>-->
+
+         
        </Component> 
       </ComponentGroup>
     </Fragment>
@@ -115,4 +134,21 @@ For blamage or help: Ask for Schmitz.
         </Component>  
 		  </ComponentGroup>
 	</Fragment>
+
+  <!--Fragment containing the start menu shortcut-->
+  <Fragment>
+    <ComponentGroup Id="StartMenuShortcut" Directory="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="{2DDC576A-9D02-43D9-8AC8-6D890B4780C3}">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Renegade X Launcher"
+                  Description="Launcher for Renegade X"
+                  Target="[#LauncherEXE]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY"
+                  Icon="SetupIcon"/>
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup> 
+  </Fragment>
+  
 </Wix>
