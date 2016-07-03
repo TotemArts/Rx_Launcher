@@ -1,42 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+WIX installer script for Renegade-X by Totem Arts
+For blamage or help: Ask for Schmitz.
+-->
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  
+  <!--Define the product information-->
 	<Product Id="*" 
            Name="Renegade X"
            Language="1033" 
            Version="0.5.6.0"
            Manufacturer="Totem Arts" 
            UpgradeCode="{74FC8E14-0C0B-42C8-86CF-565781E1A849}">
-           
     
+    <!--Define package information-->
     <Package InstallerVersion="200" 
              Compressed="yes" 
              InstallScope="perMachine" 
              Manufacturer="Totem Arts"/>
-
+    <!--Message when trying to install an older version of the launchersetup-->
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <!--Bool to determine if the setup files should be embedded in the msi, or be their own standalone cab files.-->
 		<MediaTemplate EmbedCab="yes" />
 
+    <!--Determine which features are going to be installed and what component belong to that feature-->
 		<Feature Id="ProductFeature" Title="Renegade X" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="PreviewVidComponents" />    
 		</Feature>
+    
+    <!--Determine the install UI and reference (This is available in WIX itself)-->
     <UI>
        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-      <UIRef Id="WixUI_InstallDir"/>
+       <UIRef Id="WixUI_InstallDir"/>
     </UI>
 
+    <!--Determine the custom images used in the installer-->
     <WixVariable Id="WixUIDialogBmp" Value="SetupImages/Dialog.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="SetupImages/Dialog2.bmp" />
-  
+    
+    <!--Determine the icon seen when checking programlist-->
     <Icon Id="Icon" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
     <Property Id="ARPPRODUCTICON" Value="Icon" />
   </Product>
   
   
-
+  <!--Fragment that defines the folder structure of the installed product-->
   <Fragment>
-    
+    <!--Defines the folders this installer can use. CAPITOL folders are default Windows paths. Id=Handler to use within this document; Name=the actual name of the folder when created-->
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="RenegadeXTest">
@@ -51,16 +62,15 @@
     </Directory>
   </Fragment>
 
+  <!--Fragment containing most of the vital components-->
 	<Fragment>
+    <!--Main component group with all essentional files-->
 		<ComponentGroup Id="ProductComponents" Directory="InstallLocationLauncher">
-			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<!--The productcomponens contains all the main Launcher files-->
 			 <Component Id="ProductComponent" Guid="{74FC8E14-0C0B-42C8-86CF-565781E1A849}"> 
-				<!-- TODO: Insert files, registry keys, and other resources here. -->
-
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
            <Shortcut Id='LauncherStartmenu' Directory='ProgramFilesFolder' Name='Renegade X Launcher' Advertise='no' />
          </File>
-
          <File Id="FirstFLoorDLL" Name="FirstFloor.ModernUI.dll" Source="../Renegade X Launcher/bin/Release/FirstFloor.ModernUI.dll" DiskId='1' Vital="yes"/>
          <File Id="NewtonsoftJsonDLL" Name="Newtonsoft.Json.dll" Source="../Renegade X Launcher/bin/Release/Newtonsoft.Json.dll" DiskId='1' Vital="yes"/>
          <File Id="LauncherconfigCONFIG" Name="Renegade X Launcher.exe.config" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe.config" DiskId='1' Vital="yes"/>
@@ -72,13 +82,15 @@
          <File Id="xdelta32EXE" Name="xdelta3-3.0.8.x86-32.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.0.8.x86-32.exe" DiskId='1' Vital="yes"/>
          <File Id="xdelta64EXE" Name="xdelta3-3.0.8.x86-64.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.0.8.x86-64.exe" DiskId='1' Vital="yes"/>
         
+         <!--Create folders the Launcher can use to install the game-->
          <CreateFolder Directory="InstallLocationEngine"/>
          <CreateFolder Directory="InstallLocationUDKGame"/>
          <CreateFolder Directory="InstallLocationBinaries"/>
        </Component> 
       </ComponentGroup>
     </Fragment>
-  
+
+    <!--Fragment containing the videosthat the launcher uses-->
     <Fragment>  
       <ComponentGroup Id="PreviewVidComponents" Directory="InstallLocationPreviewVids">
         <Component Id ="PreviewVidComponent" Guid="{52C23DCC-81CD-4E12-A80B-49709267DE35}">
