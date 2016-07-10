@@ -14,6 +14,8 @@ For blamage or help: Ask for Schmitz.
            Manufacturer="Totem Arts" 
            UpgradeCode="{74FC8E14-0C0B-42C8-86CF-565781E1A849}">
     
+    
+    
     <!--Define package information-->
     <Package InstallerVersion="200" 
              Compressed="yes" 
@@ -22,6 +24,15 @@ For blamage or help: Ask for Schmitz.
     
     <!--Message when trying to install an older version of the launchersetup-->
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Property Id='REGISTERKEYENGINE'>
+        <RegistrySearch Id='RegisterKeyEngineProp' Root='HKCU' Key='Software\Totem Arts\Renegade X' Name='InstallLocationEngine' Type='raw' />
+    </Property>
+    <Property Id='REGISTERKEYUDKGAME'>
+        <RegistrySearch Id='RegisterKeyUDKGameProp' Root='HKCU' Key='Software\Totem Arts\Renegade X' Name='InstallLocationUDKGame' Type='raw' />
+    </Property>
+    <Property Id='REGISTERKEYBINARIES'>
+        <RegistrySearch Id='RegisterKeyEngineBinaries' Root='HKCU' Key='Software\Totem Arts\Renegade X' Name='InstallLocationBinaries' Type='raw' />
+    </Property>
     
     <!--Bool to determine if the setup files should be embedded in the msi, or be their own standalone cab files.-->
 		<MediaTemplate EmbedCab="yes" />
@@ -43,6 +54,9 @@ For blamage or help: Ask for Schmitz.
     <WixVariable Id="WixUIDialogBmp" Value="SetupImages/Dialog.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="SetupImages/Dialog2.bmp" />
     
+    <!--Include the license document-->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    
     <!--Determine the icon seen when checking programlist-->
     <Icon Id="SetupIcon" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
     <Property Id="ARPPRODUCTICON" Value="SetupIcon" />
@@ -55,7 +69,7 @@ For blamage or help: Ask for Schmitz.
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="DesktopFolder" Name="Desktop"/>
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="RenegadeXTest">
+        <Directory Id="INSTALLFOLDER" Name="Renegade X">
           <Directory Id="InstallLocationLauncher" Name="Launcher">
             <Directory Id="InstallLocationPreviewVids" Name="PreviewVids"/>
           </Directory>
@@ -65,7 +79,7 @@ For blamage or help: Ask for Schmitz.
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="Renegade X Test"/>
+        <Directory Id="ApplicationProgramsFolder" Name="Renegade X"/>
       </Directory>
     </Directory>   
   </Fragment>
@@ -96,14 +110,18 @@ For blamage or help: Ask for Schmitz.
          <CreateFolder Directory="InstallLocationBinaries"/>
 
          <!--Set the registry keys for all the to be deleted folders -->
-         <!--<RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
          <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>-->
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>
          
-         <!--<util:RemoveFolderEx Id="RemoveLocationEngine" On="uninstall" Property="InstallLocationEngine"/>
-         <util:RemoveFolderEx Id="RemoveLocationUDKGame" On="uninstall" Property="InstallLocationUDKGame"/>
-         <util:RemoveFolderEx Id="RemoveMajor" On="uninstall" Property="InstallLocationBinaries"/>-->
+        
 
+         
+         
+         <util:RemoveFolderEx Id="RemoveLocationEngine" On="uninstall" Property="REGISTERKEYENGINE"/>
+         <util:RemoveFolderEx Id="RemoveLocationUDKGame" On="uninstall" Property="REGISTERKEYUDKGAME"/>
+         <util:RemoveFolderEx Id="RemoveLocationBinaries" On="uninstall" Property="REGISTERKEYBINARIES"/>
+         <RemoveFolder Id="RemoveLocationRoot" Directory="INSTALLFOLDER" On="uninstall"/>
          
        </Component> 
       </ComponentGroup>

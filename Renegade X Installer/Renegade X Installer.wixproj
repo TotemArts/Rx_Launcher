@@ -36,6 +36,9 @@
   <ItemGroup>
     <Folder Include="SetupImages" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="License.rtf" />
+  </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
