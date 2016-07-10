@@ -31,8 +31,8 @@ namespace LauncherTwo
         {
             LauncherVersion = new Version
             {
-                Name = "0.6",
-                Number = 06,
+                Name = "0.61",
+                Number = 061,
             };
         }
 

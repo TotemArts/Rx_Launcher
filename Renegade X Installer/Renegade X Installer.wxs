@@ -48,6 +48,7 @@ For blamage or help: Ask for Schmitz.
     <UI>
        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
        <UIRef Id="WixUI_InstallDir"/>
+       <ProgressText Action="InstallDirectX">Installing DirectX 9.0c</ProgressText>
     </UI>
 
     <!--Determine the custom images used in the installer-->
@@ -127,7 +128,7 @@ For blamage or help: Ask for Schmitz.
       </ComponentGroup>
     </Fragment>
 
-    <!--Fragment containing the videosthat the launcher uses-->
+    <!--Fragment containing the videos that the launcher uses-->
     <Fragment>  
       <ComponentGroup Id="PreviewVidComponents" Directory="InstallLocationPreviewVids">
         <Component Id ="PreviewVidComponent" Guid="{52C23DCC-81CD-4E12-A80B-49709267DE35}">
@@ -168,5 +169,4 @@ For blamage or help: Ask for Schmitz.
       </Component>
     </ComponentGroup> 
   </Fragment>
-  
 </Wix>

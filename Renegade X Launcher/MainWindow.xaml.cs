@@ -22,7 +22,7 @@ using RXPatchLib;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-
+using System.Diagnostics;
 
 namespace LauncherTwo
 {
@@ -132,6 +132,8 @@ namespace LauncherTwo
                 {
                     Properties.Settings.Default.Installed = false;
                     Properties.Settings.Default.Save();
+
+
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game
                     ModernDialog firstInstallDialog = new ModernDialog();
@@ -159,8 +161,7 @@ namespace LauncherTwo
                         {
 
                             VersionCheck.UpdateGameVersion();
-                            Properties.Settings.Default.Installed = true;
-                            Properties.Settings.Default.Save();
+                            //Execute the UE3Redist here
                             ShowUsernameBox();
                         }
                     }
@@ -179,7 +180,14 @@ namespace LauncherTwo
                 {
                     Properties.Settings.Default.Installed = true;
                     Properties.Settings.Default.Save();
-                    SD_Username.Content = Properties.Settings.Default.Username;
+                    if (Properties.Settings.Default.Username != "")
+                    {
+                        SD_Username.Content = Properties.Settings.Default.Username;
+                    }
+                    else
+                    {
+                        ShowUsernameBox();
+                    }
                 }
             };
 
@@ -601,7 +609,28 @@ namespace LauncherTwo
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
 
             SD_Name.Content = selected.ServerName;
-            SD_IP.Content = selected.IPWithPort;
+
+            //B0ng DDOS Protect system
+            switch (selected.IPWithPort)
+            {
+                case "95.172.92.169:7777":
+                    SD_IP.Content = "88.185.23.194:7777";
+                        break;
+                case "95.172.92.169:7778":
+                    SD_IP.Content = "88.185.23.194:7778";
+                    break;
+                case "195.154.167.80:7780":
+                    SD_IP.Content = "180.164.253.70:7777";
+                    break;
+                default:
+                    SD_IP.Content = selected.IPWithPort;
+                    break;
+            }
+
+
+            //End B0ng DDOs Protect system
+
+            
             SD_GameLength.Content = selected.TimeLimit.ToString();
             SD_MineLimit.Content = selected.MineLimit.ToString();
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
