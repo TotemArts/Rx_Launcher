@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Bundle Name="Renegade_X_Bootstrapper" Version="1.0.0.0" Manufacturer="Totem Arts" UpgradeCode="11c2e883-d372-46b7-bc4f-eb0008346c0c">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+
+		<Chain>
+      <!--Main setup package-->
+      <MsiPackage SourceFile="../Renegade X Installer/bin/Release/Renegade_X_Installer.msi"
+                      Id="mainSetup"
+                      Vital="yes"
+                      DisplayInternalUI='yes'
+                  />
+      <!--Add redists-->
+      <!--Direct x-->
+      <!-- UDK related stuff-->
+      <!-- .net 4.0-->
+      
+		</Chain>
+	</Bundle>
+</Wix>

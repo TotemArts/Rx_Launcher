@@ -1,0 +1,6 @@
+obj\Release\Bundle.wixobj
+D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\bin\Release\Renegade_X_Bootstrapper.exe
+D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\bin\Release\Renegade_X_Bootstrapper.wixpdb
+obj\Release\Renegade X Bootstrapper.wixproj.BindContentsFileList.txt
+obj\Release\Renegade X Bootstrapper.wixproj.BindOutputsFileList.txt
+obj\Release\Renegade X Bootstrapper.wixproj.BindBuiltOutputsFileList.txt
