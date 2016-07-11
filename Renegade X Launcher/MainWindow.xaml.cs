@@ -73,7 +73,7 @@ namespace LauncherTwo
 
         const string MESSAGE_INSTALL = "It looks like this is the first time you're running Renegade X or your installation is corrupted.\nDo you wish to install the game?";
         const string MESSAGE_NOT_INSTALLED = "You will not be able to play the game until the installation is finished!\nThis message will continue to appear untill installation is succesfull.";
-
+        const string MESSAGE_REDIST_INSTALL = "You will now be prompted to install the Unreal Engine dependancies.\nThis is needed for the successfull installation of Renegade X.";
 
 
         private BitmapImage chkBoxOnImg;
@@ -136,44 +136,7 @@ namespace LauncherTwo
 
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game
-                    ModernDialog firstInstallDialog = new ModernDialog();
-                    firstInstallDialog.Title = "Installation";
-                    firstInstallDialog.Content = MESSAGE_INSTALL;
-                    firstInstallDialog.Buttons = new Button[] { firstInstallDialog.YesButton, firstInstallDialog.NoButton };
-                    firstInstallDialog.ShowDialog();
-                    if (firstInstallDialog.DialogResult.Value == true)
-                    {
-                        VersionCheck.GetLatestGameVersionName();
-
-                        var targetDir = GameInstallation.GetRootPath();
-                        var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
-                        var patchUrls = VersionCheck.GamePatchUrls;
-                        var patchVersion = VersionCheck.GetLatestGameVersionName();
-
-                        var progress = new Progress<DirectoryPatcherProgressReport>();
-                        var cancellationTokenSource = new System.Threading.CancellationTokenSource();
-                        Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
-
-                        var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
-                        window.Owner = this;
-                        window.ShowDialog();
-                        if (window.DialogResult == true)
-                        {
-
-                            VersionCheck.UpdateGameVersion();
-                            //Execute the UE3Redist here
-                            ShowUsernameBox();
-                        }
-                    }
-                    else
-                    {
-                        //Show dialog that the game is not playable untill installation is completed
-                        ModernDialog notInstalledDialog = new ModernDialog();
-                        notInstalledDialog.Title = "Installation";
-                        notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
-                        notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
-                        notInstalledDialog.ShowDialog();
-                    }
+                    this.firstInstall();
                     #endregion PrimaryStartupInstallation
                 }
                 else
@@ -859,6 +822,101 @@ namespace LauncherTwo
             window.Show();
 
             
+        }
+
+        /// <summary>
+        /// Function to control the first launch install.
+        /// </summary>
+        private void firstInstall()
+        {
+            //Show the dialog that asks to install the game
+            ModernDialog firstInstallDialog = new ModernDialog();
+            firstInstallDialog.Title = "Installation";
+            firstInstallDialog.Content = MESSAGE_INSTALL;
+            firstInstallDialog.Buttons = new Button[] { firstInstallDialog.YesButton, firstInstallDialog.NoButton };
+            firstInstallDialog.ShowDialog();
+            //Check if the user wants to install
+            if (firstInstallDialog.DialogResult.Value == true)
+            {
+                VersionCheck.GetLatestGameVersionName();
+
+                //Get the current root path and prepare the installation
+                var targetDir = GameInstallation.GetRootPath();
+                var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
+                var patchUrls = VersionCheck.GamePatchUrls;
+                var patchVersion = VersionCheck.GetLatestGameVersionName();
+
+                //Create an empty var containing the progress report from the patcher
+                var progress = new Progress<DirectoryPatcherProgressReport>();
+                var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+                Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
+
+                //Create the update window
+                var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
+                window.Owner = this;
+                //Show the dialog and wait for completion
+                window.ShowDialog();
+                if (task.IsCompleted == true)
+                {
+
+                    VersionCheck.UpdateGameVersion();
+                    //Create the UE3 redist dialog
+                    ModernDialog UERedistDialog = new ModernDialog();
+                    UERedistDialog.Title = "UE3 Redistributable";
+                    UERedistDialog.Content = MESSAGE_REDIST_INSTALL;
+                    UERedistDialog.Buttons = new Button[] { UERedistDialog.OkButton, UERedistDialog.CancelButton };
+                    UERedistDialog.ShowDialog();
+
+                    if(UERedistDialog.DialogResult.Value== true)
+                    {
+                        //Execute the UE3Redist here
+                        try
+                        {
+                            using (Process UE3Redist = Process.Start(GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe"))
+                            {
+                                UE3Redist.WaitForExit();
+                                if (UE3Redist.ExitCode != 0)//If redis install fails, notify the user
+                                {
+                                    MessageBox.Show("Error while installing the UE3 Redist.");
+                                }
+                                else//Everything done! save installed flag and restart
+                                {
+                                    Properties.Settings.Default.Installed = true;
+                                    Properties.Settings.Default.Save();
+
+                                    //Restart launcher
+                                    System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                                    Application.Current.Shutdown();
+                                }
+                            }
+
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Error while executing the UE3 Redist.");
+                        }
+                        
+                    }
+                    else
+                    {
+                        ModernDialog notInstalledDialog = new ModernDialog();
+                        notInstalledDialog.Title = "UE3 Redistributable";
+                        notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
+                        notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
+                        notInstalledDialog.ShowDialog();
+                    }
+                    
+                }
+            }
+            else
+            {
+                //Show dialog that the game is not playable untill installation is completed
+                ModernDialog notInstalledDialog = new ModernDialog();
+                notInstalledDialog.Title = "Installation";
+                notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
+                notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
+                notInstalledDialog.ShowDialog();
+            }
         }
 
         

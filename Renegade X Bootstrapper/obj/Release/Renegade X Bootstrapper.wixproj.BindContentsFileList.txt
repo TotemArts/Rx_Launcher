@@ -1,4 +1,0 @@
-D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Installer\bin\Release\Renegade_X_Installer.msi
-D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\redists\dotNetFx40_Full_setup.exe
-D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\redists\directx_Jun2010_redist.exe
-D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\redists\vcredist_x86.exe

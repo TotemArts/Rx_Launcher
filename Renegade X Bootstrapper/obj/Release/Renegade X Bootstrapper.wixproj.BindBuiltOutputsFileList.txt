@@ -1,2 +1,0 @@
-D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\bin\Release\Renegade_X_Bootstrapper.exe
-D:\Renegade X Uncooked\main\Launcher_WPF\Renegade X Bootstrapper\bin\Release\Renegade_X_Bootstrapper.wixpdb
