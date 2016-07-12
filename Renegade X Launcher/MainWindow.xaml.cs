@@ -136,7 +136,7 @@ namespace LauncherTwo
 
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game
-                    this.firstInstall();
+                    this.FirstInstall();
                     #endregion PrimaryStartupInstallation
                 }
                 else
@@ -827,7 +827,7 @@ namespace LauncherTwo
         /// <summary>
         /// Function to control the first launch install.
         /// </summary>
-        private void firstInstall()
+        private async void FirstInstall()
         {
             //Show the dialog that asks to install the game
             ModernDialog firstInstallDialog = new ModernDialog();
@@ -869,6 +869,12 @@ namespace LauncherTwo
 
                     if(UERedistDialog.DialogResult.Value== true)
                     {
+                        //Download the redist from patch server
+                       /* var x = VersionCheck.GamePatchUrls;
+                        RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();//Need to solve a import issue regarding duplicate classes
+                        await Selector.SelectHostIndex(VersionCheck.GamePatchUrls);
+
+                        Task RedistDownloader = new Task(() => { });*/
                         //Execute the UE3Redist here
                         try
                         {
