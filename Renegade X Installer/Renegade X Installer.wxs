@@ -40,7 +40,6 @@ For blamage or help: Ask for Schmitz.
     <!--Determine which features are going to be installed and what component belong to that feature-->
 		<Feature Id="ProductFeature" Title="Renegade X" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="PreviewVidComponents" />  
       <ComponentGroupRef Id="StartMenuShortcut"/>
 		</Feature>
     
@@ -72,7 +71,6 @@ For blamage or help: Ask for Schmitz.
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="Renegade X">
           <Directory Id="InstallLocationLauncher" Name="Launcher">
-            <Directory Id="InstallLocationPreviewVids" Name="PreviewVids"/>
           </Directory>
           <Directory Id="InstallLocationEngine" Name="Engine"/>
           <Directory Id="InstallLocationUDKGame" Name="UDKGame"/>
@@ -127,32 +125,6 @@ For blamage or help: Ask for Schmitz.
        </Component> 
       </ComponentGroup>
     </Fragment>
-
-    <!--Fragment containing the videos that the launcher uses-->
-    <Fragment>  
-      <ComponentGroup Id="PreviewVidComponents" Directory="InstallLocationPreviewVids">
-        <Component Id ="PreviewVidComponent" Guid="{52C23DCC-81CD-4E12-A80B-49709267DE35}">
-            <File Id="filDE5FF965729966CA817755E989A336AC"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Canyon_day.wmv" />
-            <File Id="filB8F2D3D0A25E74B7FF1EE53DDF9C1489"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Canyon_Night.wmv" />
-            <File Id="filB4B9BC9B120DF2E7BCC2262D749709E3"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Eyes.wmv" />
-            <File Id="fil4357957792A39EB9F9A2DF501CF67119"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Field_Night.wmv" />
-            <File Id="fil60E31EE406BFD517C8432B59EE7659F8"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-Mesa_ii_Day.wmv" />
-            <File Id="filC7889386BDC36B2F963343E774C7118F"  Source="../Renegade X Launcher/bin/Release/PreviewVids/CNC-TrainingYard.wmv" />
-            <File Id="filAB04BBFF815B9A768D19FF26F8D4F6B5"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Complex.wmv" />
-            <File Id="fil0024C1A4C14CF1E978C34541C36090E0"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Default.wmv" />
-            <File Id="fil37C91FFAA84EEA48A06F68B2A7011FB2"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Field-Day.wmv" />
-            <File Id="fil3A9B20E4BDB01F0E4CF8F8098B1E0A0A"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Goldrush.wmv" />
-            <File Id="fil62D49C9D810867164F3385EF451B8259"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Islands.wmv" />
-            <File Id="fil37DD48CBFD5D708ABF3BAD435A46B594"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Lakeside.wmv" />
-            <File Id="filDC03B708F18285330C05C3DB8692B271"  Source="../Renegade X Launcher/bin/Release/PreviewVids/MesaII.wmv" />
-            <File Id="fil5C12BB44094BE1458C685CFEF4EA0CB1"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Under.wmv" />
-            <File Id="fil10089D54447CF18EF4E9259133E01BCA"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Volcano.wmv" />
-            <File Id="fil5C8F49521A37E3E72C3E4D9D4FE65B30"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Walls.wmv" />
-            <File Id="fil051C5FF0DD8F39443058F1B939C51977"  Source="../Renegade X Launcher/bin/Release/PreviewVids/Whiteout.wmv" />
-            <File Id="fil5FF21BCF13EECD0EED9DEEF0067F00FA"  Source="../Renegade X Launcher/bin/Release/PreviewVids/X-Mountain.wmv" />
-        </Component>  
-		  </ComponentGroup>
-	</Fragment>
 
   <!--Fragment containing the start menu shortcut-->
   <Fragment>

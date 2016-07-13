@@ -553,14 +553,14 @@ namespace LauncherTwo
 
 
             //Movie mappreview code
-            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/" + selected.MapName + ".wmv"))
+            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "../PreviewVids/" + selected.MapName + ".wmv"))
             {
                 this.DefaultMoviePlays = false;
-                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/" + selected.MapName + ".wmv");
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "../PreviewVids/" + selected.MapName + ".wmv");
             }
             else if (!this.DefaultMoviePlays)
             {
-                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/Default.wmv");
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "../PreviewVids/Default.wmv");
                 this.DefaultMoviePlays = true;
             }
 
