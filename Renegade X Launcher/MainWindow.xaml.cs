@@ -102,21 +102,7 @@ namespace LauncherTwo
 
         public MainWindow()
         {
-            
-
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
-
-            InitializeComponent();
-
-            SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
-            ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
-
-            SD_GameVersion.Content = VersionCheck.GetGameVersionName();
-
-            BannerTools.Setup();
-            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
-
-            
 
             SourceInitialized += (s, a) =>
             {
@@ -153,6 +139,16 @@ namespace LauncherTwo
                     }
                 }
             };
+            InitializeComponent();
+            
+
+            //SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
+            ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
+
+            SD_GameVersion.Content = VersionCheck.GetGameVersionName();
+
+            BannerTools.Setup();
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
 
         }
@@ -869,12 +865,24 @@ namespace LauncherTwo
 
                     if(UERedistDialog.DialogResult.Value== true)
                     {
-                        //Download the redist from patch server
-                       /* var x = VersionCheck.GamePatchUrls;
+                        //Determine which server has best ping
+                        String[] PatchUrls = VersionCheck.GamePatchUrls;
                         RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();//Need to solve a import issue regarding duplicate classes
-                        await Selector.SelectHostIndex(VersionCheck.GamePatchUrls);
+                        Task<int> SelectorTask = Selector.SelectHostIndex(VersionCheck.GamePatchUrls); //NEed to suppress the ui from showing here
+                        await SelectorTask;
+                        Uri Redistserver = new Uri(PatchUrls[SelectorTask.Result]);
 
-                        Task RedistDownloader = new Task(() => { });*/
+                        //Task for downloading the redist from patch server
+                        Task RedistDownloader = new Task(() => {
+                            System.IO.Directory.CreateDirectory(GameInstallation.GetRootPath() + "Launcher\\Redist");
+                            WebClient RedistRequest = new WebClient();
+                            String r = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
+                            string z = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
+                            RedistRequest.DownloadFile(r, z);
+                        });
+                         //Start downloading
+                        RedistDownloader.Start();
+                        await RedistDownloader;
                         //Execute the UE3Redist here
                         try
                         {
@@ -889,7 +897,15 @@ namespace LauncherTwo
                                 {
                                     Properties.Settings.Default.Installed = true;
                                     Properties.Settings.Default.Save();
-
+                                    try
+                                    {
+                                        System.IO.File.Delete(GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe");
+                                        System.IO.Directory.Delete(GameInstallation.GetRootPath() + "Launcher\\Redist\\");
+                                    }
+                                    catch (Exception)
+                                    {
+                                        MessageBox.Show("Could not cleanup the redist file. This won't hinder the game.");
+                                    }                              
                                     //Restart launcher
                                     System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
                                     Application.Current.Shutdown();
