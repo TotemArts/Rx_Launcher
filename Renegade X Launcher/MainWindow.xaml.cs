@@ -553,14 +553,14 @@ namespace LauncherTwo
 
 
             //Movie mappreview code
-            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "../PreviewVids/" + selected.MapName + ".wmv"))
+            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\" + selected.MapName + ".mp4"))
             {
                 this.DefaultMoviePlays = false;
-                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "../PreviewVids/" + selected.MapName + ".wmv");
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\" + selected.MapName + ".mp4");
             }
             else if (!this.DefaultMoviePlays)
             {
-                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "../PreviewVids/Default.wmv");
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\Default.mp4");
                 this.DefaultMoviePlays = true;
             }
 
@@ -585,8 +585,6 @@ namespace LauncherTwo
                     SD_IP.Content = selected.IPWithPort;
                     break;
             }
-
-
             //End B0ng DDOs Protect system
 
             
