@@ -15,58 +15,50 @@ namespace LauncherTwo
 {
     class MapPreviewSettings
     {
-        private static Dictionary<string, Bitmap> MapBitmaps = new Dictionary<string, Bitmap>()
+        public static string GetGameMode(string map)
         {
-           { "Walls",      Properties.Resources.___map_pic_cnc_walls       },
-           { "Lakeside",   Properties.Resources.___map_pic_cnc_lakeside    },
-           { "Field",      Properties.Resources.___map_pic_cnc_field       },
-           { "Mesa",       Properties.Resources.___map_pic_cnc_mesaii      },
-           { "Goldrush",   Properties.Resources.___map_pic_cnc_goldrush    },
-           { "Islands",    Properties.Resources.___map_pic_cnc_island      },
-           { "Volcano",    Properties.Resources.___map_pic_cnc_volcano     },
-           { "X-Mountain", Properties.Resources.___map_pic_cnc_xmountain   },
-           { "Whiteout",   Properties.Resources.___map_pic_cnc_hourglassii },
-           { "Canyon",     Properties.Resources.___map_pic_cnc_canyon      },
-           { "Complex",    Properties.Resources.___map_pic_cnc_complex     },
-           { "Under",      Properties.Resources.___map_pic_cnc_under       },
-        };
+            string[] separated = map.Split(new char[] { '-' }, 2);
+            if (separated.Length >= 1)
+                return separated[0];
 
-        private static Dictionary<string, string> MapNames = new Dictionary<string, string>()
-        {
-            { "cnc-walls_flying", "Walls"      },
-            { "cnc-lakeside",     "Lakeside"   },
-            { "cnc-field",        "Field"      },
-            { "cnc-mesa_ii",      "Mesa"       },
-            { "cnc-goldrush",     "Goldrush"   },
-            { "cnc-islands",      "Islands"    },
-            { "cnc-volcano",      "Volcano"    },
-            { "cnc-xmountain",    "X-Mountain" },
-            { "cnc-whiteout",     "Whiteout"   },
-            { "cnc-canyon",       "Canyon"     },
-            { "cnc-complex",      "Complex"    },
-            { "cnc-underredux",   "Under"      },
-        };
-
-        public static Bitmap GetMapBitmap(string mapName)
-        {
-           if (MapBitmaps.ContainsKey(mapName))
-           {
-                return MapBitmaps[mapName];
-           }
-           else
-           {
-               return null;
-           }
+            return "";
         }
 
-        public static string GetPrettyMapName(string theMap)
+        public static string StripGameMode(string map)
         {
-            string theMapLower = theMap.ToLower();
+            string[] separated = map.Split(new char[] { '-' }, 2);
+            if (separated.Length >= 2)
+                return separated[1];
 
-            if (MapNames.ContainsKey(theMapLower))
-                return MapNames[theMapLower];
-            else
-                return theMap;
+            return "";
+        }
+
+        public static string GetPrettyMapName(string map)
+        {
+            string tmp;
+            string[] separated;
+
+            map = StripGameMode(map);
+
+            separated = map.Split(new char[] { '_' });
+
+            if (separated.Length == 0)
+                return "";
+
+            map = separated[0];
+
+            for (int index = 1; index != separated.Length; ++index)
+            {
+                map += " ";
+                if (separated[index].ToLower() == "day")
+                    map += "(Day)";
+                else if (separated[index].ToLower() == "night")
+                    map += "(Night)";
+                else
+                    map += separated[index];
+            }
+
+            return map;
         }
     }
 }

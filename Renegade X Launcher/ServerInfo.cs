@@ -83,7 +83,7 @@ namespace LauncherTwo
 
                         NewServer.MapName = Data["Current Map"] ?? "Missing";
 
-                        NewServer.MapName = MapPreviewSettings.GetPrettyMapName(NewServer.MapName);
+                        NewServer.SimplifiedMapName = MapPreviewSettings.GetPrettyMapName(NewServer.MapName);
 
                         NewServer.GameVersion = Data["Game Version"] ?? "Missing";
 
@@ -191,6 +191,7 @@ namespace LauncherTwo
         // FRONT PAGE INFO
         public string ServerName { get; set; }
         public string MapName { get; set; }
+        public string SimplifiedMapName { get; set; }
         // Raw ping value
         public int Ping { get; set; }
         // Value used to sort ping in the server list
@@ -274,6 +275,7 @@ namespace LauncherTwo
         {
             ServerName = string.Empty;
             MapName = string.Empty;
+            SimplifiedMapName = string.Empty;
             PlayerCount = -1;
             Ping = -1;
             Port = -1;
