@@ -33,7 +33,7 @@ namespace LauncherTwo
     {
         public override string GetProcessArguments()
         {
-            return "server CNC-Walls_Flying.udk?game=RenX_Game.Rx_Game?dedicated=true -nosteam";
+            return "server CNC-Walls_Flying -nosteam";
         }
     }
 
@@ -80,11 +80,15 @@ namespace LauncherTwo
 
         public static EngineInstance Start(EngineInstanceStartupParameters StartupParameters)
         {
-            var ipHack  = (GameInstanceStartupParameters)StartupParameters;
-          
             var instance = new EngineInstance();
-            instance.IPEndpoint = ipHack.IPEndpoint;
-            ipHack = null;
+
+            try
+            {
+                var ipHack = (GameInstanceStartupParameters)StartupParameters;
+                instance.IPEndpoint = ipHack.IPEndpoint;
+                ipHack = null;
+            }
+            catch { };
 
             instance.StartupParameters = StartupParameters;
             instance.Task = instance.StartAsync();
