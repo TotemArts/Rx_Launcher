@@ -54,6 +54,8 @@ namespace LauncherTwo
                     map += "(Day)";
                 else if (separated[index].ToLower() == "night")
                     map += "(Night)";
+                else if (separated[index].ToLower() == "flying")
+                    map += "(Flying)";
                 else
                     map += separated[index];
             }
