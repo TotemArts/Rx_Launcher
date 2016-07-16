@@ -41,6 +41,7 @@ For blamage or help: Ask for Schmitz.
 		<Feature Id="ProductFeature" Title="Renegade X" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="StartMenuShortcut"/>
+      
 		</Feature>
     
     <!--Determine the install UI and reference (This is available in WIX itself)-->
@@ -59,6 +60,7 @@ For blamage or help: Ask for Schmitz.
     
     <!--Determine the icon seen when checking programlist-->
     <Icon Id="SetupIcon" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
+    <Icon Id="Shortcut.ico" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
     <Property Id="ARPPRODUCTICON" Value="SetupIcon" />
   </Product>
   
@@ -90,7 +92,7 @@ For blamage or help: Ask for Schmitz.
 			<!--The productcomponens contains all the main Launcher files-->
 			 <Component Id="ProductComponent" Guid="{74FC8E14-0C0B-42C8-86CF-565781E1A849}"> 
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
-          <!-- <Shortcut Id='LauncherStartmenu' Directory='DesktopFolder' Name='Renegade X Launcher' WorkingDirectory='InstallLocationLauncher' Advertise='no' />-->
+           <Shortcut Id='LauncherStartmenu' Directory='DesktopFolder' Name='Renegade X Launcher' WorkingDirectory='InstallLocationLauncher' Advertise='yes' Icon='Shortcut.ico'/>
          </File>
          <File Id="FirstFLoorDLL" Name="FirstFloor.ModernUI.dll" Source="../Renegade X Launcher/bin/Release/FirstFloor.ModernUI.dll" DiskId='1' Vital="yes"/>
          <File Id="NewtonsoftJsonDLL" Name="Newtonsoft.Json.dll" Source="../Renegade X Launcher/bin/Release/Newtonsoft.Json.dll" DiskId='1' Vital="yes"/>
@@ -113,10 +115,7 @@ For blamage or help: Ask for Schmitz.
          <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
          <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>
          
-        
-
-         
-         
+         <!--Set the delete folders on uninstall(This will delete everything in them aswell thus uninstalling the game-->
          <util:RemoveFolderEx Id="RemoveLocationEngine" On="uninstall" Property="REGISTERKEYENGINE"/>
          <util:RemoveFolderEx Id="RemoveLocationUDKGame" On="uninstall" Property="REGISTERKEYUDKGAME"/>
          <util:RemoveFolderEx Id="RemoveLocationBinaries" On="uninstall" Property="REGISTERKEYBINARIES"/>
