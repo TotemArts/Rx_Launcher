@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
 using System.Reflection;
-using System.Globalization;
+using System.Globalization;svn/svn.renegade-x.com/svn/main/Launcher_WPF/Renegade X Launcher
 using System.Net;
 using System;
 using System.Windows.Threading;
@@ -572,14 +572,23 @@ namespace LauncherTwo
             //B0ng DDOS Protect system
             switch (selected.IPWithPort)
             {
-                case "95.172.92.169:7777":
-                    SD_IP.Content = "88.185.23.194:7777";
+                case "95.172.92.169:5555":
+                    SD_IP.Content = "74.91.113.50:7777";
                         break;
-                case "95.172.92.169:7778":
-                    SD_IP.Content = "88.185.23.194:7778";
+                case "95.172.92.169:4433":
+                    SD_IP.Content = "74.91.113.50:7778";
                     break;
-                case "195.154.167.80:7780":
-                    SD_IP.Content = "180.164.253.70:7777";
+                case "195.154.167.80:5550"
+                    SD_IP.Content = "62.210.251.40:7777";
+                    break;
+				case "195.154.167.80:9876"
+                    SD_IP.Content = "62.210.251.40:7778";
+                    break;
+				case "195.154.167.80:3322"
+                    SD_IP.Content = "62.210.251.40:7779";
+                    break;
+				case "195.154.167.80:6969"
+                    SD_IP.Content = "62.210.251.40:7780";
                     break;
                 default:
                     SD_IP.Content = selected.IPWithPort;
