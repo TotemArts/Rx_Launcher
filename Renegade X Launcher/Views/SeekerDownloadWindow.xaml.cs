@@ -49,7 +49,6 @@ namespace LauncherTwo.Views
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             this.token.Cancel();
-            this.Close();
         }
 
         public void ToggleProgressBar()

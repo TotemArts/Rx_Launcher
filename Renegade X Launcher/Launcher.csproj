@@ -139,6 +139,9 @@
     <Compile Include="UpdateServerSelector.cs" />
     <Compile Include="URI.cs" />
     <Compile Include="VersionCheck.cs" />
+    <Compile Include="Views\GeneralDownloadWindow.xaml.cs">
+      <DependentUpon>GeneralDownloadWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -189,6 +192,10 @@
       <SubType>Designer</SubType>
     </DesignData>
     <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GeneralDownloadWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

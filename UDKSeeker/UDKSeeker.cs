@@ -124,7 +124,7 @@ namespace CustomContentSeeker
                     return this.GetMap(Map, ServerGUID); 
 
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     //If any failure gets detected, exit and print message
                     return Status.GeneralError;
@@ -416,12 +416,6 @@ namespace CustomContentSeeker
             }
             return returnDir;
         }
-
-
-
-
-
-
 
         /// <summary>
         /// Extracts the archive to the temp folder

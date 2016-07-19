@@ -379,7 +379,7 @@ namespace LauncherTwo
                     CustomContentSeeker.JSONRotationRetriever JSON = new CustomContentSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
                     List<CustomContentSeeker.Level> Levels = JSON.getMaps();
 
-                    //Prepare seekerwindow and shot it
+                    //Prepare seekerwindow and show it
                     SeekerDownloadWindow seekerWindow = new SeekerDownloadWindow(source);
                     seekerWindow.Show();
 
@@ -394,6 +394,11 @@ namespace LauncherTwo
                             
                             foreach (CustomContentSeeker.Level Level in Levels)
                             {
+                                if(token.IsCancellationRequested)
+                                {
+                                    currentStatus = CustomContentSeeker.UdkSeeker.Status.Cancelled;
+                                    break;
+                                }
                                 CustomContentSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Level.Name, Level.GUID);//Seek a map
                                 if (Status != CustomContentSeeker.UdkSeeker.Status.MapSucces)
                                 {
@@ -413,15 +418,22 @@ namespace LauncherTwo
 
 
                     //Create another cancellationsource for the UI task
-                    CancellationTokenSource source2 = new CancellationTokenSource();
-                    CancellationToken token2 = source2.Token;
+                    //CancellationTokenSource source2 = new CancellationTokenSource();
+                    //CancellationToken token2 = source2.Token;
                     //Task to update the statuswindow of the seeker
                     Task task2 = new Task(() =>
                     {
-                        while (!source.IsCancellationRequested && task.Status == TaskStatus.Running)
+                        while (task.Status == TaskStatus.Running)
                         {
                             seekerWindow.initProgressBar(Udkseeker.TotalAmountOfBytes);
-                            seekerWindow.Status = "Downloading: " + Udkseeker.currMap;// + " Downloaded: " + ((Udkseeker.getBytes()/1024)/1024).ToString() + "MB";
+                            if (!source.IsCancellationRequested)
+                            {
+                                seekerWindow.Status = "Downloading: " + Udkseeker.currMap;
+                            }
+                            else
+                            {
+                                seekerWindow.Status = "Cancelling...";
+                            }
                             seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
                             Thread.Sleep(1000);
                         }
@@ -432,7 +444,6 @@ namespace LauncherTwo
                     task.Start();
                     task2.Start();
 
-
                     //Wait for the seeker to finish
                     await task;
                     
@@ -442,8 +453,7 @@ namespace LauncherTwo
                     {
                         //Clean up tasks and windows
                         task.Dispose();
-                        source2.Cancel();
-                        //task2.Dispose(); <-Might be the cause of crash. Needs testing
+                        //source2.Cancel();
                         seekerWindow.Close();
 
                         seekerWindow = null;
@@ -454,10 +464,14 @@ namespace LauncherTwo
                     }
                     else//Something went wrong, ask if game needs to be started anyway
                     {
+                        if(seekerWindow.IsActive)
+                        {
+                            seekerWindow.Close();
+                        }
                         seekerWindow.ToggleProgressBar();
                         seekerWindow.Status = task.Result.ToString();
                         task.Dispose();
-                        source2.Cancel();
+                       //source2.Cancel();
 
                         string sMessageBoxText = "Not all maps have been downloaded... Launch the game anyway?";
                         string sCaption = "Renegade X Seeker";
@@ -594,7 +608,7 @@ namespace LauncherTwo
                     SD_IP.Content = selected.IPWithPort;
                     break;
             }
-            //End B0ng DDOs Protect system
+            //End B0ng DDOS Protect system
 
             
             SD_GameLength.Content = selected.TimeLimit.ToString();
@@ -883,11 +897,32 @@ namespace LauncherTwo
                         Task RedistDownloader = new Task(() => {
                             System.IO.Directory.CreateDirectory(GameInstallation.GetRootPath() + "Launcher\\Redist");
                             WebClient RedistRequest = new WebClient();
-                            String r = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
-                            string z = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
-                            RedistRequest.DownloadFile(r, z);
+                            String RedistUrl = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
+                            string SystemUrl = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
+                            RedistRequest.DownloadFile(RedistUrl, SystemUrl);
                         });
-                         //Start downloading
+
+
+
+                        //WIP making redist downloader statuswindow
+                        CancellationTokenSource RedistWindowToken = new CancellationTokenSource();
+                        GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(RedistWindowToken, "UE3Redist download", 123);
+
+                        /*Task RedistDownloadStatus = new Task(() =>
+                        {
+                            while (RedistDownloader.Status == TaskStatus.Running)
+                            {
+                                seekerWindow.initProgressBar(Udkseeker.TotalAmountOfBytes);
+                                seekerWindow.Status = "Downloading: " + Udkseeker.currMap;
+                                seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
+                                Thread.Sleep(1000);
+                            }
+                            Dispatcher.Invoke(() => this.Join_Server_Btn.IsEnabled = true);
+                        });*/
+
+                        //END WIP
+
+                        //Start downloading
                         RedistDownloader.Start();
                         await RedistDownloader;
                         //Execute the UE3Redist here

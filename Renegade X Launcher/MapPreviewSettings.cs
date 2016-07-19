@@ -35,7 +35,6 @@ namespace LauncherTwo
 
         public static string GetPrettyMapName(string map)
         {
-            string tmp;
             string[] separated;
 
             map = StripGameMode(map);
