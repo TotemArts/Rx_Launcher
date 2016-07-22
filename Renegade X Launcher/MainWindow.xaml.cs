@@ -875,7 +875,6 @@ namespace LauncherTwo
                 window.ShowDialog();
                 if (task.IsCompleted == true)
                 {
-
                     VersionCheck.UpdateGameVersion();
                     //Create the UE3 redist dialog
                     ModernDialog UERedistDialog = new ModernDialog();
@@ -892,39 +891,55 @@ namespace LauncherTwo
                         Task<int> SelectorTask = Selector.SelectHostIndex(VersionCheck.GamePatchUrls); //NEed to suppress the ui from showing here
                         await SelectorTask;
                         Uri Redistserver = new Uri(PatchUrls[SelectorTask.Result]);
+                        String RedistUrl = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
+                        string SystemUrl = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
+
+                        CancellationTokenSource downloaderTokenSource = new CancellationTokenSource();
+                        CancellationToken downloaderToken = downloaderTokenSource.Token;
 
                         //Task for downloading the redist from patch server
                         Task RedistDownloader = new Task(() => {
                             System.IO.Directory.CreateDirectory(GameInstallation.GetRootPath() + "Launcher\\Redist");
                             WebClient RedistRequest = new WebClient();
-                            String RedistUrl = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
-                            string SystemUrl = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
-                            RedistRequest.DownloadFile(RedistUrl, SystemUrl);
-                        });
-
-
-
-                        //WIP making redist downloader statuswindow
-                        CancellationTokenSource RedistWindowToken = new CancellationTokenSource();
-                        GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(RedistWindowToken, "UE3Redist download", 123);
-
-                        /*Task RedistDownloadStatus = new Task(() =>
-                        {
-                            while (RedistDownloader.Status == TaskStatus.Running)
+                            RedistRequest.DownloadFileAsync(new Uri(RedistUrl), SystemUrl);
+                            while (RedistRequest.IsBusy && !downloaderToken.IsCancellationRequested)
                             {
-                                seekerWindow.initProgressBar(Udkseeker.TotalAmountOfBytes);
-                                seekerWindow.Status = "Downloading: " + Udkseeker.currMap;
-                                seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
+                                if(downloaderToken.IsCancellationRequested)
+                                {
+                                    RedistRequest.CancelAsync();
+                                }
                                 Thread.Sleep(1000);
                             }
-                            Dispatcher.Invoke(() => this.Join_Server_Btn.IsEnabled = true);
-                        });*/
+                        }, downloaderToken);
 
-                        //END WIP
+                        //Redist downloader statuswindow
+                        GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(downloaderTokenSource, "UE3Redist download");
+                        RedistWindow.Show();
+                        Task RedistDownloadStatus = new Task(() =>
+                        {
+                            WebRequest req = System.Net.HttpWebRequest.Create(RedistUrl);
+                            req.Method = "HEAD";
+                            int ContentLength;
+                            using (WebResponse resp = req.GetResponse())
+                            {
+                                int.TryParse(resp.Headers.Get("Content-Length"), out ContentLength);
+                            }
+                            while (RedistDownloader.Status == TaskStatus.Running)
+                            {
+                                RedistWindow.initProgressBar(ContentLength);
+                                RedistWindow.Status = "Downloading UE3Redist";
+                                FileInfo inf = new FileInfo(SystemUrl);
+                                RedistWindow.updateProgressBar(inf.Length);
+                                Thread.Sleep(1000);
+                            }
+                        });
 
                         //Start downloading
                         RedistDownloader.Start();
+                        RedistDownloadStatus.Start();
                         await RedistDownloader;
+                        RedistWindow.Close();
+
                         //Execute the UE3Redist here
                         try
                         {

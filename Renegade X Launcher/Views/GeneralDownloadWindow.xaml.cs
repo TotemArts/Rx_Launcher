@@ -29,7 +29,7 @@ namespace LauncherTwo.Views
         }
 
         
-        public GeneralDownloadWindow(CancellationTokenSource token, String windowTitle, long sizeOfFile)
+        public GeneralDownloadWindow(CancellationTokenSource token, String windowTitle)
         {
             InitializeComponent();
             this.token = token;
@@ -44,7 +44,6 @@ namespace LauncherTwo.Views
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             this.token.Cancel();
-            this.Close();
         }
 
         public void ToggleProgressBar()
