@@ -41,7 +41,7 @@
                     <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
                 </Label.Foreground>
             </Label>
-            <Label x:Name="StatusLabelContent" Content="status"  FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" FontStyle="Italic">
+            <Label x:Name="StatusLabelContent" Content="Initialising download"  FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" FontStyle="Italic">
                 <Label.Foreground>
                     <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
                 </Label.Foreground>

@@ -891,9 +891,11 @@ namespace LauncherTwo
                         Task<int> SelectorTask = Selector.SelectHostIndex(VersionCheck.GamePatchUrls); //NEed to suppress the ui from showing here
                         await SelectorTask;
                         Uri Redistserver = new Uri(PatchUrls[SelectorTask.Result]);
+                        //Create new URL based on the patch url (Without the patch part)
                         String RedistUrl = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
                         string SystemUrl = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
 
+                        //Create canceltokens to stop the downloaderthread if neccesary
                         CancellationTokenSource downloaderTokenSource = new CancellationTokenSource();
                         CancellationToken downloaderToken = downloaderTokenSource.Token;
 
@@ -915,6 +917,7 @@ namespace LauncherTwo
                         //Redist downloader statuswindow
                         GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(downloaderTokenSource, "UE3Redist download");
                         RedistWindow.Show();
+                        //Task to keep the status of the UE3Redist download
                         Task RedistDownloadStatus = new Task(() =>
                         {
                             WebRequest req = System.Net.HttpWebRequest.Create(RedistUrl);
@@ -924,9 +927,9 @@ namespace LauncherTwo
                             {
                                 int.TryParse(resp.Headers.Get("Content-Length"), out ContentLength);
                             }
+                            RedistWindow.initProgressBar(ContentLength);
                             while (RedistDownloader.Status == TaskStatus.Running)
                             {
-                                RedistWindow.initProgressBar(ContentLength);
                                 RedistWindow.Status = "Downloading UE3Redist";
                                 FileInfo inf = new FileInfo(SystemUrl);
                                 RedistWindow.updateProgressBar(inf.Length);
@@ -940,13 +943,13 @@ namespace LauncherTwo
                         await RedistDownloader;
                         RedistWindow.Close();
 
-                        //Execute the UE3Redist here
+                        //When done, execute the UE3Redist here
                         try
                         {
                             using (Process UE3Redist = Process.Start(GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe"))
                             {
                                 UE3Redist.WaitForExit();
-                                if (UE3Redist.ExitCode != 0)//If redis install fails, notify the user
+                                if (UE3Redist.ExitCode != 0)//If redist install fails, notify the user
                                 {
                                     MessageBox.Show("Error while installing the UE3 Redist.");
                                 }
@@ -968,7 +971,6 @@ namespace LauncherTwo
                                     Application.Current.Shutdown();
                                 }
                             }
-
                         }
                         catch
                         {
