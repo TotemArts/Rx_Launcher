@@ -67,13 +67,17 @@ namespace LauncherTwo.Views
                 return "pending";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
             {
-                var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
-                return string.Format("{0} / ~{1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
+                //var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
+                //return string.Format("{0} / ~{1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
+                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
+                return string.Format("{0}%", perc.ToString("0.##"));
             }
             else
             {
-                var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
-                return string.Format("{0} / {1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
+                //var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
+                //return string.Format("{0} / {1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
+                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
+                return string.Format("{0}%", perc.ToString("0.##"));
             }
         }
 
@@ -230,6 +234,7 @@ namespace LauncherTwo.Views
         {
             Install,
             Update,
+            Reset,
             Verify
         }
 
@@ -259,6 +264,9 @@ namespace LauncherTwo.Views
                     break;
                 case UpdateWindowType.Verify:
                     Status = "verified";
+                    break;
+                case UpdateWindowType.Reset:
+                    Status = "reset";
                     break;
                 default:
                     Status = "updated";

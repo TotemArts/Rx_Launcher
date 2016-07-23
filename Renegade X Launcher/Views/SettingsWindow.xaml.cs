@@ -43,6 +43,8 @@ namespace LauncherTwo.Views
         }
         #endregion
 
+        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(string propertyName)
@@ -52,15 +54,14 @@ namespace LauncherTwo.Views
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
-
-
     }
 
 
     public partial class SettingsWindow : RXWindow
     {
         public Settings Settings { get; set; }
+
+        const String RESET_MESSAGE = "Are you sure you want to reset Renegade X?\nThis will revert all settings to their default.";
 
         public SettingsWindow()
         {
@@ -80,19 +81,19 @@ namespace LauncherTwo.Views
             {
                 bool succes = false;
                 succes = MovieRenamer.MovieRenamerMethod(Settings.SkipIntroMovies);
-               /* if (Properties.Settings.Default.SkipIntroMovies)//checks the current setting
-                {
-                    Properties.Settings.Default.SkipIntroMovies = true;//Changes the setting
-                    succes = MovieRenamer.MovieRenamerMethod();//Renames the movie
-                    Properties.Settings.Default.Save();//save the settings
+                /* if (Properties.Settings.Default.SkipIntroMovies)//checks the current setting
+                 {
+                     Properties.Settings.Default.SkipIntroMovies = true;//Changes the setting
+                     succes = MovieRenamer.MovieRenamerMethod();//Renames the movie
+                     Properties.Settings.Default.Save();//save the settings
 
-                }
-                else //The same in reverse
-                {
-                    Properties.Settings.Default.SkipIntroMovies = false;
-                    
-                    Properties.Settings.Default.Save();
-                }*/
+                 }
+                 else //The same in reverse
+                 {
+                     Properties.Settings.Default.SkipIntroMovies = false;
+
+                     Properties.Settings.Default.Save();
+                 }*/
             }
 
         }
@@ -113,6 +114,22 @@ namespace LauncherTwo.Views
 
         private void Verify_Click(object sender, RoutedEventArgs e)
         {
+            this.ApplyResetOrVerify(ApplyUpdateWindow.UpdateWindowType.Verify);
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult rsltMessageBox = MessageBox.Show(RESET_MESSAGE, "Reset", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (rsltMessageBox == MessageBoxResult.Yes)
+            {
+                String configFolder = System.IO.Path.Combine(GameInstallation.GetRootPath(), "UDKGame\\Config");
+                System.IO.Directory.Delete(configFolder, true);
+                this.ApplyResetOrVerify(ApplyUpdateWindow.UpdateWindowType.Reset);
+            }
+        }
+
+        private void ApplyResetOrVerify(ApplyUpdateWindow.UpdateWindowType type)
+        {
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
             var patchUrls = VersionCheck.GamePatchUrls;
@@ -122,15 +139,11 @@ namespace LauncherTwo.Views
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
             Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Verify);
+            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, type);
             window.Owner = this;
             window.ShowDialog();
 
             VersionCheck.UpdateGameVersion();
         }
     }
-
-    
-
-
 }
