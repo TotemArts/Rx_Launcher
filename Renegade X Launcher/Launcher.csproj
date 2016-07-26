@@ -119,7 +119,6 @@
     <Compile Include="BitmapToImageSourceConverter.cs" />
     <Compile Include="GameInstallation.cs" />
     <Compile Include="LaunchTools.cs" />
-    <Compile Include="MapPreviewSettings.cs" />
     <Compile Include="MovieRenamer.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

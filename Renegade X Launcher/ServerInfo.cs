@@ -19,32 +19,13 @@ namespace LauncherTwo
 {
     public class ServerInfo : INotifyPropertyChanged
     {
-        public enum SERVER_INFO_POSITIONS
+        public enum GameMode
         {
-            Server_Name = 0,
-            Server_IP = 1,
-            Bots = 2,
-            Password_Required = 3,
-            Map_Name = 4,
-            Server_Settings = 5,
-            Player_Count = 6,
-            Player_Limit = 7,
-        }
-
-
-        public enum SERVER_SETTINGS_POSTIONS
-        {
-            MaxPlayers = 0,
-            VehicleLimit = 1,
-            MineLimit = 2,
-            SpawnCreate = 3,
-            CrateRespawnTime = 4,
-            AutoBalance = 5,
-            TimeLimit = 6,
-            AllowPm = 7,
-            PmTeamOnly = 8,
-            SteamRequired = 9,
-            Version = 10
+            None,
+            Other,
+            DM,
+            CNC,
+            TS
         }
 
         /// <summary>
@@ -83,7 +64,9 @@ namespace LauncherTwo
 
                         NewServer.MapName = Data["Current Map"] ?? "Missing";
 
-                        NewServer.SimplifiedMapName = MapPreviewSettings.GetPrettyMapName(NewServer.MapName);
+                        NewServer.SimplifiedMapName = GetPrettyMapName(NewServer.MapName);
+
+                        NewServer.MapMode = GetGameMode(NewServer.MapName);
 
                         NewServer.GameVersion = Data["Game Version"] ?? "Missing";
 
@@ -159,7 +142,62 @@ namespace LauncherTwo
                 return def;
         }
 
- 
+        public static GameMode GetGameMode(string map)
+        {
+            string[] separated = map.Split(new char[] { '-' }, 2);
+
+            if (separated.Length <= 0)
+                return GameMode.None;
+
+            if (separated[0].ToUpper() == "DM")
+                return GameMode.DM;
+
+            if (separated[0].ToUpper() == "CNC")
+                return GameMode.CNC;
+
+            if (separated[0].ToUpper() == "TS")
+                return GameMode.TS;
+
+            return GameMode.Other;
+        }
+
+        public static string StripGameMode(string map)
+        {
+            string[] separated = map.Split(new char[] { '-' }, 2);
+            if (separated.Length >= 2)
+                return separated[1];
+
+            return "";
+        }
+
+        public static string GetPrettyMapName(string map)
+        {
+            string[] separated;
+
+            map = StripGameMode(map);
+
+            separated = map.Split(new char[] { '_' });
+
+            if (separated.Length == 0)
+                return "";
+
+            map = separated[0];
+
+            for (int index = 1; index != separated.Length; ++index)
+            {
+                map += " ";
+                if (separated[index].ToLower() == "day")
+                    map += "(Day)";
+                else if (separated[index].ToLower() == "night")
+                    map += "(Night)";
+                else if (separated[index].ToLower() == "flying")
+                    map += "(Flying)";
+                else
+                    map += separated[index];
+            }
+
+            return map;
+        }
 
         public async static Task PingActiveServersAsync()
         {
@@ -192,6 +230,7 @@ namespace LauncherTwo
         public string ServerName { get; set; }
         public string MapName { get; set; }
         public string SimplifiedMapName { get; set; }
+        public GameMode MapMode { get; set; }
         // Raw ping value
         public int Ping { get; set; }
         // Value used to sort ping in the server list
