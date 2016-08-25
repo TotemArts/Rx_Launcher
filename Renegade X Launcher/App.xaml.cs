@@ -19,6 +19,10 @@ namespace LauncherTwo
                         MessageBox.Show(string.Format("Failed to update the launcher (code {0}).\n\nPlease close any applications related to Renegade-X and try again.", code), "Patch failed", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
+                else if (a.StartsWith("--firstInstall"))
+                {
+                   LauncherTwo.MainWindow.FirstInstall();
+                }
             }
 
             if (LauncherTwo.Properties.Settings.Default.UpgradeRequired)
@@ -39,8 +43,12 @@ namespace LauncherTwo
                 }
             }
             */
-
-            new MainWindow().Show();
+            //If no args are present, normally start the launcher
+            if(e.Args.Length == 0)
+            {
+                new MainWindow().Show();
+            }
+            
         }
     }
 }

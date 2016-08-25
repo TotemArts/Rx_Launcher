@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Diagnostics;
+using System.Security.Permissions;
 
 namespace LauncherTwo
 {
@@ -122,7 +123,8 @@ namespace LauncherTwo
 
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game
-                    this.FirstInstall();
+                    //this.FirstInstall();
+                    this.InitFirstInstall();
                     #endregion PrimaryStartupInstallation
                 }
                 else
@@ -841,10 +843,7 @@ namespace LauncherTwo
             
         }
 
-        /// <summary>
-        /// Function to control the first launch install.
-        /// </summary>
-        private async void FirstInstall()
+        private void InitFirstInstall()
         {
             //Show the dialog that asks to install the game
             ModernDialog firstInstallDialog = new ModernDialog();
@@ -855,8 +854,32 @@ namespace LauncherTwo
             //Check if the user wants to install
             if (firstInstallDialog.DialogResult.Value == true)
             {
-                VersionCheck.GetLatestGameVersionName();
+                Uri path = new System.Uri(Assembly.GetExecutingAssembly().CodeBase);
+                ProcessStartInfo startInfo = new ProcessStartInfo(path.AbsoluteUri, "--firstInstall");
+                startInfo.Verb = "runas";
+                System.Diagnostics.Process.Start(startInfo);
+                Application.Current.Shutdown();
+            }
+            else
+            {
+                //Show dialog that the game is not playable untill installation is completed
+                ModernDialog notInstalledDialog = new ModernDialog();
+                notInstalledDialog.Title = "Installation";
+                notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
+                notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
+                notInstalledDialog.ShowDialog();
+            }
+        }
+        
 
+        /// <summary>
+        /// Function to control the first launch install.
+        /// </summary>
+        public static async void FirstInstall()
+        {
+                VersionCheck.GetLatestGameVersionName();
+                 await VersionCheck.UpdateLatestVersions();
+            /*
                 //Get the current root path and prepare the installation
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
@@ -867,13 +890,15 @@ namespace LauncherTwo
                 var progress = new Progress<DirectoryPatcherProgressReport>();
                 var cancellationTokenSource = new System.Threading.CancellationTokenSource();
                 Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
+                
 
                 //Create the update window
                 var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
-                window.Owner = this;
+                //window.Owner = this;
                 //Show the dialog and wait for completion
                 window.ShowDialog();
-                if (task.IsCompleted == true)
+                */
+            if (true)//task.IsCompleted == true)
                 {
                     VersionCheck.UpdateGameVersion();
                     //Create the UE3 redist dialog
@@ -902,7 +927,8 @@ namespace LauncherTwo
                         //Task for downloading the redist from patch server
                         Task RedistDownloader = new Task(() => {
                             System.IO.Directory.CreateDirectory(GameInstallation.GetRootPath() + "Launcher\\Redist");
-                            WebClient RedistRequest = new WebClient();
+                            System.Net.WebClient RedistRequest = new WebClient();
+                            RedistRequest.DownloadStringCompleted += RedistRequest_DownloadStringCompleted;
                             RedistRequest.DownloadFileAsync(new Uri(RedistUrl), SystemUrl);
                             while (RedistRequest.IsBusy && !downloaderToken.IsCancellationRequested)
                             {
@@ -912,6 +938,7 @@ namespace LauncherTwo
                                 }
                                 Thread.Sleep(1000);
                             }
+                            
                         }, downloaderToken);
 
                         //Redist downloader statuswindow
@@ -927,19 +954,20 @@ namespace LauncherTwo
                             {
                                 int.TryParse(resp.Headers.Get("Content-Length"), out ContentLength);
                             }
-                            RedistWindow.initProgressBar(ContentLength);
+                                                       
+                            //RedistWindow.initProgressBar(ContentLength);
                             while (RedistDownloader.Status == TaskStatus.Running)
                             {
                                 RedistWindow.Status = "Downloading UE3Redist";
                                 FileInfo inf = new FileInfo(SystemUrl);
                                 RedistWindow.updateProgressBar(inf.Length);
-                                Thread.Sleep(1000);
+                                //Thread.Sleep(1000);
                             }
                         });
 
                         //Start downloading
                         RedistDownloader.Start();
-                        RedistDownloadStatus.Start();
+                        //RedistDownloadStatus.Start();
                         await RedistDownloader;
                         RedistWindow.Close();
 
@@ -989,17 +1017,14 @@ namespace LauncherTwo
                     
                 }
             }
-            else
-            {
-                //Show dialog that the game is not playable untill installation is completed
-                ModernDialog notInstalledDialog = new ModernDialog();
-                notInstalledDialog.Title = "Installation";
-                notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
-                notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
-                notInstalledDialog.ShowDialog();
-            }
+
+        private static void RedistRequest_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
-        
+
     }
+
+    
 }

@@ -78,6 +78,7 @@ namespace LauncherTwo.Views
         public void initProgressBar(long sizeOfFile)
         {
             this.sizeOfFile = sizeOfFile;
+
             Dispatcher.Invoke(new Action(() => {
                 this.ProgressPercentage.Content = "0%";
                 this.ProgressBar.Maximum = sizeOfFile;
