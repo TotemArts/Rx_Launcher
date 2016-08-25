@@ -21,7 +21,9 @@ namespace LauncherTwo
                 }
                 else if (a.StartsWith("--firstInstall"))
                 {
-                   LauncherTwo.MainWindow.FirstInstall();
+                    Installer x = new Installer();
+                    x.Show();
+                    x.FirstInstall();
                 }
             }
 

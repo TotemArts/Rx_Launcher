@@ -875,11 +875,11 @@ namespace LauncherTwo
         /// <summary>
         /// Function to control the first launch install.
         /// </summary>
-        public static async void FirstInstall()
+        public async void FirstInstall()
         {
                 VersionCheck.GetLatestGameVersionName();
-                 await VersionCheck.UpdateLatestVersions();
-            /*
+                await VersionCheck.UpdateLatestVersions();
+            
                 //Get the current root path and prepare the installation
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
@@ -897,8 +897,8 @@ namespace LauncherTwo
                 //window.Owner = this;
                 //Show the dialog and wait for completion
                 window.ShowDialog();
-                */
-            if (true)//task.IsCompleted == true)
+                
+            if (task.IsCompleted == true)
                 {
                     VersionCheck.UpdateGameVersion();
                     //Create the UE3 redist dialog
@@ -936,14 +936,14 @@ namespace LauncherTwo
                                 {
                                     RedistRequest.CancelAsync();
                                 }
-                                Thread.Sleep(1000);
+                                //Thread.Sleep(1000);
                             }
                             
                         }, downloaderToken);
 
                         //Redist downloader statuswindow
                         GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(downloaderTokenSource, "UE3Redist download");
-                        RedistWindow.Show();
+                        //RedistWindow.Show();
                         //Task to keep the status of the UE3Redist download
                         Task RedistDownloadStatus = new Task(() =>
                         {

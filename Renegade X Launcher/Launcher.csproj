@@ -118,6 +118,9 @@
     <Compile Include="BannerTools.cs" />
     <Compile Include="BitmapToImageSourceConverter.cs" />
     <Compile Include="GameInstallation.cs" />
+    <Compile Include="Installer.xaml.cs">
+      <DependentUpon>Installer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LaunchTools.cs" />
     <Compile Include="MovieRenamer.cs" />
     <Compile Include="PingResult.cs" />
@@ -166,6 +169,10 @@
     <Compile Include="Views\UsernameWindow.xaml.cs">
       <DependentUpon>UsernameWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Installer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -321,6 +328,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Seeker.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Renegade_X_3.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
