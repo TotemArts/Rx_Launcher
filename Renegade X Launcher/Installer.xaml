@@ -8,7 +8,7 @@
         Title="Installer" Height="720" Width="1280" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="Resources/Renegade_X_3.jpg"/>
+            <ImageBrush ImageSource="Resources/Install_Back.jpg"/>
         </Grid.Background>
     </Grid>
 </Window>

@@ -3,7 +3,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartWorkingDirectory>
     </StartWorkingDirectory>
-    <StartArguments>--firstInstall</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\|E:\Users\Martin\Desktop\Launcher\</PublishUrlHistory>

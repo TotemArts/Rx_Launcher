@@ -330,7 +330,7 @@
     <Resource Include="Resources\Seeker.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Renegade_X_3.jpg" />
+    <Resource Include="Resources\Install_Back.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
