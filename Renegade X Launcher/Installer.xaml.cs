@@ -1,29 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using LauncherTwo.Views;
-using System.Windows.Media;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Animation;
-using System.Reflection;
-using System.Globalization;
 using System.Net;
 using System;
-using System.Windows.Threading;
-using System.ComponentModel;
 using FirstFloor.ModernUI.Windows.Controls;
-using System.Collections.Generic;
 using RXPatchLib;
 using System.IO;
-using System.Linq;
-using System.Net.Sockets;
 using System.Diagnostics;
-using System.Security.Permissions;
 
 namespace LauncherTwo
 {
@@ -47,9 +32,9 @@ namespace LauncherTwo
         /// </summary>
         public async void FirstInstall()
         {
-            /*VersionCheck.GetLatestGameVersionName();
+            VersionCheck.GetLatestGameVersionName();
             await VersionCheck.UpdateLatestVersions();
-
+            
             //Get the current root path and prepare the installation
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
@@ -66,9 +51,9 @@ namespace LauncherTwo
             var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
             //window.Owner = this;
             //Show the dialog and wait for completion
-            window.ShowDialog();*/
+            window.ShowDialog();
 
-            if (true) // task.IsCompleted == true)
+            if (task.IsCompleted == true)
             {
                 VersionCheck.UpdateGameVersion();
                 //Create the UE3 redist dialog
@@ -105,14 +90,14 @@ namespace LauncherTwo
                             {
                                 RedistRequest.CancelAsync();
                             }
-                            //Thread.Sleep(1000);
+                            Thread.Sleep(1000);
                         }
 
                     }, downloaderToken);
 
                     //Redist downloader statuswindow
                     GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(downloaderTokenSource, "UE3Redist download");
-                    //RedistWindow.Show();
+                    RedistWindow.Show();
                     //Task to keep the status of the UE3Redist download
                     Task RedistDownloadStatus = new Task(() =>
                     {
@@ -124,7 +109,7 @@ namespace LauncherTwo
                             int.TryParse(resp.Headers.Get("Content-Length"), out ContentLength);
                         }
 
-                        //RedistWindow.initProgressBar(ContentLength);
+                        RedistWindow.initProgressBar(ContentLength);
                         while (RedistDownloader.Status == TaskStatus.Running)
                         {
                             RedistWindow.Status = "Downloading UE3Redist";
@@ -136,7 +121,7 @@ namespace LauncherTwo
 
                     //Start downloading
                     RedistDownloader.Start();
-                    //RedistDownloadStatus.Start();
+                    RedistDownloadStatus.Start();
                     await RedistDownloader;
                     RedistWindow.Close();
 
@@ -163,15 +148,19 @@ namespace LauncherTwo
                                 {
                                     MessageBox.Show("Could not cleanup the redist file. This won't hinder the game.");
                                 }
-                                //Restart launcher
-                                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                                Application.Current.Shutdown();
+                                
                             }
                         }
                     }
                     catch
                     {
                         MessageBox.Show("Error while executing the UE3 Redist.");
+                    }
+                    finally
+                    {
+                        //Restart launcher
+                        System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                        Application.Current.Shutdown();
                     }
 
                 }
@@ -182,6 +171,9 @@ namespace LauncherTwo
                     notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
                     notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
                     notInstalledDialog.ShowDialog();
+                    //Shutdown launcher
+                    Application.Current.Shutdown();
+
                 }
 
             }

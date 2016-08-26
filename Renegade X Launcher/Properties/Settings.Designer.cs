@@ -71,15 +71,6 @@ namespace LauncherTwo.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://renegade-x.com/launcher_data/Post5002version.json")]
-        public string VersionUrl {
-            get {
-                return ((string)(this["VersionUrl"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -101,6 +92,15 @@ namespace LauncherTwo.Properties {
             }
             set {
                 this["Installed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://renegade-x.com/launcher_data/version/release.json")]
+        public string VersionUrl {
+            get {
+                return ((string)(this["VersionUrl"]));
             }
         }
     }
