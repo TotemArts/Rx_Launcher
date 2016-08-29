@@ -76,7 +76,7 @@ namespace RXPatchLib
             }
 
             await Task.WhenAll(pingTasks).ProceedIfCanceled();
-            return bestHostIndex ?? new Random().Next(hosts.Count);
+            return bestHostIndex ?? new Random().Next(hosts.Count); //This random needs to change. It can select a dead server!
         }
     }
 }
