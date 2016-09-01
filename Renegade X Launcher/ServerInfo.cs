@@ -33,6 +33,9 @@ namespace LauncherTwo
         /// </summary>
         public static List<ServerInfo> ActiveServers;
 
+
+        public static Dictionary<string, string> CountryCodeCache = new Dictionary<string, string>();
+
         /// <summary>
         /// This function will request all the server info on the RenXServers. This
         /// must be called to populate the server list. 
@@ -98,6 +101,43 @@ namespace LauncherTwo
 
                         NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
 
+                        //GET CountryCode
+                        //If the Ip is known, we can check the country.
+                        //Otherwise, assume CountryCode is missing
+                        if (NewServer.IPAddress != "Missing") 
+                        {
+                            string CountryCode;
+                            //First check the cache if we already have the current ip, this reduces the call to the api
+                            CountryCodeCache.TryGetValue(NewServer.IPAddress, out CountryCode); 
+                            //If the CountryCode was not found in the cache (null), grab it from the api
+                            //Else, use the CountryCode from the cache
+                            if (CountryCode == null)
+                            {
+                                try
+                                {
+                                    //Grab the Countrycode
+                                    string CountryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + NewServer.IPAddress);
+                                    var CountryResults = JsonConvert.DeserializeObject<dynamic>(CountryJson);
+                                    //Add to CurrentServer info and cache
+                                    NewServer.CountryCode = CountryResults["countryName"];
+                                    CountryCodeCache.Add(NewServer.IPAddress, (string)CountryResults["countryName"]);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //If the api does not respond in any way, assume CountryCode is missing
+                                    NewServer.CountryCode = "Unknown";
+                                }
+                            }
+                            else
+                            {
+                                NewServer.CountryCode = CountryCode;
+                            }
+                        }
+                        else
+                        {
+                            NewServer.CountryCode = "Unknown";
+                        }
+                        //All work done, add current serverinfo to the main list
                         NewActiveServers.Add(NewServer);
                     }
                     catch
@@ -309,6 +349,7 @@ namespace LauncherTwo
         public bool     SpawnCrates { get; set; }
         public int      CrateRespawnRate { get; set; }
         public int      TimeLimit { get; set; }
+        public string   CountryCode { get; set; }
 
         public ServerInfo()
         {
@@ -333,6 +374,7 @@ namespace LauncherTwo
             TimeLimit = -1;
             UsesBots = false;
             BotCount = -1;
+            CountryCode = string.Empty;
 
         }
 

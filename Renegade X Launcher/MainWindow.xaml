@@ -1116,9 +1116,19 @@
                                     <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
                                     <Label Content="Infantry Only" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                <StackPanel Grid.Row="5"  Orientation="Horizontal">
                                     <Label Content="Address:" Foreground="Gray"/>
                                     <Label x:Name="SD_IP" Content="" HorizontalAlignment="Center" Foreground="Gray"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="5"  Grid.Column="1" Orientation="Horizontal">
+                                    <Label Content="Country:" Foreground="Gray"/>
+                                    <Label x:Name="SD_CT" Content="" HorizontalAlignment="Center" Foreground="Gray"/> 
+
+                                    <!--<Image x:Name="SD_CT" Width="16" Height="16"  >
+                                        <Image.Source>
+                                            <CroppedBitmap x:Name="SD_CTCR" Source="D:\\Users\\Rob\\Pictures\\flags.png" SourceRect="112, 64, 16, 16" />
+                                        </Image.Source>
+                                    </Image>-->
                                 </StackPanel>
                                 <Grid x:Name="SD_VersionMismatch" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
                                     <Grid.ColumnDefinitions>

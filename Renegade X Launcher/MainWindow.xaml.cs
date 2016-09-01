@@ -29,6 +29,12 @@ namespace LauncherTwo
 {
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
+        public readonly Dictionary<string, int[]> FlagCodes = new Dictionary<string, int[]>()
+            {
+                { "FR", new[]{-112,-64}},
+                { "US", new[]{-208,-208} }
+            };
+
         private readonly string MAP_REPO_ADRESS = "ftp://launcher-repo.renegade-x.com/";
 
         public const bool SHOW_DEBUG = false;
@@ -123,7 +129,6 @@ namespace LauncherTwo
 
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game
-                    //this.FirstInstall();
                     this.InitFirstInstall();
                     #endregion PrimaryStartupInstallation
                 }
@@ -618,6 +623,11 @@ namespace LauncherTwo
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
             SD_ServerVersion.Content = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
+            SD_CT.Content = selected.CountryCode;
+            //SD_CTCR.SourceRect = new Int32Rect(208, 208, 16, 16);
+
+
+
 
             Autobalance_Checkbx.Source = GetChkBxImg(selected.AutoBalance);
             Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);
