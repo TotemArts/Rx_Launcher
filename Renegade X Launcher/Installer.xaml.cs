@@ -160,27 +160,13 @@ namespace LauncherTwo
                     }
                     finally
                     {
-                        //Need to set permission of the renegade x folder to user.
-                        //Directory.SetAccessControl(GameInstallation.GetRootPath(), null);
-                        /* System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(GameInstallation.GetRootPath());
-                         FileSystemAccessRule fsar = new FileSystemAccessRule("Users", FileSystemRights.FullControl, AccessControlType.Allow);
-                         DirectorySecurity ds = null;
-
-                         ds = di.GetAccessControl();
-                         ds.AddAccessRule(fsar);
-                         di.SetAccessControl(ds);*/
-
-                        DirectoryInfo myDirectoryInfo = new DirectoryInfo(GameInstallation.GetRootPath());
-
+                        
+                        //Set the directory ownership
+                        DirectoryInfo dirInfo = new DirectoryInfo(GameInstallation.GetRootPath());
                         var sid = new System.Security.Principal.SecurityIdentifier(System.Security.Principal.WellKnownSidType.AuthenticatedUserSid, null);
-
-                        DirectorySecurity myDirectorySecurity = myDirectoryInfo.GetAccessControl();
-
-                        myDirectorySecurity.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.FullControl, AccessControlType.Allow));
-
-                        myDirectoryInfo.SetAccessControl(myDirectorySecurity);
-
-
+                        DirectorySecurity dirRights = dirInfo.GetAccessControl();
+                        dirRights.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.FullControl, AccessControlType.Allow));                  
+                        dirInfo.SetAccessControl(dirRights);         
                         //Restart launcher
                         System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
                         Application.Current.Shutdown();
