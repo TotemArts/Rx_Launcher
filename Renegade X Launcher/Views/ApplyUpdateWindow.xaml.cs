@@ -186,6 +186,19 @@ namespace LauncherTwo.Views
                 NotifyPropertyChanged("StatusMessage");
             }
         }
+        private string _ServerMessage;
+        public string ServerMessage
+        {
+            get
+            {
+                return _ServerMessage;
+            }
+            private set
+            {
+                _ServerMessage = value;
+                NotifyPropertyChanged("ServerMessage");
+            }
+        }
         public string _TargetVersionString;
         public string TargetVersionString
         {
@@ -253,30 +266,37 @@ namespace LauncherTwo.Views
             TargetVersionString = targetVersionString;
             CancellationTokenSource = cancellationTokenSource;
             String Status = "updated";
+            String Title = "update";
 
             switch (type)
             {
                 case UpdateWindowType.Install:
                     Status = "installed";
+                    Title = "installation";
                     break;
                 case UpdateWindowType.Update:
                     Status = "updated";
+                    Title = "update";
                     break;
                 case UpdateWindowType.Verify:
                     Status = "verified";
+                    Title = "verification";
                     break;
                 case UpdateWindowType.Reset:
                     Status = "reset";
+                    Title = "reset";
                     break;
                 default:
                     Status = "updated";
+                    Title = "update";
                     break;
             }
 
             this.StatusMessage = string.Format("Please wait while Renegade X is being {0} .", Status);
-            
+            this.ServerMessage = string.Format("Downloadserver: {0} .", Status);
 
             InitializeComponent();
+            this.Title = string.Format("Renegade X {0} ", Title);
 
             DirectoryPatcherProgressReport lastReport = new DirectoryPatcherProgressReport();
             progress.ProgressChanged += (o, report) => lastReport = report;

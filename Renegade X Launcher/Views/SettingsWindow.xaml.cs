@@ -81,19 +81,6 @@ namespace LauncherTwo.Views
             {
                 bool succes = false;
                 succes = MovieRenamer.MovieRenamerMethod(Settings.SkipIntroMovies);
-                /* if (Properties.Settings.Default.SkipIntroMovies)//checks the current setting
-                 {
-                     Properties.Settings.Default.SkipIntroMovies = true;//Changes the setting
-                     succes = MovieRenamer.MovieRenamerMethod();//Renames the movie
-                     Properties.Settings.Default.Save();//save the settings
-
-                 }
-                 else //The same in reverse
-                 {
-                     Properties.Settings.Default.SkipIntroMovies = false;
-
-                     Properties.Settings.Default.Save();
-                 }*/
             }
 
         }

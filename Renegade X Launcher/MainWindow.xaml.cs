@@ -29,12 +29,14 @@ namespace LauncherTwo
 {
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
-        public readonly Dictionary<string, int[]> FlagCodes = new Dictionary<string, int[]>()
+        /*
+            NOT IMPLEMENTED
+            public readonly Dictionary<string, int[]> FlagCodes = new Dictionary<string, int[]>()
             {
                 { "FR", new[]{-112,-64}},
                 { "US", new[]{-208,-208} }
             };
-
+            */
         private readonly string MAP_REPO_ADRESS = "ftp://launcher-repo.renegade-x.com/";
 
         public const bool SHOW_DEBUG = false;
