@@ -50,7 +50,8 @@ namespace LauncherTwo
 
 
             //Create the update window
-            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
+            int index = await new UpdateServerSelector().SelectHostIndex(patchUrls);
+            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install, new Uri(patchUrls[index]).Host);
             //window.Owner = this;
             //Show the dialog and wait for completion
             window.ShowDialog();

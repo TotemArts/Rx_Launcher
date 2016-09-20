@@ -37,6 +37,7 @@ namespace RXPatchLib
             var hosts = baseUrls.Select(url => new Uri(url).Host).ToArray();
             int index = await new UpdateServerSelector().SelectHostIndex(hosts);
             var bestHost = baseUrls[index];
+            Console.WriteLine("#######HOST: {0}", bestHost);
             await ApplyPatchFromWeb(bestHost, targetPath, applicationDirPath, progress, cancellationToken);
         }
 

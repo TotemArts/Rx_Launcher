@@ -261,7 +261,7 @@ namespace LauncherTwo.Views
         /// <param name="isInstall">Is this the first install</param>
         
         
-        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
+        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type, String server = "Skynet")
         {
             TargetVersionString = targetVersionString;
             CancellationTokenSource = cancellationTokenSource;
@@ -287,13 +287,13 @@ namespace LauncherTwo.Views
                     Title = "reset";
                     break;
                 default:
-                    Status = "updated";
-                    Title = "update";
+                    Status = "modified";
+                    Title = "modification";
                     break;
             }
 
-            this.StatusMessage = string.Format("Please wait while Renegade X is being {0} .", Status);
-            this.ServerMessage = string.Format("Downloadserver: {0} .", Status);
+            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", Status);
+            this.ServerMessage = string.Format("Downloadserver: {0}", server);
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", Title);
