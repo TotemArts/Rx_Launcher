@@ -268,10 +268,10 @@ namespace CustomContentSeeker
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
                 
 
-                WebResponse response = request.GetResponse();
+                WebResponse response = request.GetResponse(); // <-- this is bugging Ryz
                 
 
-                Stream responseStream = response.GetResponseStream();
+                Stream responseStream = response.GetResponseStream();// <-- this is bugging Ryz
 
                 //Temporary directory creation
                 if (!Directory.Exists(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//"))
