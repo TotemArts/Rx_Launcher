@@ -375,6 +375,7 @@ namespace LauncherTwo
                 if (Properties.Settings.Default.UseSeeker)
                 {
                     #region Seeker
+
                     this.Join_Server_Btn.IsEnabled = false;
                     
                     
@@ -403,7 +404,7 @@ namespace LauncherTwo
                             
                             foreach (CustomContentSeeker.Level Level in Levels)
                             {
-                                if(token.IsCancellationRequested)
+                                if (token.IsCancellationRequested)
                                 {
                                     currentStatus = CustomContentSeeker.UdkSeeker.Status.Cancelled;
                                     break;
@@ -444,7 +445,7 @@ namespace LauncherTwo
                                 seekerWindow.Status = "Cancelling...";
                             }
                             seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
-                            Thread.Sleep(1000);
+                            //Thread.Sleep(1000);
                         }
                         Dispatcher.Invoke(() => this.Join_Server_Btn.IsEnabled = true);
                     });

@@ -55,6 +55,8 @@ namespace CustomContentSeeker
             this.password = password;
             //this.renXDir = "D:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
             this.renXDir = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../.." + "\\UDKGame\\CookedPC\\Maps\\RenX\\");
+            
+            
         }
 
         public long getBytes()

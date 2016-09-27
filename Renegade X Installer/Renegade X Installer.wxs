@@ -12,7 +12,7 @@ For blamage or help: Ask for Schmitz.
            Language="1033" 
            Version="0.5.6.0"
            Manufacturer="Totem Arts" 
-           UpgradeCode="{74FC8E14-0C0B-42C8-86CF-565781E1A849}">
+           UpgradeCode="{2473E6A8-A59F-434D-B871-E18AE833400C}">
     
     
     
@@ -92,7 +92,7 @@ For blamage or help: Ask for Schmitz.
     <!--Main component group with all essentional files-->
 		<ComponentGroup Id="ProductComponents" Directory="InstallLocationLauncher">
 			<!--The productcomponens contains all the main Launcher files-->
-			 <Component Id="ProductComponent" Guid="{74FC8E14-0C0B-42C8-86CF-565781E1A849}"> 
+			 <Component Id="ProductComponent" Guid="{D3FAB246-2A53-40A1-BCA4-4E1A087E6CD9}"> 
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
            <Shortcut Id='LauncherStartmenu' Directory='DesktopFolder' Name='Renegade X Launcher' WorkingDirectory='InstallLocationLauncher' Advertise='yes' Icon='Shortcut.ico'/>
          </File>
@@ -130,7 +130,7 @@ For blamage or help: Ask for Schmitz.
   <!--Fragment containing the start menu shortcut-->
   <Fragment>
     <ComponentGroup Id="StartMenuShortcut" Directory="ApplicationProgramsFolder">
-      <Component Id="ApplicationShortcut" Guid="{2DDC576A-9D02-43D9-8AC8-6D890B4780C3}">
+      <Component Id="ApplicationShortcut" Guid="{90C715B6-9160-4888-9787-4E176BABFCAD}">
         <Shortcut Id="ApplicationStartMenuShortcut"
                   Name="Renegade X Launcher"
                   Description="Launcher for Renegade X"
@@ -145,7 +145,7 @@ For blamage or help: Ask for Schmitz.
 
   <Fragment>
     <ComponentGroup Id="Permissions" Directory="INSTALLFOLDER">
-      <Component Id="INSTALLFOLDER_Permission" Guid="{2CDC576A-9D02-43D9-8AC8-6D890B4780C3}">
+      <Component Id="INSTALLFOLDER_Permission" Guid="{D005D14C-2580-4968-A25F-0297D004F647}">
             <CreateFolder>
                 <util:PermissionEx User="Users" GenericAll="yes"/>
             </CreateFolder>
