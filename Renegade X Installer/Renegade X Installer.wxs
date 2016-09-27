@@ -41,6 +41,7 @@ For blamage or help: Ask for Schmitz.
 		<Feature Id="ProductFeature" Title="Renegade X" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="StartMenuShortcut"/>
+      <ComponentGroupRef Id="Permissions"/>
       
 		</Feature>
     
@@ -72,6 +73,7 @@ For blamage or help: Ask for Schmitz.
       <Directory Id="DesktopFolder" Name="Desktop"/>
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="Renegade X">
+          <!--<util:PermissionEx User="Users" GenericAll="yes"/>-->
           <Directory Id="InstallLocationLauncher" Name="Launcher">
           </Directory>
           <Directory Id="InstallLocationEngine" Name="Engine"/>
@@ -139,5 +141,15 @@ For blamage or help: Ask for Schmitz.
         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </ComponentGroup> 
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="Permissions" Directory="INSTALLFOLDER">
+      <Component Id="INSTALLFOLDER_Permission" Guid="{2CDC576A-9D02-43D9-8AC8-6D890B4780C3}">
+            <CreateFolder>
+                <util:PermissionEx User="Users" GenericAll="yes"/>
+            </CreateFolder>
+        </Component>
+    </ComponentGroup>
   </Fragment>
 </Wix>
