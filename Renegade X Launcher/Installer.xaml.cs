@@ -160,14 +160,7 @@ namespace LauncherTwo
                         MessageBox.Show("Error while executing the UE3 Redist.");
                     }
                     finally
-                    {
-                        
-                        //Set the directory ownership
-                        DirectoryInfo dirInfo = new DirectoryInfo(GameInstallation.GetRootPath());
-                        var sid = new System.Security.Principal.SecurityIdentifier(System.Security.Principal.WellKnownSidType.AuthenticatedUserSid, null);
-                        DirectorySecurity dirRights = dirInfo.GetAccessControl();
-                        dirRights.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.FullControl, AccessControlType.Allow));                  
-                        dirInfo.SetAccessControl(dirRights);         
+                    {                             
                         //Restart launcher
                         System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
                         Application.Current.Shutdown();

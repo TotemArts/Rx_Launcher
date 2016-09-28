@@ -56,7 +56,6 @@ namespace CustomContentSeeker
             //this.renXDir = "D:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
             this.renXDir = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../.." + "\\UDKGame\\CookedPC\\Maps\\RenX\\");
             
-            
         }
 
         public long getBytes()
@@ -268,10 +267,10 @@ namespace CustomContentSeeker
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
                 
 
-                WebResponse response = request.GetResponse(); // <-- this is bugging Ryz
+                WebResponse response = request.GetResponse();
                 
 
-                Stream responseStream = response.GetResponseStream();// <-- this is bugging Ryz
+                Stream responseStream = response.GetResponseStream();
 
                 //Temporary directory creation
                 if (!Directory.Exists(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//"))
