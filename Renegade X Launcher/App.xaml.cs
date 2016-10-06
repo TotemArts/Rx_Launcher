@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Windows;
 
 namespace LauncherTwo
 {
@@ -9,14 +12,29 @@ namespace LauncherTwo
     {
         public void StartupApp(object sender, StartupEventArgs e)
         {
+            //Determine if the permissionChange is succesfull after launcher update
+            bool isGoodUpdate = false;
+
             foreach (string a in e.Args)
             {
                 if (a.StartsWith("--patch-result="))
                 {
                     string code = a.Substring("--patch-result=".Length);
+                    //If the code !=0 -> there is something wrong with the patching of the launcher
                     if (code != "0")
                     {
                         MessageBox.Show(string.Format("Failed to update the launcher (code {0}).\n\nPlease close any applications related to Renegade-X and try again.", code), "Patch failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else//Otherwise -> change folderpermissions and afterwards launch the launcher
+                    {
+                        try {
+                            SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());
+                            isGoodUpdate = true; //Set isGoodUpdate to true to indicate correct permissionChange
+                        }
+                        catch (System.Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
                     }
                 }
                 else if (a.StartsWith("--firstInstall"))
@@ -45,12 +63,66 @@ namespace LauncherTwo
                 }
             }
             */
-            //If no args are present, normally start the launcher
-            if(e.Args.Length == 0)
+            //If no args are present, or a permissionChange update was executed -> normally start the launcher
+            if (e.Args.Length == 0 || isGoodUpdate)
             {
                 new MainWindow().Show();
             }
+            else
+            {
+                Application.Current.Shutdown();
+            }
             
+        }
+
+        /// <summary>
+        /// Set the full rights permission to the usergroup of the desired folder
+        /// Made by Timothée Lecomte found on http://stackoverflow.com/questions/8944765/c-sharp-set-directory-permissions-for-all-users-in-windows-7
+        /// This almost made me throw out my pc
+        /// </summary>
+        /// <param name="path">The path of the folder you wish to get full permissions over</param>
+        static void SetFullControlPermissionsToEveryone(string path)
+        {
+            const FileSystemRights rights = FileSystemRights.FullControl;
+
+            var allUsers = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+
+            // Add Access Rule to the actual directory itself
+            var accessRule = new FileSystemAccessRule(
+                allUsers,
+                rights,
+                InheritanceFlags.None,
+                PropagationFlags.InheritOnly,
+                AccessControlType.Allow);
+
+            var info = new DirectoryInfo(path);
+            var security = info.GetAccessControl(AccessControlSections.Access);
+
+            bool result;
+            security.ModifyAccessRule(AccessControlModification.Set, accessRule, out result);
+
+            if (!result)
+            {
+                throw new System.InvalidOperationException("Failed to give full-control permission to all users for path " + path);
+            }
+
+            // add inheritance
+            var inheritedAccessRule = new FileSystemAccessRule(
+                allUsers,
+                rights,
+                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.InheritOnly,
+                AccessControlType.Allow);
+
+            bool inheritedResult;
+            security.ModifyAccessRule(AccessControlModification.Add, inheritedAccessRule, out inheritedResult);
+
+            if (!inheritedResult)
+            {
+                throw new System.InvalidOperationException("Failed to give full-control permission inheritance to all users for " + path);
+            }
+
+            info.SetAccessControl(security);
         }
     }
 }

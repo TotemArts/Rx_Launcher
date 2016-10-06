@@ -170,6 +170,7 @@ namespace LauncherTwo
 
                     Process process = new Process();
                     process.StartInfo = startInfo;
+                    process.StartInfo.Verb = "runas";
                     process.Start();
                 }
             }
