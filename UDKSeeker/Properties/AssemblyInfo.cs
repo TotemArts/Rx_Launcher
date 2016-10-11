@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("UDKSeeker")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("CustomContentSeeker")]
+[assembly: AssemblyDescription("This DLL is responsible for downloading custom maps for Renegade X")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("UDKSeeker")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Totem Arts")]
+[assembly: AssemblyProduct("Renegade X")]
+[assembly: AssemblyCopyright("Copyright ©Totem Arts  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

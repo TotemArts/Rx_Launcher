@@ -23,12 +23,25 @@ namespace CustomContentSeeker
         private String password { get; set; }
         private String renXDir { get; set; }
 
+        /// <summary>
+        /// The current map to download
+        /// </summary>
         public String currMap { get; private set; }
 
+        /// <summary>
+        /// The amount of bytes downloaded
+        /// </summary>
         public long DownloadedBytes { get; private set; }
+
+        /// <summary>
+        /// The size of the map
+        /// </summary>
         public long TotalAmountOfBytes { get; private set; }
 
-    public Status status { get; private set; }
+        /// <summary>
+        /// The current status
+        /// </summary>
+        public Status status { get; private set; }
 
         public enum Status{
             GeneralError, //General error
@@ -54,24 +67,28 @@ namespace CustomContentSeeker
             this.ftpAddress = ftpAddress;
             this.username = username;
             this.password = password;
-            //this.renXDir = "D:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
+            this.renXDir = "C:\\Program Files (x86)\\Renegade X\\UDKGame\\CookedPC\\Maps\\RenX\\"; //For Testing
             this.renXDir = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../.." + "\\UDKGame\\CookedPC\\Maps\\RenX\\");
             
         }
 
+        /// <summary>
+        /// Get the current downloaded bytes of the current map
+        /// </summary>
+        /// <returns>A long containing the downloaded bytes</returns>
         public long getBytes()
         {
             return DownloadedBytes;
         }
 
         /// <summary>
-        /// Seeks for all maps on a server
+        /// ---WIP---Seeks for all maps on a server
         /// </summary>
         /// <param name="serverAddress">The address of the server</param>
-        /// <returns></returns>
+        /// <returns>A status of the seeking process</returns>
         public Status SeekAll(String serverAddress)
         {
-            JSONRotationRetriever JSONretriever = new CustomContentSeeker.JSONRotationRetriever(serverAddress); //<-TestIP
+            JSONRotationRetriever JSONretriever = new CustomContentSeeker.JSONRotationRetriever(serverAddress);
             var Maps = JSONretriever.getMaps();
             if (Maps != null)
             {
@@ -147,21 +164,36 @@ namespace CustomContentSeeker
 
             FileStream fs = new FileStream(FilePath, FileMode.Open);
 
-            /*///EXPERIMENTAL, ONLY NEED TO REVERSE
-            BinaryReader temp1 = new BinaryReader(fs);
-            temp1.BaseStream.Position = 0x45;
-            byte[] itemSection = temp1.ReadBytes(16);
-            UInt16 hex2 = new UInt16();
-            String hex3 = "";
-            for (int index = 0; index < 16; index++)
+            //Create a binary reader
+            BinaryReader binReader = new BinaryReader(fs);
+            //Goto GUID position
+            binReader.BaseStream.Position = 0x45;
+            //Read dem bytes
+            byte[] itemSection = binReader.ReadBytes(16);
+            //Prep output Guid string
+            String output = "";
+            //Create temp outputStack for reversing the order
+            Stack<String> outputStack = new Stack<string>();
+            //Loop through the bytes
+            for (int index = 0; index <= 16; index++)
             {
-                 hex2 = BitConverter.ToUInt16(itemSection, index);
-                hex3 = BitConverter.ToString(itemSection, index, 4);
-                string output = new string(hex3.ToCharArray().Reverse().ToArray());
+                //If the 4th byte has been reached, add the stack contents to a string in reverse order (Stack) and clear it for the next batch
+                //Else just read and push the chars
+                if (index % 4 == 0 || index == 16)
+                {
+                    foreach (String str in outputStack)
+                        output += str;
+                    outputStack.Clear();
+                }
+                if (index != 16)
+                {
+                    outputStack.Push(BitConverter.ToString(itemSection, index, 1));
+                }
             }
             ////EXPERIMENTAL, ONLY NEED TO REVERSE*/
+            return output;
 
-
+            /*
             int hexIn;
 
             List<string> q = new List<string>();
@@ -173,8 +205,6 @@ namespace CustomContentSeeker
 
             for (int i = 0; (hexIn = fs.ReadByte()) != -1; i++)
             {
-                /*if(i >= 0 && i < 16)
-                    hex += string.Format("{0:X2}", hexIn);*/
                 if (i >= 0 && i < 4)
                 {
                     q.Add(string.Format("{0:X2}", hexIn));
@@ -223,6 +253,7 @@ namespace CustomContentSeeker
             }
             fs.Close();
             return total;
+            */
         }
 
 
@@ -257,26 +288,31 @@ namespace CustomContentSeeker
                 //Create ftp requests
                 FtpWebRequest request = FtpWebRequest.Create(this.ftpAddress + MapToDownload) as FtpWebRequest;
                 request.Credentials = new NetworkCredential(this.username, this.password);
+                request.KeepAlive = false;
 
                 //Get the filesize
-                request.Method = WebRequestMethods.Ftp.GetFileSize;
-                this.TotalAmountOfBytes = request.GetResponse().ContentLength;
+                request.Method = WebRequestMethods.Ftp.GetFileSize;         
+                WebResponse responseSize = request.GetResponse();
+                this.TotalAmountOfBytes = responseSize.ContentLength;
+                //Close this request
+                responseSize.Close();
+                
 
                 //reset the request and start the file download
-                request = null;
                 request = FtpWebRequest.Create(new Uri(this.ftpAddress + MapToDownload)) as FtpWebRequest;
                 request.Credentials = new NetworkCredential(this.username, this.password);
+                request.KeepAlive = false;
                 request.UseBinary = true;
-                request.UsePassive = false;
+                request.UsePassive = true;
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
 
                 //Try to make a request to download, if it fails -> return a responseError (Might help pinpoint some problems on clients)
-                WebResponse response;
+                WebResponse responseFile;
                 Stream responseStream;
                 try
                 {
-                    response = request.GetResponse();
-                    responseStream = response.GetResponseStream();
+                    responseFile = request.GetResponse();
+                    responseStream = responseFile.GetResponseStream();
                 }
                 catch
                 {
@@ -311,7 +347,7 @@ namespace CustomContentSeeker
                 newFile.Close();
                 this.status = Status.Finished;
                 //close the connection to the repository
-                response.Close();
+                responseFile.Close();
 
                 //Extract the map
                 if (this.Extract(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//tmp.rxmap"))

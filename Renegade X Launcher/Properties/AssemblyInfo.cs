@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LauncherTwo")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Renegade X Launcher")]
+[assembly: AssemblyDescription("This is the main launcher for Renegade X responsible installing and plaing the game.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LauncherTwo")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCompany("Totem Arts")]
+[assembly: AssemblyProduct("Renegade X")]
+[assembly: AssemblyCopyright("Copyright ©Totem Arts 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

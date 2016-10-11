@@ -445,7 +445,7 @@ namespace LauncherTwo
                                 seekerWindow.Status = "Cancelling...";
                             }
                             seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
-                            Thread.Sleep(100);
+                            Thread.Sleep(500);
                         }
                         Dispatcher.Invoke(() => this.Join_Server_Btn.IsEnabled = true);
                     });
