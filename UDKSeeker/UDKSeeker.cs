@@ -34,6 +34,7 @@ namespace CustomContentSeeker
             GeneralError, //General error
             MaplistError, //No maplist error
             DownloadError, //Error while downloading
+            ResponseError, //Error while connecting to Repository
             MapNotFoundError, //Map not present on repository
             ExtractError, //Extraction failed
             MapSucces, //Map downloaded and extracted succesfully
@@ -237,7 +238,7 @@ namespace CustomContentSeeker
             List<string> dirs = this.ShowDir(new Uri(this.ftpAddress));
 
 
-            //Searcher for all dirs and uses them to search for maps
+            //Searches for all dirs and uses them to search for maps
             foreach (string dir in dirs)
             {
                 if (dir != ".htaccess")
@@ -250,27 +251,38 @@ namespace CustomContentSeeker
                 }
             }
 
+            //If there is a map to download, initialize download process
             if (MapToDownload != null)
             {
+                //Create ftp requests
                 FtpWebRequest request = FtpWebRequest.Create(this.ftpAddress + MapToDownload) as FtpWebRequest;
                 request.Credentials = new NetworkCredential(this.username, this.password);
 
+                //Get the filesize
                 request.Method = WebRequestMethods.Ftp.GetFileSize;
-
                 this.TotalAmountOfBytes = request.GetResponse().ContentLength;
 
+                //reset the request and start the file download
                 request = null;
                 request = FtpWebRequest.Create(new Uri(this.ftpAddress + MapToDownload)) as FtpWebRequest;
                 request.Credentials = new NetworkCredential(this.username, this.password);
                 request.UseBinary = true;
                 request.UsePassive = false;
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
-                
 
-                WebResponse response = request.GetResponse();
+                //Try to make a request to download, if it fails -> return a responseError (Might help pinpoint some problems on clients)
+                WebResponse response;
+                Stream responseStream;
+                try
+                {
+                    response = request.GetResponse();
+                    responseStream = response.GetResponseStream();
+                }
+                catch
+                {
+                    return Status.ResponseError;
+                }
                 
-
-                Stream responseStream = response.GetResponseStream();
 
                 //Temporary directory creation
                 if (!Directory.Exists(this.renXDir + "..//..//..//..//" + "UDKSeekerTemp//"))
@@ -281,7 +293,7 @@ namespace CustomContentSeeker
                 DownloadedBytes = 0;
 
                 int bytesRead = 0;
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[2048];
 
                 this.status = Status.Downloading;
                 //Download the map
@@ -322,7 +334,7 @@ namespace CustomContentSeeker
         }
 
         /// <summary>
-        /// Show all the directories and files on a give repository path
+        /// Show all the directories and files on a given repository path
         /// </summary>
         /// <param name="FtpDir">The directory to search (e.g.: ftp://maps.com/John OR ftp://maps.com/)</param>
         /// <returns>A list with all the directories and files</returns>
