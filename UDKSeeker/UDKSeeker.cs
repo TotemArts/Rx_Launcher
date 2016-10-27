@@ -190,7 +190,8 @@ namespace CustomContentSeeker
                     outputStack.Push(BitConverter.ToString(itemSection, index, 1));
                 }
             }
-            ////EXPERIMENTAL, ONLY NEED TO REVERSE*/
+            //Close the file
+            fs.Close();
             return output;
 
             /*
