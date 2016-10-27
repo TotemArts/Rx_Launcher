@@ -191,6 +191,7 @@ namespace CustomContentSeeker
                 }
             }
             //Close the file
+            binReader.Close();
             fs.Close();
             return output;
 
