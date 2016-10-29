@@ -97,6 +97,10 @@ namespace LauncherTwo.Views
                 {
                     this.ProgressPercentage.Content = (int)currentAmount / (this.sizeOfFile / 100) + "%";
                 }
+                else if(this.sizeOfFile == currentAmount)
+                {
+                    this.ProgressPercentage.Content = "0%";
+                }
                 else
                 {
                     this.ProgressPercentage.Content = "0%";
