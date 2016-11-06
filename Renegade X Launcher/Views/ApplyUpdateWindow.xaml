@@ -33,7 +33,7 @@
     </Window.Resources>
     <StackPanel Orientation="Vertical">
         <TextBox Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="2" TextWrapping="Wrap" Text="{Binding StatusMessage, Mode=OneWay}" IsReadOnly="True" Background="Transparent" BorderThickness="0"/>
-        <TextBox Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" TextWrapping="Wrap" Text="{Binding ServerMessage, Mode=OneWay}" IsReadOnly="True" Background="Transparent" BorderThickness="0"/>
+        <TextBox Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" TextWrapping="Wrap" Text="{Binding ServerMessage, Mode=OneWay}" IsReadOnly="True" Background="Transparent" BorderThickness="0" Visibility="Collapsed"/>
         <FrameworkElement Height="10"/>
         <Grid Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}">
             <Grid>

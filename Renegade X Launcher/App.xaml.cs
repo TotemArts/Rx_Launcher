@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
@@ -37,11 +38,28 @@ namespace LauncherTwo
                         }
                     }
                 }
-                else if (a.StartsWith("--firstInstall"))
+                else if (a.StartsWith("--firstInstall")) //Init the first install
                 {
                     Installer x = new Installer();
                     x.Show();
                     x.FirstInstall();
+                }
+                else if(a.StartsWith("--UpdateGame="))//Manually opdate the game to a given URL.
+                {
+                    var targetDir = GameInstallation.GetRootPath();
+                    var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
+                    String[] patchUrls = new string[1];
+                    patchUrls[0] = a.Substring("--UpdateGame=".Length);
+                    var patchVersion = VersionCheck.GetLatestGameVersionName();
+
+                    var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
+                    var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+                    System.Threading.Tasks.Task task = new RXPatchLib.RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
+
+                    var window = new Views.ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
+                    window.ShowDialog();
+
+                    VersionCheck.UpdateGameVersion();
                 }
             }
 
