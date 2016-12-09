@@ -598,7 +598,7 @@ namespace LauncherTwo
             {
                 case "95.172.92.169:5555":
                     SD_IP.Content = "74.91.113.50:7777";
-                        break;
+                    break;
                 case "95.172.92.169:4433":
                     SD_IP.Content = "74.91.113.50:7778";
                     break;
