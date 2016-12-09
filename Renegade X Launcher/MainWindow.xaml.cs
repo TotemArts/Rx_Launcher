@@ -377,8 +377,11 @@ namespace LauncherTwo
                     #region Seeker
 
                     this.Join_Server_Btn.IsEnabled = false;
-                    
-                    
+
+                   // var x = new CustomContentSeeker.Controller(MAP_REPO_ADRESS);
+
+                   // x.SearchMaps(GetSelectedServer().IPWithPort);
+
                     //Create new cancellation token and source
                     CancellationTokenSource source = new CancellationTokenSource();
                     CancellationToken token = source.Token;

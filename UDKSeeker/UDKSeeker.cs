@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net;
 using System.IO.Compression;
+using System.ComponentModel;
 
 namespace CustomContentSeeker
 {
@@ -13,7 +14,7 @@ namespace CustomContentSeeker
     /// UdkSeeker wil seek Renegade-x maps from the given RenegadeX repository
     /// Created by Rob Smit for Renegade-x With help from Jessica James (GUID extraction)
     /// </summary>
-    public class UdkSeeker
+    public class UdkSeeker : INotifyPropertyChanged
     {
         /// <summary>
         /// All credentials and addresses
@@ -23,6 +24,8 @@ namespace CustomContentSeeker
         private String password { get; set; }
         private String renXDir { get; set; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// The current map to download
         /// </summary>
@@ -31,12 +34,44 @@ namespace CustomContentSeeker
         /// <summary>
         /// The amount of bytes downloaded
         /// </summary>
-        public long DownloadedBytes { get; private set; }
+        /// 
+        private long _DownloadedByte { get; set; }
+        public long DownloadedBytes {
+            get
+            {
+                return this._DownloadedByte;
+            }
+
+            set
+            {
+                if (value != this._DownloadedByte)
+                {
+                    this._DownloadedByte = value;
+                    NotifyPropertyChanged("DownloadedBytes");
+                }
+            }
+        }
 
         /// <summary>
         /// The size of the map
         /// </summary>
-        public long TotalAmountOfBytes { get; private set; }
+        public long _TotalAmountOfBytes { get; private set; }
+        public long TotalAmountOfBytes
+        {
+            get
+            {
+                return this._TotalAmountOfBytes;
+            }
+
+            set
+            {
+                if (value != this._TotalAmountOfBytes)
+                {
+                    this._TotalAmountOfBytes = value;
+                    NotifyPropertyChanged("TotalAmountOfBytes");
+                }
+            }
+        }
 
         /// <summary>
         /// The current status
@@ -523,6 +558,12 @@ namespace CustomContentSeeker
                 XCopy(dr.FullName, Path.Combine(dest, dr.Name), isOverwrite);
             }
         }
+
+        private void NotifyPropertyChanged(String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
 
     }

@@ -3,7 +3,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartWorkingDirectory>
     </StartWorkingDirectory>
-    <StartArguments>--UpdateGame=http://denver1.renegade-x.com/Patch5272</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\|E:\Users\Martin\Desktop\Launcher\</PublishUrlHistory>

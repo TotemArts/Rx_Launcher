@@ -26,3 +26,10 @@ D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\bin\Debug\Newtonsoft.Json.xml
 D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\bin\Debug\Newtonsoft.Json.dll
 D:\Renegade X Uncooked\main\Launcher_WPF\UDKSeeker\bin\Debug\Newtonsoft.Json.dll
 D:\RX Launcher SVN\Launcher_WPF\UDKSeeker\obj\Debug\UDKSeeker.csprojResolveAssemblyReference.cache
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\bin\Debug\CustomContentSeeker.dll
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\bin\Debug\CustomContentSeeker.pdb
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\bin\Debug\Newtonsoft.Json.dll
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\bin\Debug\Newtonsoft.Json.xml
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\obj\Debug\UDKSeeker.csprojResolveAssemblyReference.cache
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\obj\Debug\CustomContentSeeker.dll
+D:\Renegade X SVN\Launcher_WPF\UDKSeeker\obj\Debug\CustomContentSeeker.pdb
