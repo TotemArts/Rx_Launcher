@@ -86,6 +86,11 @@ namespace LauncherTwo
             {
                 new MainWindow().Show();
             }
+            /*else
+            {
+                Application.Current.Shutdown();
+            }*/
+
             
         }
 
