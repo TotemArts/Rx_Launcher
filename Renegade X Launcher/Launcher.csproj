@@ -135,6 +135,7 @@
     </Compile>
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
+    <Compile Include="ServerQueue.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TrulyObservableCollection.cs" />

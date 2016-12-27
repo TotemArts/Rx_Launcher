@@ -1053,10 +1053,17 @@
                                 <!--<Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>-->
                             </Border>
                             <Button x:Name="Join_Server_Btn" Content="Select a Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Foreground="#FFB0B0B0">
-                                <Button.Background>
+                                    <Button.Background>
                                     <SolidColorBrush Color="#5935BAFF" Opacity="0.5"/>
                                 </Button.Background>
                             </Button>
+
+                            <!--<Button x:Name="Queue_Server_Btn" Content="Queue this Server" Margin="3" Height="48" FontSize="24" Click="Queue_Server_Btn_Click" IsEnabled="True" Foreground="#FFB0B0B0">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#5935BAFF" Opacity="0.5"/>
+                                </Button.Background>
+                            </Button>-->
+
                         </StackPanel>
                     </Border>
                     <Border x:Name="Info_Bot_Border" BorderThickness="1" Grid.Row="2">

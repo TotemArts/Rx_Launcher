@@ -47,6 +47,8 @@ namespace LauncherTwo
         /// </summary>
         private Boolean DefaultMoviePlays = true;
 
+        private ServerQueue serverQueue = new ServerQueue();
+
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
         public static readonly int MAX_PLAYER_COUNT = 64;
@@ -149,6 +151,8 @@ namespace LauncherTwo
                 }
             };
             InitializeComponent();
+
+
             
 
             //SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
@@ -158,6 +162,7 @@ namespace LauncherTwo
 
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
+
 
 
         }
@@ -521,7 +526,9 @@ namespace LauncherTwo
                 }
                 else
                 {
-                    await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start game
+                    this.WindowState = WindowState.Minimized;
+                    await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start 
+                    this.WindowState = WindowState.Normal;
                 }
 
             }
@@ -767,7 +774,12 @@ namespace LauncherTwo
         private void SD_Settings_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow window = new SettingsWindow();
+            Uri previousVid = sv_MapPreviewVid.Source;
+            sv_MapPreviewVid.Source = null;
+            window.Owner = this;
             window.ShowDialog();
+            sv_MapPreviewVid.Source = previousVid;
+
         }
 
         private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
@@ -859,6 +871,9 @@ namespace LauncherTwo
             
         }
 
+        /// <summary>
+        /// Method that is responsible for initializing the first install message. If yes -> restart application as admin with "--firstInstall" parameter.
+        /// </summary>
         private void InitFirstInstall()
         {
             //Show the dialog that asks to install the game
@@ -886,6 +901,25 @@ namespace LauncherTwo
                 notInstalledDialog.ShowDialog();
             }
         }
+
+
+        //This is the non functional queue button handler.
+        //I need more info from the servers before this will become functional.
+        /*
+        private void Queue_Server_Btn_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.serverQueue.Enqueue(this.GetSelectedServer()))
+            {
+                this.Queue_Server_Btn.Content = "Dequeue from server";
+                this.Join_Server_Btn.IsEnabled = false;
+            }
+            else
+            {
+                this.Join_Server_Btn.IsEnabled = true;
+                this.Queue_Server_Btn.Content = "Queue this server";
+            }
+        }
+        */
     }
 
     
