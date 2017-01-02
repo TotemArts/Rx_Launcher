@@ -82,6 +82,10 @@
     <Reference Include="FirstFloor.ModernUI">
       <HintPath>..\packages\ModernUI.WPF.1.0.6\lib\net45\FirstFloor.ModernUI.dll</HintPath>
     </Reference>
+    <Reference Include="IrcClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\IrcClient.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -121,6 +125,7 @@
     <Compile Include="Installer.xaml.cs">
       <DependentUpon>Installer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IrcController.cs" />
     <Compile Include="LaunchTools.cs" />
     <Compile Include="MovieRenamer.cs" />
     <Compile Include="PingResult.cs" />
@@ -144,6 +149,9 @@
     <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\GeneralDownloadWindow.xaml.cs">
       <DependentUpon>GeneralDownloadWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\IrcWindow.xaml.cs">
+      <DependentUpon>IrcWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
@@ -205,6 +213,10 @@
     <Page Include="Views\GeneralDownloadWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\IrcWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -338,6 +350,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\flags.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\IrcBack.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

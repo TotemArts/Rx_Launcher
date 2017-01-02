@@ -902,6 +902,13 @@ namespace LauncherTwo
             }
         }
 
+        private void SD_LaunchIrcClient_Click(object sender, RoutedEventArgs e)
+        {
+            IrcWindow ircWindow = new IrcWindow(this.SD_Username.Content.ToString());
+            ircWindow.Owner = this;
+            ircWindow.Show();
+        }
+
 
         //This is the non functional queue button handler.
         //I need more info from the servers before this will become functional.
