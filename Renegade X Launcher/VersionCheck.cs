@@ -120,7 +120,7 @@ namespace LauncherTwo
         public static async Task UpdateLatestVersions()
         {
             try
-            {                
+            {
                 var versionJson = await new WebClient().DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
                 var versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
                 LatestLauncherVersion = new Version

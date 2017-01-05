@@ -892,7 +892,7 @@
     </Window.Resources>
 
     <!-- END RESOURCE -->
-    <Border x:Name="WindowInnerBorder" BorderBrush="#FFF7FCFF" BorderThickness="1">
+    <Border x:Name="WindowInnerBorder" BorderBrush="#000000" BorderThickness="1">
         <Border.Background>
             <ImageBrush ImageSource="Resources/rx_Background.png" Stretch="UniformToFill"/>
         </Border.Background>

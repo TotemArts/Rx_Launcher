@@ -176,7 +176,7 @@ namespace LauncherTwo
         {
             this.Client.ChannelMessage += Client_ChannelMessage;
             //client.ExceptionThrown += client_ExceptionThrown;
-            this.Client.NoticeMessage += Client_NoticeMessage;
+            //this.Client.NoticeMessage += Client_NoticeMessage;
             this.Client.OnConnect += Client_OnConnect;
             this.Client.PrivateMessage += Client_PrivateMessage;
             //this.Client.ServerMessage += Client_ServerMessage;
