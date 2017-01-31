@@ -76,7 +76,12 @@ namespace RXPatchLib
             }
 
             await Task.WhenAll(pingTasks).ProceedIfCanceled();
-            return bestHostIndex ?? new Random().Next(hosts.Count); //This random needs to change. It can select a dead server!
+            if (bestHostIndex == null)
+            {      
+                throw new Exception("Could not select a reliable downloadserver. Please try again later...");
+            }
+
+            return (int)bestHostIndex;// ?? new Random().Next(hosts.Count); //This random needs to change. It can select a dead server!
         }
     }
 }

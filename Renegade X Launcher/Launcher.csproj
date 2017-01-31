@@ -153,6 +153,9 @@
     <Compile Include="Views\IrcWindow.xaml.cs">
       <DependentUpon>IrcWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ServerSelectView.xaml.cs">
+      <DependentUpon>ServerSelectView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -215,6 +218,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\IrcWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ServerSelectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
