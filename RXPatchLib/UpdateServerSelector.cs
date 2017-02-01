@@ -24,15 +24,32 @@ namespace RXPatchLib
                 using (var ping = new Ping())
                 {
                     var reply = await ping.SendPingAsync(host, 5000, CancellationTokenSource.Token);
-                    Trace.WriteLine(string.Format("Ping to {0}: {1}.", host, reply.RoundtripTime));
-                    lock (bestHostLock)
+
+
+                    System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(new Uri("http://" + host));
+                    request.Method = "GET";
+                    System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
+                    try
                     {
-                        if (!bestHostIndex.HasValue || reply.RoundtripTime < bestHostRtt)
-                        {
-                            bestHostRtt = reply.RoundtripTime;
-                            bestHostIndex = index;
-                        }
+                        response = ((System.Net.HttpWebResponse)request.GetResponse()).StatusCode;
                     }
+                    catch
+                    {
+                        Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", host));
+                    }
+
+                    if (response == System.Net.HttpStatusCode.OK)
+                    {
+                        Trace.WriteLine(string.Format("Ping to {0}: {1}.", host, reply.RoundtripTime));
+                        lock (bestHostLock)
+                        {
+                            if (!bestHostIndex.HasValue || reply.RoundtripTime < bestHostRtt)
+                            {
+                                bestHostRtt = reply.RoundtripTime;
+                                bestHostIndex = index;
+                            }
+                        }
+                    }       
                 }
             }
             catch (PingException)
@@ -75,7 +92,7 @@ namespace RXPatchLib
                     .Forget();
             }
 
-            await Task.WhenAll(pingTasks).ProceedIfCanceled();
+            await Task.WhenAll(pingTasks).ProceedIfCanceled().CancelAfter(5000);
             if (bestHostIndex == null)
             {      
                 throw new Exception("Could not select a reliable downloadserver. Please try again later...");
