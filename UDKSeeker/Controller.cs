@@ -40,11 +40,11 @@ namespace CustomContentSeeker
 
                 foreach (CustomContentSeeker.Level level in levels)
                 {
-                    if (false)//token.IsCancellationRequested)
+                    /*if (false)//token.IsCancellationRequested)
                     {
                         currentStatus = CustomContentSeeker.UdkSeeker.Status.Cancelled;
                         break;
-                    }
+                    }*/
                     CustomContentSeeker.UdkSeeker.Status Status = this.udkseeker.Seek(level.Name, level.GUID);//Seek a map
                     if (Status != CustomContentSeeker.UdkSeeker.Status.MapSucces)
                     {

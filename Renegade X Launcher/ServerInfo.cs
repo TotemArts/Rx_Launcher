@@ -122,7 +122,7 @@ namespace LauncherTwo
                                     NewServer.CountryCode = CountryResults["countryName"];
                                     CountryCodeCache.Add(NewServer.IPAddress, (string)CountryResults["countryName"]);
                                 }
-                                catch (Exception ex)
+                                catch
                                 {
                                     //If the api does not respond in any way, assume CountryCode is missing
                                     NewServer.CountryCode = "Unknown";

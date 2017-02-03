@@ -34,7 +34,7 @@ namespace RXPatchLib
         public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
         {
             Contract.Assert(baseUrls.Length > 0);
-            var hosts = baseUrls.Select(url => new Uri(url).Host).ToArray();
+            var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
             int index = await new UpdateServerSelector().SelectHostIndex(hosts);
             var bestHost = baseUrls[index];
             Console.WriteLine("#######HOST: {0}", bestHost);
