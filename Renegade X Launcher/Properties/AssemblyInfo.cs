@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Renegade X Launcher")]
-[assembly: AssemblyDescription("This is the main launcher for Renegade X responsible installing and plaing the game.")]
+[assembly: AssemblyDescription("This is the main launcher for Renegade X responsible for installing and playing the game.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Totem Arts")]
 [assembly: AssemblyProduct("Renegade X")]
