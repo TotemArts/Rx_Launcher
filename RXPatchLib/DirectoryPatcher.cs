@@ -185,7 +185,7 @@ namespace RXPatchLib
                 ProgressCallback(Progress);
             }
 
-            public async Task StartLoading(IFilePatchAction action)
+            public async void StartLoading(IFilePatchAction action)
             {
                 var progressItem = Progress.AddItem();
                 progressItem.Total = action.PatchSize;
@@ -321,7 +321,7 @@ namespace RXPatchLib
 
             await Analyze(cancellationToken, action =>
             {
-                Task ignoreWarning = loadPhase.StartLoading(action);
+                loadPhase.StartLoading(action);
                 actions.Add(action);
             }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress));
 

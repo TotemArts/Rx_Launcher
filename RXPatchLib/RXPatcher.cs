@@ -29,6 +29,8 @@ namespace RXPatchLib
                 await patcher.ApplyPatchAsync(progress, cancellationToken);
                 DirectoryEx.DeleteContents(downloadPath);
                 DirectoryEx.DeleteContents(tempPath);
+
+                // delete backup?
             }
         }
         public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)

@@ -92,8 +92,12 @@ namespace RXPatchLib
                 });
             }
 
+            // Write instructions
             string instructionsString = JsonConvert.SerializeObject(instructions);
             File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions.json", instructionsString);
+
+            // Write SHA1 hash of instructions.json to instructions_hash.txt
+            File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt", await SHA1.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
         }
     }
 }
