@@ -228,9 +228,9 @@ namespace RXPatchLib
             PatchSource = patchSource;
         }
 
-        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback)
+        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructions_hash)
         {
-            await PatchSource.Load("instructions.json", null, cancellationToken, (done, total) => {});
+            await PatchSource.Load("instructions.json", instructions_hash, cancellationToken, (done, total) => {});
             string headerFileContents;
             using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var streamReader = new StreamReader(file, Encoding.UTF8))
@@ -309,7 +309,7 @@ namespace RXPatchLib
             progressCallback(progress);
         }
 
-        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback, CancellationToken cancellationToken)
+        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback, CancellationToken cancellationToken, string instructions_hash)
         {
             var actions = new List<IFilePatchAction>();
             var progress = new DirectoryPatcherProgressReport();
@@ -323,7 +323,7 @@ namespace RXPatchLib
             {
                 loadPhase.StartLoading(action);
                 actions.Add(action);
-            }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress));
+            }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress), instructions_hash);
 
             await loadPhase.AwaitAllTasksAndFinish();
 

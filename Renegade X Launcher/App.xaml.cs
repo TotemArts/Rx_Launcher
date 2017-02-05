@@ -54,7 +54,7 @@ namespace LauncherTwo
 
                     var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
-                    System.Threading.Tasks.Task task = new RXPatchLib.RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
+                    System.Threading.Tasks.Task task = new RXPatchLib.RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
                     var window = new Views.ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();

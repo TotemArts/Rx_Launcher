@@ -80,9 +80,10 @@ namespace RXPatchLibTest
             var instructionsJson = JsonConvert.SerializeObject(instructions);
             var instructionsFilename = Path.Combine(PatchDir.Path, "instructions.json");
             File.WriteAllText(instructionsFilename, instructionsJson);
+
             try
             {
-                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken());
+                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken(), await SHA1.GetFileHashAsync(instructionsFilename));
             }
             finally
             {

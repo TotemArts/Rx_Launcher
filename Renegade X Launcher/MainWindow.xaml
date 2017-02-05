@@ -925,7 +925,6 @@
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_JoinIPBtn" Width="50" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
                 <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchServerBtn" Width="94" Height="25" FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click"/>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchIrcClient" Width="94" Height="25" FontSize="11" Content="Launch IRC(BETA)" Click="SD_LaunchIrcClient_Click"/>
 
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchEditorBtn" Width="94" Height="25" FontSize="11" Content="Launch Editor" Click="SD_LaunchEditor_Click"/>-->
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_SettingsBtn" Width="94" Height="25" FontSize="11" Content="Settings" Click="SD_Settings_Click"/>-->

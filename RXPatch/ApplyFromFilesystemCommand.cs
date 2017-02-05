@@ -48,7 +48,7 @@ namespace RXPatch
             }
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => new RXPatcher().ApplyPatchFromFilesystem(patchDir, destinationDir, applicationDir, progress, new CancellationToken())
+                (progress) => new RXPatcher().ApplyPatchFromFilesystem(patchDir, destinationDir, applicationDir, progress, new CancellationToken(), null)
             );
 
             return 0;

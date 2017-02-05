@@ -44,7 +44,7 @@ namespace RXPatch
             }
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, new CancellationToken())
+                (progress) => new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, new CancellationToken(), null) // intentionally skipping instructions.json verification
             );
 
             return 0;

@@ -24,6 +24,7 @@ namespace LauncherTwo
         static Version LatestLauncherVersion;
         static Version LatestGameVersion;
 
+        public static string InstructionsHash;
         public static string[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
 
@@ -133,6 +134,7 @@ namespace LauncherTwo
                     Name = versionData["game"]["version_name"],
                     Number = versionData["game"]["version_number"],
                 };
+                InstructionsHash = versionData["game"]["instructions_hash"];
                 GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
                 LauncherPatchUrl = versionData["launcher"]["patch_url"];
             }
