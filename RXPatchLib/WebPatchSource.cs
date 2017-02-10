@@ -70,6 +70,10 @@ namespace RXPatchLib
                         try
                         {
                             await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
+
+                            if (hash != null && await SHA1.GetFileHashAsync(filePath) != hash)
+                                return new Exception("Download hash mismatch");
+
                             return null;
                         }
                         catch (WebException e)
