@@ -297,9 +297,9 @@ namespace LauncherTwo.Views
             var BaseURL = patcher.BaseURL;
 
             if (BaseURL == null)
-                this.ServerMessage = "Source: pending";
+                this.ServerMessage = "pending";
             else
-                this.ServerMessage = "Source: " + BaseURL;
+                this.ServerMessage = BaseURL;
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", Title);
@@ -315,7 +315,7 @@ namespace LauncherTwo.Views
                     if (BaseURL != patcher.BaseURL)
                     {
                         BaseURL = patcher.BaseURL;
-                        this.ServerMessage = "Source: " + patcher.BaseURL;
+                        this.ServerMessage = patcher.BaseURL;
                     }
 
                     ProgressReport = lastReport;

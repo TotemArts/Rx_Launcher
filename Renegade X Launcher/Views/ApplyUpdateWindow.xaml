@@ -40,6 +40,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -55,9 +56,11 @@
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="2" Content="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressStringConverter}}"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding LoadProgressWithSpeed, Converter={StaticResource PhaseProgressWithSpeedStringConverter}}"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="0"  Content="Source"  Background="Transparent" BorderThickness="0" />
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="{Binding ServerMessage, Mode=OneWay}"  Background="Transparent" BorderThickness="0" Padding="0,5,5,5"/>
             </Grid>
         </Grid>
-        <TextBox Foreground="{DynamicResource RenXFontColorBrush}" TextWrapping="Wrap" Text="{Binding ServerMessage, Mode=OneWay}" IsReadOnly="True" Background="Transparent" BorderThickness="0"/>
+        
         <Grid>
             <FrameworkElement Height="10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
