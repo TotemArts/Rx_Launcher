@@ -261,7 +261,7 @@ namespace LauncherTwo.Views
         /// <param name="isInstall">Is this the first install</param>
         
         
-        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type, String server = "Skynet")
+        public ApplyUpdateWindow(Task patchTask, RXPatcher patcher, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
         {
             TargetVersionString = targetVersionString;
             CancellationTokenSource = cancellationTokenSource;
@@ -293,7 +293,13 @@ namespace LauncherTwo.Views
             }
 
             this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", Status);
-            this.ServerMessage = string.Format("Downloadserver: {0}", server);
+
+            var BaseURL = patcher.BaseURL;
+
+            if (BaseURL == null)
+                this.ServerMessage = "Source: pending";
+            else
+                this.ServerMessage = "Source: " + BaseURL;
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", Title);
@@ -305,6 +311,13 @@ namespace LauncherTwo.Views
             {
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
+                    // URL could theoretically change at any point
+                    if (BaseURL != patcher.BaseURL)
+                    {
+                        BaseURL = patcher.BaseURL;
+                        this.ServerMessage = "Source: " + patcher.BaseURL;
+                    }
+
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;

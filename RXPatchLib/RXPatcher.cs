@@ -16,14 +16,17 @@ namespace RXPatchLib
         const string BackupSubPath = "backup";
         const string DownloadSubPath = "download"; // Note that this directory will be automatically emptied after patching.
         const string TempSubPath = "apply"; // Note that this directory will be automatically emptied after patching.
+        public string BaseURL = null;
 
         public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
+            BaseURL = baseUrl;
+
             var backupPath = CreateBackupPath(applicationDirPath);
             var downloadPath = CreateDownloadPath(applicationDirPath);
             var tempPath = CreateTempPath(applicationDirPath);
 
-            using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
+            using (var patchSource = new WebPatchSource(BaseURL, downloadPath))
             {
                 var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
                 await patcher.ApplyPatchAsync(progress, cancellationToken, instructions_hash);
@@ -32,6 +35,8 @@ namespace RXPatchLib
 
                 // delete backup?
             }
+
+            BaseURL = null;
         }
         public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {

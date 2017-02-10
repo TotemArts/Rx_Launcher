@@ -46,12 +46,13 @@ namespace LauncherTwo
             //Create an empty var containing the progress report from the patcher
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
-            Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+
+            var patcher = new RXPatcher();
+            Task task = patcher.ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
 
             //Create the update window
-            int index = await new UpdateServerSelector().SelectHostIndex(patchUrls);
-            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install, new Uri(patchUrls[index]).Host);
+            var window = new ApplyUpdateWindow(task, patcher, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
             //window.Owner = this;
             //Show the dialog and wait for completion
             window.ShowDialog();
