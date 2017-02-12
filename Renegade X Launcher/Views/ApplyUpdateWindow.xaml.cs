@@ -294,12 +294,10 @@ namespace LauncherTwo.Views
 
             this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", Status);
 
-            var BaseURL = patcher.BaseURL;
-
-            if (BaseURL == null)
+            if (patcher.BaseURL == null || patcher.BaseURL == "")
                 this.ServerMessage = "pending";
             else
-                this.ServerMessage = BaseURL;
+                this.ServerMessage = patcher.BaseURL;
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", Title);
@@ -312,11 +310,8 @@ namespace LauncherTwo.Views
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
                     // URL could theoretically change at any point
-                    if (BaseURL != patcher.BaseURL)
-                    {
-                        BaseURL = patcher.BaseURL;
+                    if (this.ServerMessage != patcher.BaseURL)
                         this.ServerMessage = patcher.BaseURL;
-                    }
 
                     ProgressReport = lastReport;
                 }
