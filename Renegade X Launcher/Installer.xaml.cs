@@ -10,6 +10,7 @@ using RXPatchLib;
 using System.IO;
 using System.Diagnostics;
 using System.Security.AccessControl;
+using System.Linq;
 
 namespace LauncherTwo
 {
@@ -70,13 +71,15 @@ namespace LauncherTwo
                 if (UERedistDialog.DialogResult.Value == true)
                 {
                     //Determine which server has best ping
-                    String[] PatchUrls = VersionCheck.GamePatchUrls;
-                    RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();//Need to solve a import issue regarding duplicate classes
-                    Task<int> SelectorTask = Selector.SelectHostIndex(VersionCheck.GamePatchUrls); //NEed to suppress the ui from showing here
-                    await SelectorTask;
-                    Uri Redistserver = new Uri(PatchUrls[SelectorTask.Result]);
+                    var PatchUrls = VersionCheck.GamePatchUrls;
+                    var hosts = PatchUrls.Select(url => new Uri(url)).ToArray();
+
+                    RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();
+                    await Selector.SelectHosts(hosts); //NEed to suppress the ui from showing here
+                    Uri RedistServer = Selector.Hosts.First();
+
                     //Create new URL based on the patch url (Without the patch part)
-                    String RedistUrl = "http://" + Redistserver.Host + "/redists/UE3Redist.exe";
+                    String RedistUrl = "http://" + RedistServer.Host + "/redists/UE3Redist.exe";
                     string SystemUrl = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
 
                     //Create canceltokens to stop the downloaderthread if neccesary

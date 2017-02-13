@@ -42,10 +42,13 @@ namespace RXPatchLib
         {
             Contract.Assert(baseUrls.Length > 0);
             var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
-            int index = await new UpdateServerSelector().SelectHostIndex(hosts);
-            var bestHost = baseUrls[index];
+
+            var selector = new UpdateServerSelector();
+            await selector.SelectHosts(hosts);
+            var bestHost = selector.Hosts.First();
+
             Console.WriteLine("#######HOST: {0}", bestHost);
-            await ApplyPatchFromWeb(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
+            await ApplyPatchFromWeb(bestHost.ToString(), targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 
         public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)

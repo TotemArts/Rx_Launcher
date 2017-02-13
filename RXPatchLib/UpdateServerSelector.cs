@@ -13,105 +13,66 @@ namespace RXPatchLib
     {
         CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        int? bestHostIndex = null;
-        long bestHostRtt = 0;
-        object bestHostLock = new object();
+        private const string TestFile = "/instructions.json"; // Change to 10kb_file after adding patch_path.
+        public Queue<Uri> Hosts;
 
-        /// <summary>
-        /// Check if the host is reachable by loading the patch subfolder
-        /// If host is reachable, ping to determine the best connection
-        /// </summary>
-        /// <param name="fullHost">An Uri containing the full host path e.g.: "http://rxp-nyc.cncirc.net/Patch5282b/"</param>
-        /// <param name="index">The index of this host in the main hostArray</param>
-        /// <returns>A task object with no usefull data other than task info</returns>
-        async Task CheckAndPingHost(Uri fullHost, int index)
-        {  
-                //Try getting a response from the desired patch folder on the host
-                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(fullHost);
-                request.Method = "GET";
-                //Default to "not found"
-                System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
-                try
-                {
-                    response = ((System.Net.HttpWebResponse)request.GetResponse()).StatusCode; //This needs to become async... For now it will do
-                }
-                catch
-                {                           
-                    Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", fullHost));
-                }
+        public async Task<bool> QueryHost(Uri InHost)
+        {
+            // Send GET request to host
+            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(InHost + TestFile);
+            request.Method = "GET";
 
-            //If host response from the desired patch folder on the host is OK
-            //Ping the host and determine the best RoundTripTime
-            //Else -> Don't use this host and don't ever set this index as the desired index
+            //Default to "not found"
+            System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
+            try
+            {
+                response = ((System.Net.HttpWebResponse) await request.GetResponseAsync()).StatusCode;
+            }
+            catch
+            {
+                Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", InHost));
+            }
+
+            // Push host to queue if valid
             if (response == System.Net.HttpStatusCode.OK)
             {
-                try
-                {
-                    using (var ping = new Ping())
-                    {
-                        var reply = await ping.SendPingAsync(fullHost.Host, 5000, CancellationTokenSource.Token);
-                        Trace.WriteLine(string.Format("Ping to {0}: {1}.", fullHost, reply.RoundtripTime));
-                        lock (bestHostLock)
-                        {
-                            if (!bestHostIndex.HasValue || reply.RoundtripTime < bestHostRtt)
-                            {
-                                bestHostRtt = reply.RoundtripTime;
-                                bestHostIndex = index;
-                            }
-                        }
-                    }
-                }
-                catch (PingException)
-                {
-                    Trace.WriteLine(string.Format("Ping to {0} failed.", fullHost));
-                }
-                catch (OperationCanceledException)
-                {
-                    Trace.WriteLine(string.Format("Ping to {0} canceled.", fullHost));
-                }
+                lock (Hosts)
+                    Hosts.Enqueue(InHost);
+
+                Trace.WriteLine("Added: " + InHost);
+
+                return true;
             }
 
+            return false;
         }
 
-        /// <summary>
-        /// Select the host with the lowest ping.
-        /// 
-        /// Allows all hosts at least 500 ms to reply. After 500 ms (earlier if possible), the best server is selected.
-        /// Allows all hosts to reply within 100 ms after the best host replied, to avoid incorrect results due to scheduling. (Somewhat pedantic.)
-        /// If no pings were received within the default system timeout, a random server is selected.
-        /// </summary>
-        /// <param name="fullHosts"></param>
-        /// <returns></returns>
-        public async Task<int> SelectHostIndex(ICollection<Uri> fullHosts)
+        public async Task SelectHosts(ICollection<Uri> InHosts)
         {
-            Contract.Assume(fullHosts.Count > 0);
+            // Safety check
+            if (InHosts.Count == 0)
+                throw new Exception("No download servers are available; please try again later.");
 
-            //If there is only one host, return index 0
-            if (fullHosts.Count == 1) 
+            // Initialize new Hosts queue
+            Hosts = new Queue<Uri>();
+
+            // Initialize query to each host
+            List<Task<bool>> tasks = InHosts.Select(host => QueryHost(host)).ToList();
+
+            // Return when we have our best host; continue populating list in background
+            while (tasks.Any())
             {
-                return 0;
+                var task = await Task.WhenAny(tasks);
+
+                // Good mirror found; return result
+                if (task.Result)
+                    return;
+
+                tasks.Remove(task);
             }
 
-            //Ping and statuscheck all Hosts and determine the best host to download from
-            Task[] pingTasks = fullHosts.Select((host, index) => CheckAndPingHost(host, index)).ToArray();
-            await Task.WhenAll(pingTasks).ProceedAfter(500);
-            foreach (var task in pingTasks)
-            {
-                task
-                    .ContinueWith((result) =>
-                    {
-                        CancellationTokenSource.CancelAfter(100);
-                    }, TaskContinuationOptions.OnlyOnRanToCompletion)
-                    .Forget();
-            }
-
-            await Task.WhenAll(pingTasks).ProceedIfCanceled().CancelAfter(5000);
-            if (bestHostIndex == null)
-            {      
-                throw new Exception("Could not select a reliable downloadserver. Please try again later...");
-            }
-
-            return (int)bestHostIndex;// ?? new Random().Next(hosts.Count); //This random needs to change. It can select a dead server!
+            // No host found; throw exception
+            throw new Exception("Could not select a reliable download server. Please try again later.");
         }
     }
 }
