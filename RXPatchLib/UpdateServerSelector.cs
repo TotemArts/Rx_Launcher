@@ -13,7 +13,7 @@ namespace RXPatchLib
     {
         CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        private const string TestFile = "/instructions.json"; // Change to 10kb_file after adding patch_path.
+        private const string TestFile = "10kb_file";
         public Queue<Uri> Hosts;
 
         public async Task<bool> QueryHost(Uri InHost)

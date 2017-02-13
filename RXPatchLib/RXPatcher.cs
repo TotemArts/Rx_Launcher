@@ -38,7 +38,7 @@ namespace RXPatchLib
 
             BaseURL = null;
         }
-        public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+        public async Task ApplyPatchFromWeb(string[] baseUrls, string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
             Contract.Assert(baseUrls.Length > 0);
             var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
@@ -48,7 +48,7 @@ namespace RXPatchLib
             var bestHost = selector.Hosts.First();
 
             Console.WriteLine("#######HOST: {0}", bestHost);
-            await ApplyPatchFromWeb(bestHost.ToString(), targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
+            await ApplyPatchFromWeb(bestHost.ToString() + patchPath, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 
         public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)

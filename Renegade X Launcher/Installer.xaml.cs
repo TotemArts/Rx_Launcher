@@ -41,6 +41,7 @@ namespace LauncherTwo
             //Get the current root path and prepare the installation
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
+            var patchPath = VersionCheck.GamePatchPath;
             var patchUrls = VersionCheck.GamePatchUrls;
             var patchVersion = VersionCheck.GetLatestGameVersionName();
 
@@ -49,7 +50,7 @@ namespace LauncherTwo
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
             var patcher = new RXPatcher();
-            Task task = patcher.ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+            Task task = patcher.ApplyPatchFromWeb(patchUrls, patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
 
             //Create the update window
@@ -79,7 +80,7 @@ namespace LauncherTwo
                     Uri RedistServer = Selector.Hosts.First();
 
                     //Create new URL based on the patch url (Without the patch part)
-                    String RedistUrl = "http://" + RedistServer.Host + "/redists/UE3Redist.exe";
+                    String RedistUrl = RedistServer.Host + "/redists/UE3Redist.exe";
                     string SystemUrl = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
 
                     //Create canceltokens to stop the downloaderthread if neccesary

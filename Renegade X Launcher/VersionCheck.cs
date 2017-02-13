@@ -25,6 +25,7 @@ namespace LauncherTwo
         static Version LatestGameVersion;
 
         public static string InstructionsHash;
+        public static string GamePatchPath = null;
         public static string[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
 
@@ -32,7 +33,7 @@ namespace LauncherTwo
         {
             LauncherVersion = new Version
             {
-                Name = "0.70-dev",
+                Name = "0.70",
                 Number = 070,
             };
         }
@@ -124,19 +125,24 @@ namespace LauncherTwo
             {
                 var versionJson = await new WebClient().DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
                 var versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
+
+                // Launcher
                 LatestLauncherVersion = new Version
                 {
                     Name = versionData["launcher"]["version_name"],
                     Number = versionData["launcher"]["version_number"],
                 };
+                LauncherPatchUrl = versionData["launcher"]["patch_url"];
+
+                // Game
                 LatestGameVersion = new Version
                 {
                     Name = versionData["game"]["version_name"],
                     Number = versionData["game"]["version_number"],
                 };
                 InstructionsHash = versionData["game"]["instructions_hash"];
+                GamePatchPath = versionData["game"]["patch_path"];
                 GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
-                LauncherPatchUrl = versionData["launcher"]["patch_url"];
             }
             catch
             {

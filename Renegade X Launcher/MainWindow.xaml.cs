@@ -235,6 +235,7 @@ namespace LauncherTwo
             {
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
+                var patchPath = VersionCheck.GamePatchPath;
                 var patchUrls = VersionCheck.GamePatchUrls;
                 var patchVersion = VersionCheck.GetLatestGameVersionName();
 
@@ -242,7 +243,7 @@ namespace LauncherTwo
                 var cancellationTokenSource = new CancellationTokenSource();
 
                 var patcher = new RXPatcher();
-                Task task = patcher.ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+                Task task = patcher.ApplyPatchFromWeb(patchUrls, patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
                 var window = new ApplyUpdateWindow(task, patcher, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
                 window.Owner = this;

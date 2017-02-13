@@ -48,15 +48,14 @@ namespace LauncherTwo
                 {
                     var targetDir = GameInstallation.GetRootPath();
                     var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
-                    String[] patchUrls = new string[1];
-                    patchUrls[0] = a.Substring("--UpdateGame=".Length);
+                    String patchUrl = a.Substring("--UpdateGame=".Length);
                     var patchVersion = VersionCheck.GetLatestGameVersionName();
 
                     var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
                     var patcher = new RXPatchLib.RXPatcher();
-                    System.Threading.Tasks.Task task = patcher.ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
+                    System.Threading.Tasks.Task task = patcher.ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
                     var window = new Views.ApplyUpdateWindow(task, patcher, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();
