@@ -311,7 +311,12 @@ namespace LauncherTwo.Views
                 {
                     // URL could theoretically change at any point
                     if (this.ServerMessage != patcher.BaseURL)
-                        this.ServerMessage = patcher.BaseURL;
+                    {
+                        if (patcher.BaseURL == null)
+                            this.ServerMessage = "pending";
+                        else
+                            this.ServerMessage = patcher.BaseURL;
+                    }
 
                     ProgressReport = lastReport;
                 }

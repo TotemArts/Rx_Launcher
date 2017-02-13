@@ -62,6 +62,8 @@ namespace RXPatchLib
                     progressCallback(args.BytesReceived, args.TotalBytesToReceive);
                 };
 
+                new_host_selected:
+
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     RetryStrategy retryStrategy = new RetryStrategy();
@@ -88,16 +90,12 @@ namespace RXPatchLib
                     }
                     catch (TooManyRetriesException)
                     {
-                        // Try the next best host
-                        try
-                        {
-                            Patcher.PopHost();
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            // No other hosts remain
+                        // Try the next best host; throw an exception if there is none
+                        if (Patcher.PopHost() == null)
                             throw new Exception("No valid mirrors are available; please check your network connection or try again later.");
-                        }
+
+                        // Proceed execution with next mirror
+                        goto new_host_selected;
                     }
                 }
             }

@@ -63,12 +63,11 @@ namespace RXPatchLib
             while (tasks.Any())
             {
                 var task = await Task.WhenAny(tasks);
+                tasks.Remove(task);
 
                 // Good mirror found; return result
                 if (task.Result)
                     return;
-
-                tasks.Remove(task);
             }
 
             // No host found; throw exception

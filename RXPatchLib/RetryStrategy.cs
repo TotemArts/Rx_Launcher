@@ -17,9 +17,9 @@ namespace RXPatchLib
         }
 
         ITimeProvider TimeProvider;
-        TimeSpan TestIntervalLength = new TimeSpan(0, 0, 40);
-        int MaxExceptionsInInterval = 3;
-        TimeSpan DelayAfterException = new TimeSpan(0, 0, 4);
+        TimeSpan TestIntervalLength = new TimeSpan(0, 0, 60);
+        int MaxExceptionsInInterval = 2;
+        TimeSpan DelayAfterException = new TimeSpan(0, 0, 2);
 
         public RetryStrategy(ITimeProvider timeProvider = null)
         {

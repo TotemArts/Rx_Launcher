@@ -19,6 +19,7 @@ namespace RXPatchLib
 
         public UpdateServerSelector Selector = null;
         public string BaseURL = null;
+        public string WebPatchPath = null;
 
         public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
@@ -42,6 +43,7 @@ namespace RXPatchLib
         public async Task ApplyPatchFromWeb(string[] baseUrls, string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
             Contract.Assert(baseUrls.Length > 0);
+            WebPatchPath = patchPath;
             var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
 
             Selector = new UpdateServerSelector();
@@ -52,7 +54,7 @@ namespace RXPatchLib
                 bestHost = Selector.Hosts.Dequeue().ToString();
 
             Console.WriteLine("#######HOST: {0}", bestHost);
-            await ApplyPatchFromWeb(bestHost + patchPath, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
+            await ApplyPatchFromWeb(bestHost + WebPatchPath, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 
         public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
@@ -65,18 +67,17 @@ namespace RXPatchLib
             await patcher.ApplyPatchAsync(progress, cancellationToken, instructions_hash);
         }
 
-        public void PopHost()
+        public string PopHost()
         {
-            // Check if we ever used a Selector
-            if (Selector == null)
-            {
-                BaseURL = null;
-                throw new InvalidOperationException();
-            }
+            BaseURL = null;
 
             // Lock Hosts queue and dequeue next host to BaseURL.
-            lock (Selector.Hosts)
-                BaseURL = Selector.Hosts.Dequeue().ToString();
+            if (Selector != null && Selector.Hosts.Count != 0)
+                lock (Selector.Hosts)
+                    BaseURL = Selector.Hosts.Dequeue().ToString() + WebPatchPath;
+
+            // Lock Hosts queue and dequeue next host to BaseURL.
+            return BaseURL;
         }
 
         private static string CreateBackupPath(string applicationDirPath)
