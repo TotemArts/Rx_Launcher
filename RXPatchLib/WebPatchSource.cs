@@ -13,12 +13,12 @@ namespace RXPatchLib
     class WebPatchSource : IPatchSource, IDisposable
     {
         Dictionary<string, Task> LoadTasks = new Dictionary<string, Task>();
-        string BaseUrl;
+        RXPatcher Patcher;
         string DownloadPath;
 
-        public WebPatchSource(string baseUrl, string downloadPath)
+        public WebPatchSource(RXPatcher patcher, string downloadPath)
         {
-            BaseUrl = baseUrl;
+            Patcher = patcher;
             DownloadPath = downloadPath;
         }
 
@@ -65,23 +65,40 @@ namespace RXPatchLib
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     RetryStrategy retryStrategy = new RetryStrategy();
-                    await retryStrategy.Run(async () =>
+
+                    try
                     {
+                        await retryStrategy.Run(async () =>
+                        {
+                            try
+                            {
+                                await webClient.DownloadFileTaskAsync(new Uri(Patcher.BaseURL + "/" + subPath), filePath);
+
+                                if (hash != null && await SHA1.GetFileHashAsync(filePath) != hash)
+                                    return new Exception("Download hash mismatch");
+
+                                return null;
+                            }
+                            catch (WebException e)
+                            {
+                                cancellationToken.ThrowIfCancellationRequested();
+                                return e;
+                            }
+                        });
+                    }
+                    catch (TooManyRetriesException)
+                    {
+                        // Try the next best host
                         try
                         {
-                            await webClient.DownloadFileTaskAsync(new Uri(BaseUrl + "/" + subPath), filePath);
-
-                            if (hash != null && await SHA1.GetFileHashAsync(filePath) != hash)
-                                return new Exception("Download hash mismatch");
-
-                            return null;
+                            Patcher.PopHost();
                         }
-                        catch (WebException e)
+                        catch (InvalidOperationException)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            return e;
+                            // No other hosts remain
+                            throw new Exception("No valid mirrors are available; please check your network connection or try again later.");
                         }
-                    });
+                    }
                 }
             }
             /* TODO
