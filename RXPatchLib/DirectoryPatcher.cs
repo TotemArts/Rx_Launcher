@@ -63,19 +63,21 @@ namespace RXPatchLib
         private DirectoryPatcher DirectoryPatcher;
         private string SubPath;
         private string PatchSubPath;
+        private string Hash;
         public long PatchSize { get; private set; }
 
-        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long patchSize)
+        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long patchSize, string hash)
         {
             DirectoryPatcher = directoryPatcher;
             SubPath = subPath;
             PatchSubPath = patchSubPath;
+            Hash = hash;
             PatchSize = patchSize;
         }
 
         public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
-            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, Hash, cancellationToken, progressCallback);
         }
 
         public async Task Execute()
@@ -83,8 +85,12 @@ namespace RXPatchLib
             string tempPath = DirectoryPatcher.GetTempPath(SubPath);
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string patchPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
+
+            // Ensure the temp directory exists, and generate the new file based on the old file and the delta
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
             await DirectoryPatcher.FilePatcher.ApplyPatchAsync(targetPath, tempPath, patchPath);
+
+            // Delete the old file and move the new one into place
             File.Delete(targetPath);
             File.Move(tempPath, targetPath);
         }
@@ -96,20 +102,22 @@ namespace RXPatchLib
         private string SubPath;
         private string PatchSubPath;
         private bool NeedsBackup;
+        private string Hash;
         public long PatchSize { get; private set; }
 
-        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long patchSize)
+        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long patchSize, string hash)
         {
             DirectoryPatcher = directoryPatcher;
             SubPath = subPath;
             PatchSubPath = patchSubPath;
             NeedsBackup = needsBackup;
+            Hash = hash;
             PatchSize = patchSize;
         }
 
         public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
-            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, Hash, cancellationToken, progressCallback);
         }
 
         public async Task Execute()
@@ -118,8 +126,12 @@ namespace RXPatchLib
             string newPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
+
+            // Ensure the temp directory exists, and decompress the file
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
             await DirectoryPatcher.FilePatcher.DecompressAsync(tempPath, newPath); // Extract to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted). Copying is also necessary because the file may be shared (moving is not allowed).
+
+            // Get the old file out of the way, if it exists
             if (File.Exists(targetPath))
             {
                 if (NeedsBackup)
@@ -132,6 +144,8 @@ namespace RXPatchLib
                     File.Delete(targetPath);
                 }
             }
+
+            // Move the new file into place
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
             File.Move(tempPath, targetPath);
         }
@@ -265,26 +279,33 @@ namespace RXPatchLib
         {
             string installedHash = await SHA1.GetFileHashAsync(targetFilePath);
             bool isOld = installedHash == instruction.OldHash;
-            bool isNew = installedHash == instruction.NewHash;
-            if (!isNew)
+
+            // Patch file only if it is different from the new version
+            if (installedHash != instruction.NewHash)
             {
+                // Backup any existing files that don't match the old hash
                 bool needsBackup = !isOld && installedHash != null;
+
                 if (instruction.NewHash == null)
                 {
+                    // File deleted
                     callback(new RemoveAction(this, instruction.Path, needsBackup));
                 }
                 else if (isOld && instruction.HasDelta)
                 {
+                    // Incremental update
                     string deltaFileName = Path.Combine("delta", instruction.NewHash + "_from_" + instruction.OldHash);
-                    callback(new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize));
+                    callback(new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize, instruction.DeltaHash));
                 }
                 else
                 {
+                    // Full download
                     string fullFileName = Path.Combine("full", instruction.NewHash);
-                    callback(new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.FullReplaceSize));
+                    callback(new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.FullReplaceSize, instruction.CompressedHash));
                 }
             }
 
+            // Update LastWriteTime
             if (instruction.NewHash != null)
             {
                 callback(new ModifiedTimeReplaceAction(this, instruction.Path, instruction.NewLastWriteTime));

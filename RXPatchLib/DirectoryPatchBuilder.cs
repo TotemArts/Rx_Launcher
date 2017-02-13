@@ -46,33 +46,48 @@ namespace RXPatchLib
             var allPaths = oldPaths.Union(newPaths).ToArray();
             foreach (var path in allPaths)
             {
+                // oldPath and newPath refer to files
                 string oldPath = oldRootPath + Path.DirectorySeparatorChar + path;
                 string newPath = newRootPath + Path.DirectorySeparatorChar + path;
+
+                // Hashes of oldPath and newPath
                 string oldHash = GetHash(oldPath);
                 string newHash = GetHash(newPath);
-                long newSize = File.Exists(newPath) ? new FileInfo(newPath).Length : 0;
-                DateTime oldLastWriteTime = File.Exists(oldPath) ? new FileInfo(oldPath).LastWriteTimeUtc : DateTime.MinValue;
-                DateTime newLastWriteTime = File.Exists(newPath) ? new FileInfo(newPath).LastWriteTimeUtc : DateTime.MinValue;
-                long fullReplaceSize = 0;
-                long deltaSize = 0;
-                bool hasDelta = false;
+
+                // Hashes of the full (compressed) and delta files
+                string compressedHash = null;
+                string deltaHash = null;
+
+                long newSize = File.Exists(newPath) ? new FileInfo(newPath).Length : 0; // New file size
+                DateTime oldLastWriteTime = File.Exists(oldPath) ? new FileInfo(oldPath).LastWriteTimeUtc : DateTime.MinValue; // Old last write time
+                DateTime newLastWriteTime = File.Exists(newPath) ? new FileInfo(newPath).LastWriteTimeUtc : DateTime.MinValue; // New last write time
+                long fullReplaceSize = 0; // Size of the full file
+                long deltaSize = 0; // Size of the delta
+                bool hasDelta = false; // True if there's a delta, false otherwise
 
                 if (newHash != null)
                 {
+                    // Copy and compress newPath to fullPath
                     string fullPath = patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash;
                     await PatchBuilder.CompressAsync(newPath, fullPath);
+                    compressedHash = await SHA1.GetFileHashAsync(fullPath);
                     fullReplaceSize = new FileInfo(fullPath).Length;
 
+                    // Write delta to deltaPath if the old file differs from the new one
                     if (oldHash != null && oldHash != newHash)
                     {
+                        // Create delta
                         string deltaPath = patchPath + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + newHash + "_from_" + oldHash;
                         await PatchBuilder.CreatePatchAsync(oldPath, newPath, deltaPath);
+
+                        // Only keep the delta if it's smaller than the full download
                         if (new FileInfo(deltaPath).Length >= new FileInfo(fullPath).Length)
                         {
                             File.Delete(deltaPath);
                         }
                         else
                         {
+                            deltaHash = await SHA1.GetFileHashAsync(deltaPath);
                             deltaSize = new FileInfo(deltaPath).Length;
                             hasDelta = true;
                         }
@@ -84,6 +99,8 @@ namespace RXPatchLib
                     Path = path,
                     OldHash = oldHash,
                     NewHash = newHash,
+                    CompressedHash = compressedHash,
+                    DeltaHash = deltaHash,
                     OldLastWriteTime = oldLastWriteTime,
                     NewLastWriteTime = newLastWriteTime,
                     FullReplaceSize = fullReplaceSize,
