@@ -8,7 +8,7 @@ using System.IO;
 
 namespace RXPatchLib
 {
-    class SHA1
+    public class SHA1
     {
         static SHA1CryptoServiceProvider CryptoProvider = new SHA1CryptoServiceProvider();
 

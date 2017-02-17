@@ -100,6 +100,11 @@ namespace LauncherTwo.Views
             }));
         }
 
-        
+        public void updateProgressBar(long currentAmount, long totalAmount)
+        {
+            this.sizeOfFile = totalAmount;
+            this.ProgressBar.Value = currentAmount;
+            this.ProgressPercentage.Content = (int)currentAmount / (this.sizeOfFile / 100) + "%";
+        }
     }
 }
