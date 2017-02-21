@@ -15,6 +15,8 @@ namespace RXPatchLib
         Dictionary<string, Task> LoadTasks = new Dictionary<string, Task>();
         RXPatcher Patcher;
         string DownloadPath;
+        bool IsDownloading = false;
+        object IsDownloadingLock = new object();
 
         public WebPatchSource(RXPatcher patcher, string downloadPath)
         {
@@ -47,20 +49,44 @@ namespace RXPatchLib
         {
             string filePath = GetSystemPath(subPath);
 
+            // Check if the file exists
             if (File.Exists(filePath))
             {
+                // If the file exists and is correct, return without redownloading.
+                if (hash != null && await SHA1.GetFileHashAsync(filePath) == hash)
+                {
+                    // Update progress (probably unncessary)
+                    long FileSize = new FileInfo(filePath).Length;
+                    progressCallback(FileSize, FileSize);
+
+                    return;
+                }
+
+                // The hash didn't match; delete it.
                 File.Delete(filePath);
             }
+
+            // Ensure the necessary directory exists
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+            // Since I can't await within a lock...
+            while (true)
+            {
+                lock (IsDownloadingLock)
+                {
+                    if (!IsDownloading)
+                    {
+                        IsDownloading = true;
+                        break;
+                    }
+                }
+
+                await Task.Delay(100);
+            }
 
             using (var webClient = new WebClient())
             {
                 webClient.Proxy = null;
-
-                webClient.DownloadProgressChanged += (o, args) =>
-                {
-                    progressCallback(args.BytesReceived, args.TotalBytesToReceive);
-                };
 
                 new_host_selected:
 
@@ -99,6 +125,10 @@ namespace RXPatchLib
                     }
                 }
             }
+
+            lock (IsDownloadingLock)
+                IsDownloading = false;
+
             /* TODO
             if (UseProxy)
             {
