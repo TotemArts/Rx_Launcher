@@ -50,7 +50,7 @@ namespace LauncherTwo
             await RedistRequest.DownloadFileTaskAsync(new Uri(source), target);
 
             // Verify (UE3Redist isn't expected to ever change, so we're just dumping the hash here).
-            return (await RXPatchLib.SHA1.GetFileHashAsync("Launcher\\Redist\\UE3Redist.exe") == "0F755E0EFE6756AA8940A86AA61BAF9E905B8C02");
+            return (await RXPatchLib.SHA1.GetFileHashAsync(target) == "0F755E0EFE6756AA8940A86AA61BAF9E905B8C02");
         }
 
         /// <summary>
@@ -102,6 +102,8 @@ namespace LauncherTwo
                     RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();
                     await Selector.SelectHosts(hosts); //NEed to suppress the ui from showing here
 
+                    bool downloadSuccess = false;
+
                     while (Selector.Hosts.Count > 0)
                     {
                         Uri RedistServer = Selector.Hosts.Dequeue();
@@ -119,7 +121,7 @@ namespace LauncherTwo
                         RedistWindow.Show();
 
                         //Start downloading redist
-                        bool downloadSuccess = await DownloadRedist(RedistUrl, SystemPath, downloaderToken, (received, size) =>
+                        downloadSuccess = await DownloadRedist(RedistUrl, SystemPath, downloaderToken, (received, size) =>
                         {
                             RedistWindow.updateProgressBar(received, size);
                         });
@@ -172,7 +174,8 @@ namespace LauncherTwo
                         // If downloadSuccess is false, then this will move on to the next best mirror and try to download the redist again until it either succeeds or runs out of mirrors.
                     }
 
-                    MessageBox.Show("Unable to download the UE3 Redist (corrupt download)");
+                    if (downloadSuccess == false)
+                        MessageBox.Show("Unable to download the UE3 Redist (corrupt download)");
                 }
                 else
                 {
