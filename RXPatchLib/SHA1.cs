@@ -10,8 +10,6 @@ namespace RXPatchLib
 {
     public class SHA1
     {
-        static SHA1CryptoServiceProvider CryptoProvider = new SHA1CryptoServiceProvider();
-
         public static async Task<string> GetFileHashAsync(string path)
         {
             if (!File.Exists(path))
@@ -21,14 +19,14 @@ namespace RXPatchLib
             {
                 using (var stream = File.OpenRead(path))
                 {
-                    return BitConverter.ToString(CryptoProvider.ComputeHash(stream)).Replace("-", string.Empty);
+                    return BitConverter.ToString(new SHA1CryptoServiceProvider().ComputeHash(stream)).Replace("-", string.Empty);
                 }
             });
         }
 
         public static string Get(byte[] data)
         {
-            return BitConverter.ToString(CryptoProvider.ComputeHash(data)).Replace("-", string.Empty);
+            return BitConverter.ToString(new SHA1CryptoServiceProvider().ComputeHash(data)).Replace("-", string.Empty);
         }
     }
 }
