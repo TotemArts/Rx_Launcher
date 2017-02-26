@@ -8,7 +8,7 @@ using System.IO;
 
 namespace RXPatchLib
 {
-    public class SHA1
+    public class SHA256
     {
         public static async Task<string> GetFileHashAsync(string path)
         {
@@ -19,14 +19,14 @@ namespace RXPatchLib
             {
                 using (var stream = File.OpenRead(path))
                 {
-                    return BitConverter.ToString(new SHA1CryptoServiceProvider().ComputeHash(stream)).Replace("-", string.Empty);
+                    return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(stream)).Replace("-", string.Empty);
                 }
             });
         }
 
         public static string Get(byte[] data)
         {
-            return BitConverter.ToString(new SHA1CryptoServiceProvider().ComputeHash(data)).Replace("-", string.Empty);
+            return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(data)).Replace("-", string.Empty);
         }
     }
 }

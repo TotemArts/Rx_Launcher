@@ -313,7 +313,7 @@ namespace RXPatchLib
 
         private async Task BuildFilePatchAction(FilePatchInstruction instruction, string targetFilePath, Action<IFilePatchAction> callback)
         {
-            string installedHash = await SHA1.GetFileHashAsync(targetFilePath);
+            string installedHash = await SHA256.GetFileHashAsync(targetFilePath);
             bool isOld = installedHash == instruction.OldHash;
 
             // Patch file only if it is different from the new version

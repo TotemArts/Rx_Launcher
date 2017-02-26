@@ -11,7 +11,7 @@ namespace RXPatchLib
 {
     public class DirectoryPatchBuilder : IDisposable
     {
-        SHA1CryptoServiceProvider CryptoProvider = new SHA1CryptoServiceProvider();
+        SHA256CryptoServiceProvider CryptoProvider = new SHA256CryptoServiceProvider();
         XdeltaPatchBuilder PatchBuilder;
 
         public DirectoryPatchBuilder(XdeltaPatchBuilder patchBuilder)
@@ -70,7 +70,7 @@ namespace RXPatchLib
                     // Copy and compress newPath to fullPath
                     string fullPath = patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash;
                     await PatchBuilder.CompressAsync(newPath, fullPath);
-                    compressedHash = await SHA1.GetFileHashAsync(fullPath);
+                    compressedHash = await SHA256.GetFileHashAsync(fullPath);
                     fullReplaceSize = new FileInfo(fullPath).Length;
 
                     // Write delta to deltaPath if the old file differs from the new one
@@ -87,7 +87,7 @@ namespace RXPatchLib
                         }
                         else
                         {
-                            deltaHash = await SHA1.GetFileHashAsync(deltaPath);
+                            deltaHash = await SHA256.GetFileHashAsync(deltaPath);
                             deltaSize = new FileInfo(deltaPath).Length;
                             hasDelta = true;
                         }
@@ -113,8 +113,8 @@ namespace RXPatchLib
             string instructionsString = JsonConvert.SerializeObject(instructions);
             File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions.json", instructionsString);
 
-            // Write SHA1 hash of instructions.json to instructions_hash.txt
-            File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt", await SHA1.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
+            // Write SHA256 hash of instructions.json to instructions_hash.txt
+            File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt", await SHA256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
         }
     }
 }

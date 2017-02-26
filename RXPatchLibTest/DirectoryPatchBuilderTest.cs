@@ -18,7 +18,7 @@ namespace RXPatchLibTest
 
         string GetStringHash(string s)
         {
-            return BitConverter.ToString(new SHA1CryptoServiceProvider().ComputeHash(Encoding.ASCII.GetBytes(s))).Replace("-", string.Empty);
+            return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(Encoding.ASCII.GetBytes(s))).Replace("-", string.Empty);
         }
 
         [TestMethod]
@@ -156,7 +156,7 @@ namespace RXPatchLibTest
         }
 
         [TestMethod]
-        public async Task TestIdenticalFiles() // Detects bug when attempting to overwrite a file with the same SHA1.
+        public async Task TestIdenticalFiles() // Detects bug when attempting to overwrite a file with the same SHA256.
         {
             using (var oldDir = new TemporaryDirectory())
             using (var newDir = new TemporaryDirectory())

@@ -37,9 +37,9 @@ namespace RXPatchLibTest
                 File.WriteAllText(oldFile.Path, "old");
                 File.WriteAllText(newDeltaFile.Path, "new_delta");
                 File.WriteAllText(newFullFile.Path, "new_full");
-                string oldHash = SHA1.Get(Encoding.UTF8.GetBytes("old"));
-                string newDeltaHash = SHA1.Get(Encoding.UTF8.GetBytes("new_delta"));
-                string newFullHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full"));
+                string oldHash = SHA256.Get(Encoding.UTF8.GetBytes("old"));
+                string newDeltaHash = SHA256.Get(Encoding.UTF8.GetBytes("new_delta"));
+                string newFullHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full"));
 
                 Directory.CreateDirectory(Path.Combine(PatchDir.Path, "delta"));
                 Directory.CreateDirectory(Path.Combine(PatchDir.Path, "full"));
@@ -83,7 +83,7 @@ namespace RXPatchLibTest
 
             try
             {
-                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken(), await SHA1.GetFileHashAsync(instructionsFilename));
+                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken(), await SHA256.GetFileHashAsync(instructionsFilename));
             }
             finally
             {
@@ -120,7 +120,7 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
                     NewHash = null,
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
@@ -140,7 +140,7 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
                     NewHash = null,
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
@@ -161,7 +161,7 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
                     NewHash = null,
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
@@ -183,7 +183,7 @@ namespace RXPatchLibTest
                 {
                     Path = "file",
                     OldHash = null,
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,
@@ -205,7 +205,7 @@ namespace RXPatchLibTest
                 {
                     Path = "file",
                     OldHash = null,
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_nopatch")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,
@@ -227,7 +227,7 @@ namespace RXPatchLibTest
                 {
                     Path = "file",
                     OldHash = null,
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,
@@ -249,8 +249,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_delta")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_delta")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = true,
@@ -271,8 +271,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_nopatch")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = true,
@@ -293,8 +293,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = true,
@@ -315,8 +315,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = true,
@@ -337,8 +337,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,
@@ -359,8 +359,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_nopatch")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,
@@ -381,8 +381,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,
@@ -403,8 +403,8 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA1.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA1.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
                     OldLastWriteTime = DummyLastWriteTime,
                     NewLastWriteTime = DummyLastWriteTime,
                     HasDelta = false,

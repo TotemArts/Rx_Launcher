@@ -50,7 +50,7 @@ namespace LauncherTwo
             await RedistRequest.DownloadFileTaskAsync(new Uri(source), target);
 
             // Verify (UE3Redist isn't expected to ever change, so we're just dumping the hash here).
-            return (await RXPatchLib.SHA1.GetFileHashAsync(target) == "0F755E0EFE6756AA8940A86AA61BAF9E905B8C02");
+            return (await RXPatchLib.SHA256.GetFileHashAsync(target) == "0F755E0EFE6756AA8940A86AA61BAF9E905B8C02");
         }
 
         /// <summary>

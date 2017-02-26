@@ -76,7 +76,7 @@ namespace RXPatchLib
             if (File.Exists(filePath))
             {
                 // If the file exists and is correct, return without redownloading.
-                if (hash != null && await SHA1.GetFileHashAsync(filePath) == hash)
+                if (hash != null && await SHA256.GetFileHashAsync(filePath) == hash)
                 {
                     // Update progress (probably unncessary)
                     long FileSize = new FileInfo(filePath).Length;
@@ -113,7 +113,7 @@ namespace RXPatchLib
                             {
                                 await webClient.DownloadFileTaskAsync(new Uri(Patcher.BaseURL + "/" + subPath), filePath);
 
-                                if (hash != null && await SHA1.GetFileHashAsync(filePath) != hash)
+                                if (hash != null && await SHA256.GetFileHashAsync(filePath) != hash)
                                     return new HashMistmatchException();
 
                                 return null;
