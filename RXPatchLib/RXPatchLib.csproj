@@ -46,6 +46,7 @@
     <Compile Include="DirectoryPatcherProgress.cs" />
     <Compile Include="DirectoryPatchPhaseProgress.cs" />
     <Compile Include="DiscreteProgress.cs" />
+    <Compile Include="HashMistmatchException.cs" />
     <Compile Include="ITimeProvider.cs" />
     <Compile Include="ObjectEx.cs" />
     <Compile Include="PingExtensions.cs" />

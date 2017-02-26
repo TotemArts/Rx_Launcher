@@ -45,6 +45,29 @@ namespace RXPatchLib
             return task;
         }
 
+        private async Task LockDownload()
+        {
+            while (true)
+            {
+                lock (IsDownloadingLock)
+                {
+                    if (!IsDownloading)
+                    {
+                        IsDownloading = true;
+                        break;
+                    }
+                }
+
+                await Task.Delay(100);
+            }
+        }
+
+        private void UnlockDownload()
+        {
+            lock (IsDownloadingLock)
+                IsDownloading = false;
+        }
+
         public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
             string filePath = GetSystemPath(subPath);
@@ -70,19 +93,7 @@ namespace RXPatchLib
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
             // Since I can't await within a lock...
-            while (true)
-            {
-                lock (IsDownloadingLock)
-                {
-                    if (!IsDownloading)
-                    {
-                        IsDownloading = true;
-                        break;
-                    }
-                }
-
-                await Task.Delay(100);
-            }
+            await LockDownload();
 
             using (var webClient = new WebClient())
             {
@@ -103,7 +114,7 @@ namespace RXPatchLib
                                 await webClient.DownloadFileTaskAsync(new Uri(Patcher.BaseURL + "/" + subPath), filePath);
 
                                 if (hash != null && await SHA1.GetFileHashAsync(filePath) != hash)
-                                    return new Exception("Download hash mismatch");
+                                    return new HashMistmatchException();
 
                                 return null;
                             }
@@ -126,8 +137,7 @@ namespace RXPatchLib
                 }
             }
 
-            lock (IsDownloadingLock)
-                IsDownloading = false;
+            UnlockDownload();
 
             /* TODO
             if (UseProxy)
