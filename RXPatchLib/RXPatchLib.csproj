@@ -48,6 +48,7 @@
     <Compile Include="DiscreteProgress.cs" />
     <Compile Include="HashMistmatchException.cs" />
     <Compile Include="ITimeProvider.cs" />
+    <Compile Include="NoReliableHostException.cs" />
     <Compile Include="ObjectEx.cs" />
     <Compile Include="PingExtensions.cs" />
     <Compile Include="RetryStrategy.cs" />

@@ -99,6 +99,11 @@ namespace RXPatchLib
             {
                 webClient.Proxy = null;
 
+                webClient.DownloadProgressChanged += (o, args) =>
+                {
+                    progressCallback(args.BytesReceived, args.TotalBytesToReceive);
+                };
+
                 new_host_selected:
 
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
@@ -111,10 +116,14 @@ namespace RXPatchLib
                         {
                             try
                             {
+                                // Download file and wait until finished
                                 await webClient.DownloadFileTaskAsync(new Uri(Patcher.BaseURL + "/" + subPath), filePath);
 
+                                // File finished downoading successfully; allow next download to start and check hash
+                                UnlockDownload();
+
                                 if (hash != null && await SHA256.GetFileHashAsync(filePath) != hash)
-                                    return new HashMistmatchException();
+                                    throw new HashMistmatchException(); // Hash mismatch; throw exception
 
                                 return null;
                             }
@@ -124,20 +133,34 @@ namespace RXPatchLib
                                 return e;
                             }
                         });
+
+                        // Download successfully completed
                     }
                     catch (TooManyRetriesException)
                     {
                         // Try the next best host; throw an exception if there is none
                         if (Patcher.PopHost() == null)
-                            throw new Exception("No valid mirrors are available; please check your network connection or try again later.");
+                        {
+                            // Unlock download to leave in clean state.
+                            UnlockDownload();
+
+                            throw new NoReliableHostException();
+                        }
 
                         // Proceed execution with next mirror
                         goto new_host_selected;
                     }
+                    catch (HashMistmatchException)
+                    {
+                        // Try the next best host; throw an exception if there is none
+                        if (Patcher.PopHost() == null)
+                            throw new NoReliableHostException();
+
+                        // Reset progress and requeue download
+                        await LoadNew(subPath, hash, cancellationToken, progressCallback);
+                    }
                 }
             }
-
-            UnlockDownload();
 
             /* TODO
             if (UseProxy)
