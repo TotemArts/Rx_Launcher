@@ -170,9 +170,6 @@
     <Compile Include="Views\UpdateAvailableWindow.xaml.cs">
       <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SeekerDownloadWindow.xaml.cs">
-      <DependentUpon>SeekerDownloadWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\UpdateDownloadWindow.xaml.cs">
       <DependentUpon>UpdateDownloadWindow.xaml</DependentUpon>
     </Compile>
@@ -244,10 +241,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SeekerDownloadWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\UpdateDownloadWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -313,10 +306,6 @@
     <ProjectReference Include="..\SteamWebAPI-master\SteamWebAPI.csproj">
       <Project>{d846d108-d95b-4488-ba01-e487da220c17}</Project>
       <Name>SteamWebAPI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UDKSeeker\UDKSeeker.csproj">
-      <Project>{605f489b-1c72-4ffa-afda-3388bca59d1e}</Project>
-      <Name>UDKSeeker</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

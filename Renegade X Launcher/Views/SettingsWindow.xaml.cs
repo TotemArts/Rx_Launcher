@@ -29,24 +29,6 @@ namespace LauncherTwo.Views
         }
         #endregion
 
-        #region UseSeeker Setting
-        private bool _UseSeeker;
-        public bool UseSeeker
-        {
-            get
-            {
-                return _UseSeeker;
-            }
-            set
-            {
-                _UseSeeker = value;
-                NotifyPropertyChanged("UseSeeker");
-            }
-        }
-        #endregion
-
-        
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(string propertyName)
@@ -70,7 +52,6 @@ namespace LauncherTwo.Views
             Settings = new Settings
             {
                 SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies,
-                UseSeeker = Properties.Settings.Default.UseSeeker,
             };
             InitializeComponent();
 
@@ -90,7 +71,6 @@ namespace LauncherTwo.Views
         public void ApplyAndClose(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.SkipIntroMovies = Settings.SkipIntroMovies;
-            Properties.Settings.Default.UseSeeker = Settings.UseSeeker;
             Properties.Settings.Default.Save();
             Close();
         }

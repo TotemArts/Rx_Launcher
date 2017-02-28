@@ -905,19 +905,6 @@
                 <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
                 <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
 
-                <!-- <StackPanel  Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox x:Name="Movies_Checkbx" Height="25" Width="25" Margin="6,0,0,0"  IsChecked="{Binding ElementName=LauncherTwo, Path=IsCheckBoxChecked, Mode=TwoWay}" Click="Movies_Checkbx_Checked" />
-                        <Label Content="Skip intro movies?" Height="25" FontSize="12" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox x:Name="Seeker_Checkbx" Height="25" Width="25" Margin="6,0,0,0"  IsChecked="{Binding ElementName=LauncherTwo, Path=IsSeekerCheckBoxChecked, Mode=TwoWay}" Click="Seeker_Checkbx_Checked" />
-                        <Label Content="Use MapSeeker?" Height="25" FontSize="12" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
-                    </StackPanel> 
-                </StackPanel>
-                <Button Margin="3" x:Name="SD_ForceUpdateBtn" Width="94" Height="25" FontSize="11" Content="Recheck game" Click="SD_UpdateGame_Click"/>-->
-
                 <Button DockPanel.Dock="Right" Margin="3,3,6,3" x:Name="SD_SettingsBtn" Width="60" Height="25" FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center">
 
 

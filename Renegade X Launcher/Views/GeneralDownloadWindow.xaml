@@ -1,7 +1,4 @@
-﻿<!--<Window x:Name="Seeker" x:Class="LauncherTwo.Views.SeekerDownloadWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="132" Width="350" ResizeMode="NoResize" WindowStyle="None" Title="Seeker" Icon="/Renegade X Launcher;component/Resources/Seeker.ico" WindowStartupLocation="CenterScreen">-->
-<parent:RXWindow
+﻿<parent:RXWindow
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:parent="clr-namespace:LauncherTwo"

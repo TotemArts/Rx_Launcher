@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebAPI", "SteamWebAPI-master\SteamWebAPI.csproj", "{D846D108-D95B-4488-BA01-E487DA220C17}"
 EndProject
@@ -12,8 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RXPatchLibTest", "RXPatchLibTest\RXPatchLibTest.csproj", "{C5F6C8DF-3CFF-4757-A4F7-FD99E8893A2B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RXPatch", "RXPatch\RXPatch.csproj", "{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDKSeeker", "UDKSeeker\UDKSeeker.csproj", "{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Renegade X Installer", "Renegade X Installer\Renegade X Installer.wixproj", "{1081A06F-6D2C-46A8-8EEC-E30C54E29093}"
 EndProject
@@ -65,14 +63,6 @@ Global
 		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}.Release|x86.ActiveCfg = Release|Any CPU
 		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}.Release|x86.Build.0 = Release|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|x86.Build.0 = Debug|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|x86.ActiveCfg = Release|Any CPU
-		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|x86.Build.0 = Release|Any CPU
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Debug|x86.ActiveCfg = Debug|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Debug|x86.Build.0 = Debug|x86

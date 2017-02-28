@@ -31,7 +31,6 @@
         <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="75" MinWidth="250">
             <StackPanel>
                 <CheckBox Content="Skip intro movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
-                <CheckBox Content="Use UDKSeeker" IsChecked="{Binding Settings.UseSeeker}"/>
                 <Separator Height="5" Margin="2"/>
                 <StackPanel Orientation="Horizontal">
                     <Button x:Name="BT_Verify" Content="&#10004; Verify Game Integrity" Height="21" Width="140"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Verify_Click" Margin="0,0,2,0"/>
