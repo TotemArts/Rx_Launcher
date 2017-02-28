@@ -255,7 +255,7 @@ namespace LauncherTwo
 
         void DownloadLauncherUpdate(out bool updateInstallPending)
         {
-            UpdateDownloadWindow theWindow = new UpdateDownloadWindow(VersionCheck.LauncherPatchUrl);
+            UpdateDownloadWindow theWindow = new UpdateDownloadWindow(VersionCheck.LauncherPatchUrl, VersionCheck.LauncherPatchHash);
             theWindow.Owner = this;
             theWindow.ShowDialog();
 

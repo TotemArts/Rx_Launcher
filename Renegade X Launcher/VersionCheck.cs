@@ -28,13 +28,14 @@ namespace LauncherTwo
         public static string GamePatchPath = null;
         public static string[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
+        public static string LauncherPatchHash = null;
 
         static VersionCheck()
         {
             LauncherVersion = new Version
             {
-                Name = "0.75",
-                Number = 075
+                Name = "0.76-dev",
+                Number = 076
             };
         }
 
@@ -133,6 +134,7 @@ namespace LauncherTwo
                     Number = versionData["launcher"]["version_number"],
                 };
                 LauncherPatchUrl = versionData["launcher"]["patch_url"];
+                LauncherPatchHash = versionData["launcher"]["patch_hash"];
 
                 // Game
                 LatestGameVersion = new Version

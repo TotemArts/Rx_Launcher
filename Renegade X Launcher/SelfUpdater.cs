@@ -26,7 +26,7 @@ namespace LauncherTwo
         static eUpdateState UpdateState = eUpdateState.NotStarted;
         static Views.UpdateDownloadWindow UpdaterWindow = null;
         static WebClient Client;
-
+        static string PatchHash;
 
         static string GetTempDirectory()
         {
@@ -59,9 +59,10 @@ namespace LauncherTwo
             // TODO: Cancel whichever state is currently happening.
         }
 
-        public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow, string url)
+        public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow, string url, string hash)
         {
             UpdaterWindow = aUpdaterWindow;
+            PatchHash = hash;
             if (UpdateState != eUpdateState.Downloading && UpdateState != eUpdateState.Extracting && UpdateState != eUpdateState.ReadyToInstall)
             {
                 StartDownload(url);
@@ -194,8 +195,24 @@ namespace LauncherTwo
             }
             else
             {
-                UpdaterWindow.StatusLabel.Content = "Download Finished";
-                StartExtract();
+                UpdaterWindow.StatusLabel.Content = "Download Finished; verifying...";
+
+                // Generate SHA256 hash of the download
+                Task<string> hash_task = RXPatchLib.SHA256.GetFileHashAsync(GetSavePath());
+                hash_task.Wait();
+
+                // Verify the hash of the download
+                if (hash_task.Result == PatchHash || PatchHash == "")
+                {
+                    // Download valid; begin extraction
+                    StartExtract();
+                }
+                else
+                {
+                    // Hash mismatch; set an error
+                    UpdateState = eUpdateState.Error;
+                    UpdaterWindow.StatusLabel.Content = "Hash mismatch";
+                }
             }
         }
 

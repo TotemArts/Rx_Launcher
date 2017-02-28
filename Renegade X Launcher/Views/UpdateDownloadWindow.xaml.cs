@@ -21,17 +21,19 @@ namespace LauncherTwo.Views
     {
         public bool UpdateFinished = false;
         private string PatchUrl;
+        private string PatchHash;
 
-        public UpdateDownloadWindow(string patchUrl)
+        public UpdateDownloadWindow(string patchUrl, string patchHash)
         {
             PatchUrl = patchUrl;
+            PatchHash = patchHash;
             InitializeComponent();
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
         }
 
         private void OnActivated(object sender, EventArgs e)
         {
-            SelfUpdater.StartUpdate(this, PatchUrl);
+            SelfUpdater.StartUpdate(this, PatchUrl, PatchHash);
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
