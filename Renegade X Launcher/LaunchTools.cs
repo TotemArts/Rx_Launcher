@@ -55,10 +55,10 @@ namespace LauncherTwo
                     Arguments += "?PASSWORD=" + Password;
                 }
             }
-            /*if (SkipIntroMovies)
+            if (SkipIntroMovies)
             {
-                Arguments += " -nomovies"; 
-            }*/
+                Arguments += " -nomoviestartup"; 
+            }
 
             //Pinpoint location of quote error
             //Arguments += " -ini:UDKGame:DefaultPlayer.Name=\"" + Username + "\"";

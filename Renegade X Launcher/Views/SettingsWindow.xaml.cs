@@ -54,18 +54,6 @@ namespace LauncherTwo.Views
                 SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies,
             };
             InitializeComponent();
-
-            this.Settings.PropertyChanged += Settings_ChangeMovies;
-        }
-
-        private void Settings_ChangeMovies(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "SkipIntroMovies")
-            {
-                bool succes = false;
-                succes = MovieRenamer.MovieRenamerMethod(Settings.SkipIntroMovies);
-            }
-
         }
 
         public void ApplyAndClose(object sender, RoutedEventArgs e)

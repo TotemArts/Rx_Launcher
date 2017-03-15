@@ -127,7 +127,6 @@
     </Compile>
     <Compile Include="IrcController.cs" />
     <Compile Include="LaunchTools.cs" />
-    <Compile Include="MovieRenamer.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
