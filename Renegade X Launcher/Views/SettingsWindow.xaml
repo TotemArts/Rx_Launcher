@@ -3,8 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:parent="clr-namespace:LauncherTwo"
     xmlns:local="clr-namespace:LauncherTwo.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
     x:Class="LauncherTwo.Views.SettingsWindow"
-    Style="{StaticResource {x:Type parent:RXWindow}}"
     Padding="12"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     Title="Renegade X launcher settings"
@@ -12,17 +12,20 @@
     WindowStartupLocation="CenterScreen"
     MinHeight="0"
     MinWidth="0"
-    ResizeMode="NoResize">
-    <Window.Resources>
-        <Style x:Key="MinimizeTitleBarButton" TargetType="UserControl"/>
-        <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
-        <Style x:Key="RestoreTitleBarButton" TargetType="UserControl"/>
-        <Style x:Key="CloseTitleBarButton" TargetType="UserControl"/>
+    ResizeMode="NoResize" d:DesignHeight="201.373">
+    <parent:RXWindow.Resources>
+        <Style x:Key="MinimizeTitleBarButton" TargetType="{x:Type UserControl}"/>
+        <Style x:Key="MaximizeTitleBarButton" TargetType="{x:Type UserControl}"/>
+        <Style x:Key="RestoreTitleBarButton" TargetType="{x:Type UserControl}"/>
+        <Style x:Key="CloseTitleBarButton" TargetType="{x:Type UserControl}"/>
         <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
         <Color x:Key="RenX_Window_Border_Color">#CC65787D</Color>
         <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
         <SolidColorBrush x:Key="RenX_Window_Border_Color_Brush" Color="{DynamicResource RenX_Window_Border_Color}"/>
-    </Window.Resources>
+    </parent:RXWindow.Resources>
+    <parent:RXWindow.Style>
+        <StaticResource ResourceKey="{x:Type parent:RXWindow}"/>
+    </parent:RXWindow.Style>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Margin="3,0" Foreground="{DynamicResource RenXFontColorBrush}" Height="21" Width="70" Click="ApplyAndClose" IsDefault="True" Content="OK"/>
@@ -31,15 +34,16 @@
         <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="75" MinWidth="250">
             <StackPanel>
                 <CheckBox Content="Skip intro movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
+                <CheckBox Content="Use 64Bit" IsChecked="{Binding Settings.Use64Bit}"/>
                 <Separator Height="5" Margin="2"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="BT_Verify" Content="&#10004; Verify Game Integrity" Height="21" Width="140"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Verify_Click" Margin="0,0,2,0"/>
-                    <Button x:Name="BT_Reset" Content="&#8635; Reset Game" Height="21" Width="100"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Reset_Click" Margin="2,0,0,0"/>
+                    <Button x:Name="BT_Verify" Content="✔ Verify Game Integrity" Height="21" Width="140"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Verify_Click" Margin="0,0,2,0"/>
+                    <Button x:Name="BT_Reset" Content="↻ Reset Game" Height="21" Width="100"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Reset_Click" Margin="2,0,0,0"/>
                 </StackPanel>
             </StackPanel>
-            
-            
+
+
         </Border>
-        
+
     </DockPanel>
 </parent:RXWindow>

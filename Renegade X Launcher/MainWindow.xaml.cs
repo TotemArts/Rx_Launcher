@@ -559,6 +559,7 @@ namespace LauncherTwo
                 startupParameters.Password = password;
                 //startupParameters.SkipIntroMovies = false; <-Default value
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
+                startupParameters.Use64Bit = Properties.Settings.Default.Use64Bit;
 
 
                 
