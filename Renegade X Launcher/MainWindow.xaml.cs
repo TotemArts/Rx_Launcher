@@ -46,8 +46,6 @@ namespace LauncherTwo
         /// </summary>
         private Boolean DefaultMoviePlays = true;
 
-        private ServerQueue serverQueue = new ServerQueue();
-
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
         public static readonly int MAX_PLAYER_COUNT = 64;
@@ -452,35 +450,6 @@ namespace LauncherTwo
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
 
             SD_Name.Content = selected.ServerName;
-
-            //B0ng DDOS Protect system
-            switch (selected.IPWithPort)
-            {
-                case "95.172.92.169:5555":
-                    SD_IP.Content = "74.91.113.50:7777";
-                    break;
-                case "95.172.92.169:4433":
-                    SD_IP.Content = "74.91.113.50:7778";
-                    break;
-                case "195.154.167.80:5550":
-                    SD_IP.Content = "62.210.251.40:7777";
-                    break;
-                case "195.154.167.80:9876":
-                    SD_IP.Content = "62.210.251.40:7778";
-                    break;
-                case "195.154.167.80:3322":
-                    SD_IP.Content = "62.210.251.40:7779";
-                    break;
-                case "195.154.167.80:6969":
-                    SD_IP.Content = "62.210.251.40:7780";
-                    break;
-                default:
-                    SD_IP.Content = selected.IPWithPort;
-                    break;
-            }
-            //End B0ng DDOS Protect system
-
-            
             SD_GameLength.Content = selected.TimeLimit.ToString();
             SD_MineLimit.Content = selected.MineLimit.ToString();
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
@@ -557,13 +526,7 @@ namespace LauncherTwo
                 startupParameters.Username = Properties.Settings.Default.Username;
                 startupParameters.IPEndpoint = ipEndpoint;
                 startupParameters.Password = password;
-                //startupParameters.SkipIntroMovies = false; <-Default value
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
-                startupParameters.Use64Bit = Properties.Settings.Default.Use64Bit;
-
-
-                
-
 
                 GameInstance = EngineInstance.Start(startupParameters);
 
@@ -752,33 +715,5 @@ namespace LauncherTwo
                 notInstalledDialog.ShowDialog();
             }
         }
-
-        private void SD_LaunchIrcClient_Click(object sender, RoutedEventArgs e)
-        {
-            IrcWindow ircWindow = new IrcWindow(this.SD_Username.Content.ToString());
-            ircWindow.Owner = this;
-            ircWindow.Show();
-        }
-
-
-        //This is the non functional queue button handler.
-        //I need more info from the servers before this will become functional.
-        /*
-        private void Queue_Server_Btn_Click(object sender, RoutedEventArgs e)
-        {
-            if(this.serverQueue.Enqueue(this.GetSelectedServer()))
-            {
-                this.Queue_Server_Btn.Content = "Dequeue from server";
-                this.Join_Server_Btn.IsEnabled = false;
-            }
-            else
-            {
-                this.Join_Server_Btn.IsEnabled = true;
-                this.Queue_Server_Btn.Content = "Queue this server";
-            }
-        }
-        */
     }
-
-    
 }

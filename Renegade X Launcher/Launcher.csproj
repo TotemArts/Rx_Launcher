@@ -125,7 +125,6 @@
     <Compile Include="Installer.xaml.cs">
       <DependentUpon>Installer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IrcController.cs" />
     <Compile Include="LaunchTools.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -139,7 +138,6 @@
     </Compile>
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
-    <Compile Include="ServerQueue.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TrulyObservableCollection.cs" />
@@ -147,9 +145,6 @@
     <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\GeneralDownloadWindow.xaml.cs">
       <DependentUpon>GeneralDownloadWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\IrcWindow.xaml.cs">
-      <DependentUpon>IrcWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ServerSelectView.xaml.cs">
       <DependentUpon>ServerSelectView.xaml</DependentUpon>
@@ -212,10 +207,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\IrcWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ServerSelectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -272,6 +263,7 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
@@ -338,12 +330,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Install_Back.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\__country_flags.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\flags.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\IrcBack.png" />

@@ -11,13 +11,8 @@ namespace LauncherTwo
 {
     public abstract class EngineInstanceStartupParameters
     {
-        public bool Use64Bit { get; set; }
-
         public string GetProcessPath ()
         {
-            if(Use64Bit && File.Exists(GameInstallation.GetRootPath() + "Binaries\\Win64\\UDK.exe"))
-                return GameInstallation.GetRootPath() + "Binaries\\Win64\\UDK.exe";
-
             return GameInstallation.GetRootPath() + "Binaries\\Win32\\UDK.exe";
         }
 

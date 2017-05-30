@@ -29,22 +29,6 @@ namespace LauncherTwo.Views
         }
         #endregion
 
-        #region Use64Bit Setting
-        private bool _Use64Bit;
-        public bool Use64Bit
-        {
-            get
-            {
-                return _Use64Bit;
-            }
-            set
-            {
-                _Use64Bit = value;
-                NotifyPropertyChanged("Use64Bit");
-            }
-        }
-        #endregion
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(string propertyName)
@@ -68,7 +52,6 @@ namespace LauncherTwo.Views
             Settings = new Settings
             {
                 SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies,
-                Use64Bit = Properties.Settings.Default.Use64Bit,
             };
             InitializeComponent();
         }
@@ -76,7 +59,6 @@ namespace LauncherTwo.Views
         public void ApplyAndClose(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.SkipIntroMovies = Settings.SkipIntroMovies;
-            Properties.Settings.Default.Use64Bit = Settings.Use64Bit;
             Properties.Settings.Default.Save();
             Close();
         }

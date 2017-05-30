@@ -91,17 +91,5 @@ namespace LauncherTwo.Properties {
                 this["Installed"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Use64Bit {
-            get {
-                return ((bool)(this["Use64Bit"]));
-            }
-            set {
-                this["Use64Bit"] = value;
-            }
-        }
     }
 }

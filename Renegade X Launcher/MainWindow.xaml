@@ -905,13 +905,10 @@
                 <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
                 <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
 
-                <Button DockPanel.Dock="Right" Margin="3,3,6,3" x:Name="SD_SettingsBtn" Width="60" Height="25" FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center">
-
-
-                </Button>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_JoinIPBtn" Width="50" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchServerBtn" Width="94" Height="25" FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click"/>
+                <Button DockPanel.Dock="Right" Margin="3,3,6,3" x:Name="SD_SettingsBtn" Width="60" Height="25" FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center"/>
+                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_JoinIPBtn" ToolTip="Direct connect to a Renegade X server by address"  Width="50" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" ToolTip="Launches Renegade X without joining any server" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
+                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchServerBtn" ToolTip="Launches a standalone server" Width="94" Height="25" FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click"/>
 
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchEditorBtn" Width="94" Height="25" FontSize="11" Content="Launch Editor" Click="SD_LaunchEditor_Click"/>-->
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_SettingsBtn" Width="94" Height="25" FontSize="11" Content="Settings" Click="SD_Settings_Click"/>-->
@@ -1111,10 +1108,6 @@
                                     <Label Content="Infantry Only" Foreground="White"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="5"  Orientation="Horizontal">
-                                    <Label Content="Address:" Foreground="Gray"/>
-                                    <Label x:Name="SD_IP" Content="" HorizontalAlignment="Center" Foreground="Gray"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="5"  Grid.Column="1" Orientation="Horizontal">
                                     <Label Content="Country:" Foreground="Gray"/>
                                     <Label x:Name="SD_CT" Content="" HorizontalAlignment="Center" Foreground="Gray"/> 
 
