@@ -257,7 +257,7 @@
     <SolidColorBrush x:Key="ButtonBorderHover">#CC65787D</SolidColorBrush>
     <SolidColorBrush x:Key="ButtonBorderPressed">#CC65787D</SolidColorBrush>
     <CornerRadius x:Key="ButtonCornerRadius">3</CornerRadius>
-    <Style TargetType="{x:Type Button}">
+    <Style TargetType="{x:Type Button}" >
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Background" Value="{DynamicResource ButtonBackground}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorder}"/>
@@ -293,5 +293,10 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="TopBarButtons" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}" >
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="Height" Value="24" />
     </Style>
 </ResourceDictionary>

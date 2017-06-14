@@ -902,14 +902,16 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
-                <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click"/>
+                <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="24" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" />
                 <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
 
-                <Button DockPanel.Dock="Right" Margin="3,3,6,3" x:Name="SD_SettingsBtn" Width="60" Height="25" FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center"/>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_JoinIPBtn" ToolTip="Direct connect to a Renegade X server by address"  Width="50" Height="25" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchGameBtn" ToolTip="Launches Renegade X without joining any server" Width="94" Height="25" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}"/>
-                <Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchServerBtn" ToolTip="Launches a standalone server" Width="94" Height="25" FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click"/>
-
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="0,0,5,0">
+                    <Button DockPanel.Dock="Right" x:Name="SD_LaunchServerBtn" ToolTip="Launches a standalone server" Width="90"  FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click" Style="{StaticResource TopBarButtons}"/>
+                    <Button DockPanel.Dock="Right" x:Name="SD_LaunchGameBtn" ToolTip="Launches Renegade X without joining any server" Width="90"  FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}" Style="{StaticResource TopBarButtons}"/>
+                    <Button DockPanel.Dock="Right" x:Name="SD_JoinIPBtn" ToolTip="Direct connect to a Renegade X server by address"  Width="50"  FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}" Style="{StaticResource TopBarButtons}"/>
+                    <Button DockPanel.Dock="Right" x:Name="SD_SettingsBtn" ToolTip="Open the settings menu" Width="68"  FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center" Style="{StaticResource TopBarButtons}"/>
+                </StackPanel>
+                
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchEditorBtn" Width="94" Height="25" FontSize="11" Content="Launch Editor" Click="SD_LaunchEditor_Click"/>-->
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_SettingsBtn" Width="94" Height="25" FontSize="11" Content="Settings" Click="SD_Settings_Click"/>-->
                 <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="Resources/RenX_Logo.png"/>
