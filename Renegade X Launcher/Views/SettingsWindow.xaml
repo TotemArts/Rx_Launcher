@@ -33,12 +33,12 @@
         </StackPanel>
         <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="75" MinWidth="250">
             <StackPanel>
-                <CheckBox Content="Skip Movies" ToolTip="Disables all movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
+                <CheckBox Content="Skip Movies" Margin="1,0,0,2" ToolTip="Disables all movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
                 <Separator Height="5" Margin="2"/>
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="BT_Verify" Content="✔ Verify Game Integrity" ToolTip="Resets all game settings; verifies integrity" Height="21" Width="138"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Verify_Click" />
-                    <Button x:Name="BT_Reset" Content="↻ Reset Game" Height="21" ToolTip="Verifies the integrity of all game files" Width="90"  VerticalContentAlignment="Center" Click="Reset_Click" HorizontalAlignment="Right" />
-                </StackPanel>
+                <DockPanel>
+                    <Button x:Name="BT_Verify" Content=" ✔ Verify Game Integrity " ToolTip="Resets all game settings; verifies integrity" Margin="5" Height="21" HorizontalAlignment="Left" VerticalContentAlignment="Center" Click="Verify_Click" />
+                    <Button x:Name="BT_Reset" Content=" ↻ Reset Game " ToolTip="Verifies the integrity of all game files" Margin="5" Height="21" HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Reset_Click" />
+                </DockPanel>
             </StackPanel>
 
 

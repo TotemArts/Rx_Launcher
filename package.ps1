@@ -2,9 +2,6 @@
 Remove-Item "bin" -Recurse -ErrorAction Ignore
 ROBOCOPY "Renegade X Launcher/bin/Release" "bin" *.dll *.exe *.config /S /XF *.vshost*
 
-# Copy launcher binaries to /UDK_Uncooked/Launcher
-ROBOCOPY "Renegade X Launcher/bin/Release" "../UDK_Uncooked/Launcher" *.dll *.exe *.config /S /XF *.vshost*
-
 # Copy patcher binaries to /RXPatch
 ROBOCOPY "RXPatch/bin/Release" "../RXPatch" *.dll *.exe *.config /S /XF *.vshost*
 

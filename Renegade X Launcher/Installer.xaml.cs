@@ -20,7 +20,7 @@ namespace LauncherTwo
     /// </summary>
     public partial class Installer : Window
     {
-        const string MESSAGE_INSTALL = "It looks like this is the first time you're running Renegade X or your installation is corrupted.\nDo you wish to install the game?";
+        const string MESSAGE_INSTALL = "It looks like this is the first time you're running Renegade X.\nDo you wish to install the game?";
         const string MESSAGE_NOT_INSTALLED = "You will not be able to play the game until the installation is finished!\nThis message will continue to appear untill installation is succesfull.";
         const string MESSAGE_REDIST_INSTALL = "You will now be prompted to install the Unreal Engine dependancies.\nThis is needed for the successfull installation of Renegade X.";
 
@@ -50,7 +50,7 @@ namespace LauncherTwo
             await RedistRequest.DownloadFileTaskAsync(new Uri(source), target);
 
             // Verify (UE3Redist isn't expected to ever change, so we're just dumping the hash here).
-            return (await RXPatchLib.SHA256.GetFileHashAsync(target) == "0F755E0EFE6756AA8940A86AA61BAF9E905B8C02");
+            return (await RXPatchLib.SHA256.GetFileHashAsync(target) == "A1A49F3C2E6830BAE084259650DFADF3AD97A30F59391930639D59220CC0B01F");
         }
 
         /// <summary>
