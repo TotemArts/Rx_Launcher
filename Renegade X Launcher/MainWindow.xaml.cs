@@ -439,11 +439,13 @@ namespace LauncherTwo
             {
                 this.DefaultMoviePlays = false;
                 sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\" + selected.MapName + ".mp4");
+                sv_MapPreviewVid.Play();
             }
             else if (!this.DefaultMoviePlays)
             {
                 sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\Default.mp4");
                 this.DefaultMoviePlays = true;
+                sv_MapPreviewVid.Play();
             }
 
             SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
@@ -585,17 +587,6 @@ namespace LauncherTwo
             }
         }
 
-        private void SD_Settings_Click(object sender, RoutedEventArgs e)
-        {
-            SettingsWindow window = new SettingsWindow();
-            Uri previousVid = sv_MapPreviewVid.Source;
-            sv_MapPreviewVid.Source = null;
-            window.Owner = this;
-            window.ShowDialog();
-            sv_MapPreviewVid.Source = previousVid;
-
-        }
-
         private async void SD_LaunchGame_Click(object sender, RoutedEventArgs e)
         {
             await StartGameInstance(null, null);
@@ -662,7 +653,6 @@ namespace LauncherTwo
         {
             var PreviewMovie = (sender as MediaElement);
             PreviewMovie.Position = System.TimeSpan.Zero;
-            //myMedia.Play();
         }
 
         private void SD_UpdateGame_Click(object sender, RoutedEventArgs e)
@@ -677,12 +667,21 @@ namespace LauncherTwo
             }
         }
 
+        /// <summary>
+        /// Opens the settings menu dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SD_OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            SettingsWindow window = new SettingsWindow();
-            window.Show();
-
-            
+            //Get the previous vid that plays and store it. Nullify the playing vid so no handle is open
+            Uri previousVid = sv_MapPreviewVid.Source;
+            sv_MapPreviewVid.Source = null;
+            //Open the settings as a dialog
+            new SettingsWindow().ShowDialog();
+            //Resume playback of vid
+            sv_MapPreviewVid.Source = previousVid;
+            sv_MapPreviewVid.Play();
         }
 
         /// <summary>

@@ -1032,7 +1032,7 @@
                                     <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                 </Border.BorderBrush>
 
-                                <MediaElement x:Name="sv_MapPreviewVid" Width="320" Height ="180" Source="Vids\Default.wmv" MediaEnded="MediaEndedHandler" Volume="0">
+                                <MediaElement x:Name="sv_MapPreviewVid" Width="320" Height ="180" Source="Vids\Default.wmv" MediaEnded="MediaEndedHandler" Volume="0" LoadedBehavior="Manual">
 
                                 </MediaElement>
 
