@@ -44,7 +44,7 @@ namespace LauncherTwo
         /// <summary>
         /// Boolean that holds the state of the default movie.
         /// </summary>
-        private Boolean DefaultMoviePlays = true;
+        private Boolean DefaultMoviePlays = false;
 
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
