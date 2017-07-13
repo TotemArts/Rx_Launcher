@@ -123,7 +123,7 @@ namespace LauncherTwo
         {
             try
             {
-                if (UpdateState == eUpdateState.ReadyToInstall)
+                if (UpdateState == eUpdateState.ReadyToInstall || true)
                 {
                     string installLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     string executableName = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -163,7 +163,10 @@ namespace LauncherTwo
                         // Clean up. (This also removes this batch file!)
                         "rmdir \"" + GetTempDirectory().TrimEnd('\\') + "\" /s /q",
                     });
-
+                    if (!Directory.Exists(GetTempDirectory()))
+                    {
+                        throw new Exception("Temp directory failure, can not initialize bat file.");
+                    }
                     File.WriteAllText(GetBatPath(), contents);
 
                     ProcessStartInfo startInfo = new ProcessStartInfo(GetBatPath(), "/B");
