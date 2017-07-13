@@ -72,7 +72,14 @@ namespace LauncherTwo
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName(); } }
+        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName() + " | Players online: " + this.TotalPlayersOnline; } }
+
+        private int _TotalPlayersOnline = 0;
+        public int TotalPlayersOnline {get { return this._TotalPlayersOnline; } private set
+            {
+                this._TotalPlayersOnline = value;
+                this.NotifyPropertyChanged("TitleValue");       
+            } }
         public bool IsLaunchingPossible { get { return GameInstance == null && version_mismatch == false; } }
 
         const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
@@ -296,9 +303,10 @@ namespace LauncherTwo
                 return;
 
             OFilteredServerList.Clear();
-
+            this.TotalPlayersOnline = 0;
             foreach (ServerInfo info in ServerInfo.ActiveServers)
             {
+                this.TotalPlayersOnline += info.PlayerCount;
                 if (sv_ServerSearch.Text != "")
                 {
                     if (info.ServerName.ToLower().Contains(sv_ServerSearch.Text.ToLower()) ||
