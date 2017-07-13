@@ -123,7 +123,7 @@ namespace LauncherTwo
         {
             try
             {
-                if (UpdateState == eUpdateState.ReadyToInstall || true)
+                if (UpdateState == eUpdateState.ReadyToInstall)
                 {
                     string installLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     string executableName = System.Reflection.Assembly.GetExecutingAssembly().Location;
