@@ -29,14 +29,14 @@ namespace LauncherTwo
 {
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
-        /*
-            NOT IMPLEMENTED
-            public readonly Dictionary<string, int[]> FlagCodes = new Dictionary<string, int[]>()
-            {
-                { "FR", new[]{-112,-64}},
-                { "US", new[]{-208,-208} }
-            };
-            */
+        public readonly Dictionary<string, Rect> FlagCodes = new Dictionary<string, Rect>()
+        {
+            { "France", new Rect(192,128,32,32)},
+            { "Germany", new Rect(128,96,32,32)},
+            { "China", new Rect(384,64,32,32)},
+            { "Australia", new Rect(384,0,32,32)},
+            { "USA", new Rect(0,448,32,32)}
+        };
 
         public const bool SHOW_DEBUG = false;
         public bool version_mismatch = false;
@@ -441,7 +441,6 @@ namespace LauncherTwo
             //Original mappreview code
             //sv_MapPreview.Source = BitmapToImageSourceConverter.Convert(MapPreviewSettings.GetMapBitmap(selected.MapName));
 
-
             //Movie mappreview code
             if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\" + selected.MapName + ".mp4"))
             {
@@ -466,10 +465,11 @@ namespace LauncherTwo
             SD_ServerVersion.Content = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
             SD_CT.Content = selected.CountryCode;
-            //SD_CTCR.SourceRect = new Int32Rect(208, 208, 16, 16);
 
-
-
+            Rect r;
+            this.FlagCodes.TryGetValue(selected.CountryCode, out r);
+            this.SD_CFI.Viewbox = r;
+            
 
             Autobalance_Checkbx.Source = GetChkBxImg(selected.AutoBalance);
             Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);

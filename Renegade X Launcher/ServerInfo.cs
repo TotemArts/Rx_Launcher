@@ -33,7 +33,9 @@ namespace LauncherTwo
         /// </summary>
         public static List<ServerInfo> ActiveServers;
 
-
+        /// <summary>
+        /// Contains all the previous grabbed countrycodes
+        /// </summary>
         public static Dictionary<string, string> CountryCodeCache = new Dictionary<string, string>();
 
         /// <summary>
@@ -101,42 +103,8 @@ namespace LauncherTwo
 
                         NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
 
-                        //GET CountryCode
-                        //If the Ip is known, we can check the country.
-                        //Otherwise, assume CountryCode is missing
-                        if (NewServer.IPAddress != "Missing") 
-                        {
-                            string CountryCode;
-                            //First check the cache if we already have the current ip, this reduces the call to the api
-                            CountryCodeCache.TryGetValue(NewServer.IPAddress, out CountryCode); 
-                            //If the CountryCode was not found in the cache (null), grab it from the api
-                            //Else, use the CountryCode from the cache
-                            if (CountryCode == null)
-                            {
-                                try
-                                {
-                                    //Grab the Countrycode
-                                    string CountryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + NewServer.IPAddress);
-                                    var CountryResults = JsonConvert.DeserializeObject<dynamic>(CountryJson);
-                                    //Add to CurrentServer info and cache
-                                    NewServer.CountryCode = CountryResults["countryName"];
-                                    CountryCodeCache.Add(NewServer.IPAddress, (string)CountryResults["countryName"]);
-                                }
-                                catch
-                                {
-                                    //If the api does not respond in any way, assume CountryCode is missing
-                                    NewServer.CountryCode = "Unknown";
-                                }
-                            }
-                            else
-                            {
-                                NewServer.CountryCode = CountryCode;
-                            }
-                        }
-                        else
-                        {
-                            NewServer.CountryCode = "Unknown";
-                        }
+                        NewServer.CountryCode = await GrabCountry(NewServer.IPAddress);
+
                         //All work done, add current serverinfo to the main list
                         NewActiveServers.Add(NewServer);
                     }
@@ -266,6 +234,54 @@ namespace LauncherTwo
             }
         }
 
+        /// <summary>
+        /// Tries to grab the countryname based on the given IPAddress.
+        /// </summary>
+        /// <param name="IPAddress">The IPAddress</param>
+        /// <returns>The name of the country that belongs to the IPAddress</returns>
+        static async Task<string> GrabCountry(string IPAddress)
+        {
+            //GET CountryCode
+            //If the Ip is known, we can check the country.
+            //Otherwise, assume CountryCode is missing
+            if (IPAddress != "Missing")
+            {
+                string CountryCode;
+                //First check the cache if we already have the current ip, this reduces the call to the api
+                CountryCodeCache.TryGetValue(IPAddress, out CountryCode);
+                //If the CountryCode was not found in the cache (null), grab it from the api
+                //Else, use the CountryCode from the cache
+                if (CountryCode == null)
+                {
+                    try
+                    {
+                        //Grab the Countrycode
+                        string CountryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + IPAddress);
+                        var CountryResults = JsonConvert.DeserializeObject<dynamic>(CountryJson);
+
+                        //Add to CurrentServer info and cache
+                        CountryCodeCache.Add(IPAddress, (string)CountryResults["countryName"]);
+                        return CountryResults["countryName"];
+                    }
+                    catch
+                    {
+                        //If the api does not respond in any way, assume CountryCode is missing
+                        return "Unknown";
+                    }
+                }
+                else
+                {
+                    return CountryCode;
+                }
+            }
+            else
+            {
+                return "Unknown";
+            }
+        }
+
+
+
         // FRONT PAGE INFO
         public string ServerName { get; set; }
         public string MapName { get; set; }
@@ -379,5 +395,7 @@ namespace LauncherTwo
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        
     }
 }

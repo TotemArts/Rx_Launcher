@@ -911,7 +911,7 @@
                     <Button DockPanel.Dock="Right" x:Name="SD_JoinIPBtn" ToolTip="Direct connect to a Renegade X server by address"  Width="50"  FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}" Style="{StaticResource TopBarButtons}"/>
                     <Button DockPanel.Dock="Right" x:Name="SD_SettingsBtn" ToolTip="Open the settings menu" Width="68"  FontSize="11" Content="&#9881; Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center" Style="{StaticResource TopBarButtons}"/>
                 </StackPanel>
-                
+
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchEditorBtn" Width="94" Height="25" FontSize="11" Content="Launch Editor" Click="SD_LaunchEditor_Click"/>-->
                 <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_SettingsBtn" Width="94" Height="25" FontSize="11" Content="Settings" Click="SD_Settings_Click"/>-->
                 <Image Grid.Column="2" Margin="3,6,3,6" Height="42" Source="Resources/RenX_Logo.png"/>
@@ -1039,7 +1039,7 @@
                                 <!--<Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>-->
                             </Border>
                             <Button x:Name="Join_Server_Btn" Content="Select a Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Foreground="#FFB0B0B0">
-                                    <Button.Background>
+                                <Button.Background>
                                     <SolidColorBrush Color="#5935BAFF" Opacity="0.5"/>
                                 </Button.Background>
                             </Button>
@@ -1109,15 +1109,13 @@
                                     <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
                                     <Label Content="Infantry Only" Foreground="White"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="5"  Orientation="Horizontal">
-                                    <Label Content="Country:" Foreground="Gray"/>
-                                    <Label x:Name="SD_CT" Content="" HorizontalAlignment="Center" Foreground="Gray"/> 
-
-                                    <!--<Image x:Name="SD_CT" Width="16" Height="16"  >
-                                        <Image.Source>
-                                            <CroppedBitmap x:Name="SD_CTCR" Source="D:\\Users\\Rob\\Pictures\\flags.png" SourceRect="112, 64, 16, 16" />
-                                        </Image.Source>
-                                    </Image>-->
+                                <StackPanel Grid.Row="5"  Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Rectangle x:Name="SD_CF" Width="32" Height="32" Margin="6,0,0,0">
+                                        <Rectangle.Fill>
+                                            <ImageBrush x:Name="SD_CFI" ImageSource="{StaticResource FlagBatch}" Stretch="none" AlignmentX="Left" AlignmentY="Top" ViewboxUnits="Absolute" Viewbox="-32,0,32,32"/>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Label x:Name="SD_CT" Content="" HorizontalAlignment="Center" Foreground="Gray" Padding="5,7,0,0"/>
                                 </StackPanel>
                                 <Grid x:Name="SD_VersionMismatch" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
                                     <Grid.ColumnDefinitions>

@@ -299,4 +299,9 @@
         <Setter Property="Margin" Value="3"/>
         <Setter Property="Height" Value="24" />
     </Style>
+
+    <BitmapImage x:Key="FlagBatch" UriSource="Resources/FlagBatch.png"/>
+
+
+
 </ResourceDictionary>
