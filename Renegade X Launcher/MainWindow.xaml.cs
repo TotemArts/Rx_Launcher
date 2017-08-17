@@ -1,43 +1,26 @@
-﻿using System.Collections.ObjectModel;
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using LauncherTwo.Views;
-using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Animation;
 using System.Reflection;
-using System.Globalization;
 using System.Net;
 using System;
 using System.Windows.Threading;
 using System.ComponentModel;
 using FirstFloor.ModernUI.Windows.Controls;
-using System.Collections.Generic;
 using RXPatchLib;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Diagnostics;
-using System.Security.Permissions;
 
 namespace LauncherTwo
 {
     public partial class MainWindow : RXWindow, INotifyPropertyChanged
     {
-        public readonly Dictionary<string, Rect> FlagCodes = new Dictionary<string, Rect>()
-        {
-            { "France", new Rect(192,128,32,32)},
-            { "Germany", new Rect(128,96,32,32)},
-            { "China", new Rect(384,64,32,32)},
-            { "Australia", new Rect(384,0,32,32)},
-            { "USA", new Rect(0,448,32,32)}
-        };
-
         public const bool SHOW_DEBUG = false;
         public bool version_mismatch = false;
 
@@ -464,13 +447,12 @@ namespace LauncherTwo
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
             SD_ServerVersion.Content = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
-            SD_CT.Content = selected.CountryCode;
+            SD_CN.Content = selected.CountryName;
 
             Rect r;
-            this.FlagCodes.TryGetValue(selected.CountryCode, out r);
+            ServerInfo.FlagCodes.TryGetValue(selected.CountryCode, out r);
             this.SD_CFI.Viewbox = r;
             
-
             Autobalance_Checkbx.Source = GetChkBxImg(selected.AutoBalance);
             Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);
             Crates_Checkbx.Source = GetChkBxImg(selected.SpawnCrates);

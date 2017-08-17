@@ -1115,7 +1115,7 @@
                                             <ImageBrush x:Name="SD_CFI" ImageSource="{StaticResource FlagBatch}" Stretch="none" AlignmentX="Left" AlignmentY="Top" ViewboxUnits="Absolute" Viewbox="-32,0,32,32"/>
                                         </Rectangle.Fill>
                                     </Rectangle>
-                                    <Label x:Name="SD_CT" Content="" HorizontalAlignment="Center" Foreground="Gray" Padding="5,7,0,0"/>
+                                    <Label x:Name="SD_CN" Content="" HorizontalAlignment="Center" Foreground="Gray" Padding="5,7,0,0"/>
                                 </StackPanel>
                                 <Grid x:Name="SD_VersionMismatch" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
                                     <Grid.ColumnDefinitions>
