@@ -571,8 +571,34 @@ namespace LauncherTwo
                 else return null;
             }
         }
-        
-       
+
+        private BitmapImage modeImage;
+
+        public BitmapImage ModeImage
+        {
+            get
+            {
+                if(this.modeImage == null)
+                {
+                    switch (this.MapMode)
+                    {
+                        case GameMode.DM:
+                            this.modeImage = new BitmapImage(new Uri("Resources/dm_modeIcon.png", UriKind.Relative));
+                            break;
+                        case GameMode.CNC:
+                            this.modeImage = new BitmapImage(new Uri("Resources/cnc_modeIcon.png", UriKind.Relative));
+                            break;
+                        case GameMode.TS:
+                            this.modeImage = new BitmapImage(new Uri("Resources/ts_modeIcon.png", UriKind.Relative));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return this.modeImage;
+            }
+        }
+
         // SIDE BAR INFO
         public string   IPAddress { get; set; }
         public int Port { get; set; }

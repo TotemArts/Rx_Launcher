@@ -337,6 +337,13 @@
   <ItemGroup>
     <Resource Include="Resources\FlagBatch.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cnc_modeIcon.png" />
+    <Resource Include="Resources\ts_modeIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dm_modeIcon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

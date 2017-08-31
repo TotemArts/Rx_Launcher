@@ -444,6 +444,7 @@ namespace LauncherTwo
             SD_Name.Content = selected.ServerName;
             SD_GameLength.Content = selected.TimeLimit.ToString();
             SD_MineLimit.Content = selected.MineLimit.ToString();
+            SD_GameMode.Content = selected.MapMode.ToString();
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
             SD_ServerVersion.Content = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
