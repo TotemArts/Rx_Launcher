@@ -139,9 +139,6 @@ namespace LauncherTwo
             };
             InitializeComponent();
 
-
-            
-
             //SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
@@ -150,8 +147,8 @@ namespace LauncherTwo
             BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
-
-
+            //due to the mediaelement being set to manual control, we need to start the previewvid in the constructor
+            this.sv_MapPreviewVid.Play();
         }
 
         private async Task CheckVersionsAsync()
@@ -425,15 +422,15 @@ namespace LauncherTwo
             //sv_MapPreview.Source = BitmapToImageSourceConverter.Convert(MapPreviewSettings.GetMapBitmap(selected.MapName));
 
             //Movie mappreview code
-            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\" + selected.MapName + ".mp4"))
+            if (File.Exists(GameInstallation.GetRootPath() + "\\PreviewVids\\" + selected.MapName + ".mp4"))
             {
                 this.DefaultMoviePlays = false;
-                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\" + selected.MapName + ".mp4");
+                sv_MapPreviewVid.Source = new Uri(GameInstallation.GetRootPath() + "\\PreviewVids\\" + selected.MapName + ".mp4");
                 sv_MapPreviewVid.Play();
             }
             else if (!this.DefaultMoviePlays)
             {
-                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "\\..\\PreviewVids\\Default.mp4");
+                sv_MapPreviewVid.Source = new Uri(GameInstallation.GetRootPath() + "\\PreviewVids\\Default.mp4");
                 this.DefaultMoviePlays = true;
                 sv_MapPreviewVid.Play();
             }
