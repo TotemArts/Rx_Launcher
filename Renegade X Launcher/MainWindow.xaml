@@ -889,19 +889,19 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Storyboard x:Key="JoinButtonGlow" RepeatBehavior="Forever">
+        <Storyboard x:Key="JoinButtonGlow">
             <DoubleAnimation 
 				Storyboard.TargetName="Join_Server_Btn"
 				Storyboard.TargetProperty="Opacity"
 				From="1.0" To="0.1" Duration="0:0:0.3"
 				AutoReverse="True"
 				/>
-            <DoubleAnimation 
+            <!--<DoubleAnimation 
 				Storyboard.TargetName="Join_Server_Btn"
 				Storyboard.TargetProperty="Opacity"
 				From="1.0" To="1.0" BeginTime="0:0:3" Duration="0:0:0.5"
 				AutoReverse="True" 
-				/>
+				/>-->
         </Storyboard>
     </Window.Resources>
 
