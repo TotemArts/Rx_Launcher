@@ -472,6 +472,10 @@ namespace LauncherTwo
                 this.Join_Server_Btn.Content = "Server Version Mismatch";
             }
 
+            System.Windows.Media.Animation.Storyboard sb = this.FindResource("JoinButtonGlow") as System.Windows.Media.Animation.Storyboard;
+            System.Windows.Media.Animation.Storyboard.SetTarget(sb, this.Join_Server_Btn);
+            sb.Begin();
+
             ServerInfoGrid.UpdateLayout();
         }
 

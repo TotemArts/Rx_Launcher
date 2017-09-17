@@ -362,5 +362,15 @@ namespace LauncherTwo.Views
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        /// <summary>
+        /// Buttonhandler for pause command
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Pause_Click(object sender, RoutedEventArgs e)
+        {
+            //Todo-> Agents miraculous pause code that's needed in RXPatch "Help"
+        }
     }
 }

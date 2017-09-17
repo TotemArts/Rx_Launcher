@@ -24,7 +24,10 @@
         <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="RestoreTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="CloseTitleBarButton" TargetType="UserControl"/>
+        
         <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
+
+        
         <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
         <local:PhaseProgressPercentageConverter x:Key="PhaseProgressPercentageConverter"/>
         <local:PhaseProgressStringConverter x:Key="PhaseProgressStringConverter"/>
@@ -64,8 +67,9 @@
         <Grid>
             <FrameworkElement Height="10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Cancel_Click" IsCancel="True" Content="Cancel" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>
-                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Close_Click" IsDefault="True" Content="Close" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Button Foreground="{DynamicResource RenXFontColorBrush}"  Margin="0,0,20,0" Width="70" Click="Cancel_Click" IsCancel="True" Content="Cancel" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>
+                <Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Pause_Click" IsCancel="True" Content="Pause" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>
+                <Button Foreground="{DynamicResource RenXFontColorBrush}" Margin="20,0,0,0"  Width="70" Click="Close_Click" IsDefault="True" Content="Close" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>
         </Grid>
     </StackPanel>

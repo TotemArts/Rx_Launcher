@@ -889,6 +889,20 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Storyboard x:Key="JoinButtonGlow" RepeatBehavior="Forever">
+            <DoubleAnimation 
+				Storyboard.TargetName="Join_Server_Btn"
+				Storyboard.TargetProperty="Opacity"
+				From="1.0" To="0.1" Duration="0:0:0.3"
+				AutoReverse="True"
+				/>
+            <DoubleAnimation 
+				Storyboard.TargetName="Join_Server_Btn"
+				Storyboard.TargetProperty="Opacity"
+				From="1.0" To="1.0" BeginTime="0:0:3" Duration="0:0:0.5"
+				AutoReverse="True" 
+				/>
+        </Storyboard>
     </Window.Resources>
 
     <!-- END RESOURCE -->
@@ -1053,11 +1067,7 @@
                                 </Button.Background>
                             </Button>
 
-                            <!--<Button x:Name="Queue_Server_Btn" Content="Queue this Server" Margin="3" Height="48" FontSize="24" Click="Queue_Server_Btn_Click" IsEnabled="True" Foreground="#FFB0B0B0">
-                                <Button.Background>
-                                    <SolidColorBrush Color="#5935BAFF" Opacity="0.5"/>
-                                </Button.Background>
-                            </Button>-->
+
 
                         </StackPanel>
                     </Border>
