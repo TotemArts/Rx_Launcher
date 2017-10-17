@@ -31,7 +31,7 @@ namespace LauncherTwo
 
         public const int SERVER_REFRESH_RATE = 10000; // 10 sec
         public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
-        public static readonly int MAX_PLAYER_COUNT = 64;
+        public static readonly int MAX_PLAYER_COUNT = 40;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer refreshTimer;
         private EngineInstance _GameInstance;
@@ -91,7 +91,7 @@ namespace LauncherTwo
 
 
         #region -= Filters =-
-        private int filter_MaxPlayers = 64;
+        private int filter_MaxPlayers = MAX_PLAYER_COUNT; // Default to max
         private int filter_MinPlayers = 0;
         #endregion -= Filters =-
 
