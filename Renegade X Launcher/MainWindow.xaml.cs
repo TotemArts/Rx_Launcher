@@ -276,11 +276,11 @@ namespace LauncherTwo
 
         public void RefilterServers()
         {
-            var previousSelectedServer = GetSelectedServer();
-
             //If we don't have an active server list we want to return
             if (ServerInfo.ActiveServers == null)
                 return;
+
+            var previousSelectedServer = GetSelectedServer();
 
             OFilteredServerList.Clear();
             this.TotalPlayersOnline = 0;
@@ -348,26 +348,7 @@ namespace LauncherTwo
 
         private async void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
         {
-            ServerInfo SelectedServerInfo = GetSelectedServer();
-            if (SelectedServerInfo != null)
-            {
-                string password = null;
-                if (GetSelectedServer().PasswordProtected)
-                {
-                    PasswordWindow PassWindow = new PasswordWindow();
-                    PassWindow.Owner = this;
-                    PassWindow.ShowDialog();
-                    if (!PassWindow.WantsToJoin)
-                    {
-                        return;
-                    }
-                    password = PassWindow.Password;
-                }
-
-                this.WindowState = WindowState.Minimized;
-                await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start 
-                this.WindowState = WindowState.Normal;
-            }
+            JoinSelectedServer();
         }
 
         private async Task RefreshServersAsync()
@@ -705,6 +686,35 @@ namespace LauncherTwo
                 notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
                 notInstalledDialog.ShowDialog();
             }
+        }
+
+        private async void JoinSelectedServer()
+        {
+            ServerInfo SelectedServerInfo = GetSelectedServer();
+            if (SelectedServerInfo != null)
+            {
+                string password = null;
+                if (GetSelectedServer().PasswordProtected)
+                {
+                    PasswordWindow PassWindow = new PasswordWindow();
+                    PassWindow.Owner = this;
+                    PassWindow.ShowDialog();
+                    if (!PassWindow.WantsToJoin)
+                    {
+                        return;
+                    }
+                    password = PassWindow.Password;
+                }
+
+                this.WindowState = WindowState.Minimized;
+                await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start 
+                this.WindowState = WindowState.Normal;
+            }
+        }
+
+        private void ServerInfoGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            JoinSelectedServer();
         }
     }
 }
