@@ -1016,6 +1016,14 @@
                   </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <DataGridTemplateColumn x:Name="RankedColumn" Width="10" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding RankImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
                 <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" Foreground="White" />
                 <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding SimplifiedMapName}" Header="Map" Width="100" Foreground="#FF98ABAE"/>
                 <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort"/>
@@ -1092,7 +1100,7 @@
                   <RowDefinition Height="Auto"/>
                   <RowDefinition Height="Auto"/>
                   <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
                   <Label x:Name="SD_Name" Content="" Foreground="#BF35BAFF" HorizontalAlignment="Center" FontWeight="Bold"/>
@@ -1138,11 +1146,16 @@
                   <Label Content="Steam Required" Foreground="White"/>
                 </StackPanel>
                 <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
-                  <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
-                  <Label Content="Infantry Only" Foreground="White"/>
+                    <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                    <Label Content="Infantry Only" Foreground="White"/>
                 </StackPanel>
 
-                <Grid x:Name="SD_VersionMismatch" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
+                <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal">
+                    <Image x:Name="Ranked_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                    <Label Content="Ranked" Foreground="White" />
+                </StackPanel>
+
+                <Grid x:Name="SD_VersionMismatch" Grid.Row="7" Grid.ColumnSpan="2" Visibility="Hidden">
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                   </Grid.ColumnDefinitions>

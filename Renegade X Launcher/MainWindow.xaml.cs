@@ -346,7 +346,7 @@ namespace LauncherTwo
             }
         }
 
-        private async void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
+        private void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
         {
             JoinSelectedServer();
         }
@@ -436,6 +436,7 @@ namespace LauncherTwo
             Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);
             Crates_Checkbx.Source = GetChkBxImg(selected.SpawnCrates);
             InfantryOnly_Checkbx.Source = GetChkBxImg(selected.VehicleLimit <= 0);
+            Ranked_Checkbx.Source = GetChkBxImg(selected.Ranked);
 
             // Set version mismatch message visibility and join button opacity
             if (VersionCheck.GetGameVersionName() == selected.GameVersion)

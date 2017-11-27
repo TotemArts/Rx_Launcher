@@ -335,6 +335,8 @@ namespace LauncherTwo
 
                         NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
 
+                        NewServer.Ranked = Data.Variables["bRanked"] ?? false;
+
                         //SET COUNTRYINFO
                         string[] CountryInfo = await GrabCountry(NewServer.IPAddress);
                         NewServer.CountryName = CountryInfo[0];
@@ -522,6 +524,7 @@ namespace LauncherTwo
         public string MapName { get; set; }
         public string SimplifiedMapName { get; set; }
         public GameMode MapMode { get; set; }
+        public bool Ranked { get; set; }
         // Raw ping value
         public int Ping { get; set; }
         // Value used to sort ping in the server list
@@ -596,6 +599,19 @@ namespace LauncherTwo
                     }
                 }
                 return this.modeImage;
+            }
+        }
+
+        private BitmapImage rankedImage;
+
+        public BitmapImage RankedImage
+        {
+            get
+            {
+                if (this.rankedImage == null && this.Ranked)
+                        this.rankedImage = new BitmapImage(new Uri("Resources/RankedIcon.png", UriKind.Relative));
+
+                return this.rankedImage;
             }
         }
 
