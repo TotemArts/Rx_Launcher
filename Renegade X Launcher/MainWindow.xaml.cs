@@ -29,8 +29,8 @@ namespace LauncherTwo
         /// </summary>
         private Boolean DefaultMoviePlays = false;
 
-        public const int SERVER_REFRESH_RATE = 10000; // 10 sec
-        public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
+        public const int SERVER_REFRESH_RATE = 60; // 60 sec
+        public const int SERVER_AUTO_PING_RATE = 60; // unused
         public static readonly int MAX_PLAYER_COUNT = 40;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer refreshTimer;
