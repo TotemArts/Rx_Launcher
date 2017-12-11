@@ -31,7 +31,7 @@ namespace LauncherTwo
 
         public const int SERVER_REFRESH_RATE = 60; // 60 sec
         public const int SERVER_AUTO_PING_RATE = 60; // unused
-        public static readonly int MAX_PLAYER_COUNT = 40;
+        public static readonly int MAX_PLAYER_COUNT = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer refreshTimer;
         private EngineInstance _GameInstance;
