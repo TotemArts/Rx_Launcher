@@ -32,7 +32,7 @@ namespace LauncherTwo
     {
         private static Dictionary<string, BannerInfo> Banners = new Dictionary<string, BannerInfo>()
         {
-            { "Default", new BannerInfo("http://www.renegade-x.com/", new BitmapImage(new Uri("Resources/defaultBanner.png", UriKind.Relative))) }
+            { "Default", new BannerInfo("https://renegade-x.com/", new BitmapImage(new Uri("Resources/defaultBanner.png", UriKind.Relative))) }
         };
 
         public static ImageSource GetBanner(string IPAddress)
