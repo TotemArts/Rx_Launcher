@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Collections.Generic;
 
 namespace LauncherTwo.Views
 {
@@ -265,34 +266,19 @@ namespace LauncherTwo.Views
         {
             TargetVersionString = targetVersionString;
             CancellationTokenSource = cancellationTokenSource;
-            String Status = "updated";
-            String Title = "update";
+            string[] StatusTitle = new string[]{"updated", "update"};
 
-            switch (type)
+            Dictionary<UpdateWindowType, string[]> StatusTitleDict = new Dictionary<UpdateWindowType, string[]>()
             {
-                case UpdateWindowType.Install:
-                    Status = "installed";
-                    Title = "installation";
-                    break;
-                case UpdateWindowType.Update:
-                    Status = "updated";
-                    Title = "update";
-                    break;
-                case UpdateWindowType.Verify:
-                    Status = "verified";
-                    Title = "verification";
-                    break;
-                case UpdateWindowType.Reset:
-                    Status = "reset";
-                    Title = "reset";
-                    break;
-                default:
-                    Status = "modified";
-                    Title = "modification";
-                    break;
-            }
+                {UpdateWindowType.Install, new string[]{"installed", "installation" } },
+                {UpdateWindowType.Update, new string[]{"updated", "update" } },
+                {UpdateWindowType.Verify, new string[]{"verified", "verification" } },
+                {UpdateWindowType.Reset, new string[]{"modified", "modification" } }
+            };
 
-            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", Status);
+            StatusTitleDict.TryGetValue(type, out StatusTitle);
+
+            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", StatusTitle[0]);
 
             if (patcher.BaseURL == null || patcher.BaseURL == "")
                 this.ServerMessage = "pending";
@@ -300,7 +286,7 @@ namespace LauncherTwo.Views
                 this.ServerMessage = patcher.BaseURL;
 
             InitializeComponent();
-            this.Title = string.Format("Renegade X {0} ", Title);
+            this.Title = string.Format("Renegade X {0} ", StatusTitle[1]);
 
             DirectoryPatcherProgressReport lastReport = new DirectoryPatcherProgressReport();
             progress.ProgressChanged += (o, report) => lastReport = report;
@@ -325,12 +311,12 @@ namespace LauncherTwo.Views
                 try
                 {
                     await patchTask; // Collect exceptions.
-                    this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", Status, TargetVersionString);
+                    this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", StatusTitle[0], TargetVersionString);
                     
                 }
                 catch (Exception exception)
                 {
-                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", Status, exception.Message);
+                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", StatusTitle[0], exception.Message);
                 }
                 HasFinished = true;
             });

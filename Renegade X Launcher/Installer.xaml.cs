@@ -74,7 +74,7 @@ namespace LauncherTwo
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
             var patcher = new RXPatcher();
-            Task task = patcher.ApplyPatchFromWeb(patchUrls, patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+            Task task = patcher.ApplyPatchFromWeb(patchUrls.Select(url => url.ServerUri.AbsoluteUri).ToArray(), patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
 
             //Create the update window
@@ -97,7 +97,7 @@ namespace LauncherTwo
                 {
                     //Determine which server has best ping
                     var PatchUrls = VersionCheck.GamePatchUrls;
-                    var hosts = PatchUrls.Select(url => new Uri(url)).ToArray();
+                    var hosts = PatchUrls.Select(url => url.ServerUri).ToArray();
 
                     RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();
                     await Selector.SelectHosts(hosts); //NEed to suppress the ui from showing here

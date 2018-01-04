@@ -26,7 +26,8 @@ namespace LauncherTwo
 
         public static string InstructionsHash;
         public static string GamePatchPath = null;
-        public static string[] GamePatchUrls = null;
+        //public static string[] GamePatchUrls = null;
+        public static UpdateServerModel[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
         public static string LauncherPatchHash = null;
 
@@ -144,7 +145,8 @@ namespace LauncherTwo
                 };
                 InstructionsHash = versionData["game"]["instructions_hash"];
                 GamePatchPath = versionData["game"]["patch_path"];
-                GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
+                //GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
+                GamePatchUrls = UpdateServerModelFactory.CreateUpdateServerModels(versionData["game"]["patch_urls"].ToObject<string[]>());
             }
             catch
             {
