@@ -416,8 +416,8 @@ namespace LauncherTwo
                 sv_MapPreviewVid.Play();
             }
 
-            SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
-            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
+            SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPWithPort);
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPWithPort) != "" ? Cursors.Hand : null;
 
             SD_Name.Content = selected.ServerName;
             SD_GameLength.Content = selected.TimeLimit.ToString();
@@ -469,7 +469,7 @@ namespace LauncherTwo
         private void SD_ClanHeader_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ServerInfo selected = GetSelectedServer();
-            BannerTools.LaunchBannerLink(selected != null ? selected.IPAddress : null);
+            BannerTools.LaunchBannerLink(selected != null ? selected.IPWithPort : null);
         }
 
         private void SD_EditUsernameBtn_Click(object sender, RoutedEventArgs e)
