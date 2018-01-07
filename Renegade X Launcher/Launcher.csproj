@@ -82,10 +82,6 @@
     <Reference Include="FirstFloor.ModernUI">
       <HintPath>..\packages\ModernUI.WPF.1.0.6\lib\net45\FirstFloor.ModernUI.dll</HintPath>
     </Reference>
-    <Reference Include="IrcClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\IrcClient.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -125,6 +121,7 @@
     <Compile Include="Installer.xaml.cs">
       <DependentUpon>Installer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InstanceHandler.cs" />
     <Compile Include="LaunchTools.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

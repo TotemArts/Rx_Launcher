@@ -1,20 +1,13 @@
-﻿// AX
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LauncherTwo
 {
-    /*
-     * InstanceHandler class
-     * What Does It Do
-     *  This class attempts to find other running instances of the launcher running in the same directory.
-     */
+    /// <summary>
+    /// InstanceHandler class
+    /// This class attempts to find other running instances of the launcher running in the same directory.
+    /// </summary>
     static class InstanceHandler
     {
         public static bool IsAnotherInstanceRunning()
@@ -34,10 +27,10 @@ namespace LauncherTwo
             }
         }
 
-        /*
-         * Kills a "ghosted" process if the process is from the same directory as the current instance
-         *  Helps with updater errors when a file lock is open on a file attempting to be updated.
-         */
+       /// <summary>
+       /// Kills a "ghosted" process if the process is from the same directory as the current instance
+       /// Helps with updater errors when a file lock is open on a file attempting to be updated.
+       /// </summary>
         public static void KillDuplicateInstance()
         {
             try
