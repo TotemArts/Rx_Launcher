@@ -46,6 +46,10 @@ namespace LauncherTwo
                 }
                 else if(a.StartsWith("--UpdateGame="))//Manually opdate the game to a given URL.
                 {
+                    // Close any other instances of the RenX-Launcher
+                    if ( InstanceHandler.IsAnotherInstanceRunning() )
+                        InstanceHandler.KillDuplicateInstance();
+
                     var targetDir = GameInstallation.GetRootPath();
                     var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
                     String patchUrl = a.Substring("--UpdateGame=".Length);
@@ -85,6 +89,13 @@ namespace LauncherTwo
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
             if (e.Args.Length == 0 || isGoodUpdate)
             {
+                if (InstanceHandler.IsAnotherInstanceRunning())
+                {
+                    MessageBox.Show("Error:\nUnable to start Renegade-X Launcher: Another instance is already running!",
+                        "Renegade-X Launcher", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    Current.Shutdown();
+                }
+
                 new MainWindow().Show();
             }
             /*else
