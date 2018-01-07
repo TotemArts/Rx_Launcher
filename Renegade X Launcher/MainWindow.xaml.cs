@@ -217,6 +217,10 @@ namespace LauncherTwo
             }
             else
             {
+                // Close any other instances of the RenX-Launcher
+                if (InstanceHandler.IsAnotherInstanceRunning())
+                    InstanceHandler.KillDuplicateInstance();
+
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
                 var patchPath = VersionCheck.GamePatchPath;
