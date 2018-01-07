@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -85,25 +86,31 @@ namespace LauncherTwo
 
                 foreach(var Data in results)
                 {
-                    BannerInfo info = new BannerInfo();
+                    BannerInfo info = new BannerInfo
+                    {
+                        m_WebsiteLink = Data["Link"],
+                    };
 
-                    info.m_WebsiteLink = Data["Link"];
-
-                    string urlLink = Data["Banner"];
-
-                    info.m_BannerImageSource = DownloadImage(urlLink);
+                    string bannerURL = Data["Banner"];
+                    info.m_BannerImageSource = DownloadImage(bannerURL);
 
                     string ipString = Data["IP"] ?? "-1";
                     string[] ips = ipString.Split(RenXWebLinks.RENX_SERVER_SETTING_SPACE_SYMBOL);
 
                     foreach( string ip in ips)
                     {
-                        Banners.Add(ip.Replace(":7777", ""), info); 
+                        /*
+                         * AX: No longer are we ripping the port off of the IP Address here for banners,
+                         *  Reason: Game server providers use the same server IP Address for multiple instances of the same game, this fixes banners for these server types.
+                         */
+
+                        Banners.Add(ip, info); 
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                Debug.Print(ex.Message);
                 // Swallow any exceptions (usually connectivity or parse errors).
             }
         }
