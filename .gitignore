@@ -1,8 +1,9 @@
 
 # /
-/Renegade X Launcher.v12.suo
-
 /.vs
+/bin
+/RXPatch-bin
+/Renegade X Launcher.v12.suo
 
 # /RXPatch/
 /RXPatch/bin
@@ -20,44 +21,3 @@
 /Renegade X Launcher/bin
 /Renegade X Launcher/obj
 
-# /Renegade X Launcher/Net45/
-
-# /Renegade X Launcher/Properties/
-
-# /Renegade X Launcher/Resources/
-
-# /Renegade X Launcher/Steam/
-
-# /Renegade X Launcher/Themes/
-
-# /Renegade X Launcher/Tools/
-
-# /Renegade X Launcher/Views/
-
-# /Renegade X Launcher/fonts/
-
-# /SteamWebAPI-master/
-
-# /SteamWebAPI-master/Properties/
-
-# /WPF Toolkit/
-
-# /WPF Toolkit/de/
-
-# /WPF Toolkit/es/
-
-# /WPF Toolkit/fr/
-
-# /WPF Toolkit/hu/
-
-# /WPF Toolkit/it/
-
-# /WPF Toolkit/pt-BR/
-
-# /WPF Toolkit/ro/
-
-# /WPF Toolkit/ru/
-
-# /WPF Toolkit/sv/
-
-# /WPF Toolkit/zh-Hans/
