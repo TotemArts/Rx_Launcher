@@ -1,5 +1,6 @@
 # Copy launcher binaries to /bin
 Remove-Item "bin" -Recurse -ErrorAction Ignore
+Remove-Item "RXPatch-bin" -Recurse -ErrorAction Ignore
 ROBOCOPY "Renegade X Launcher/bin/Release" "bin" *.dll *.exe *.config /S /XF *.vshost*
 
 # Copy patcher binaries to /RXPatch-bin
