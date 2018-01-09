@@ -89,7 +89,7 @@ namespace LauncherTwo
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
             if (e.Args.Length == 0 || isGoodUpdate)
             {
-                if (InstanceHandler.IsAnotherInstanceRunning())
+                if (InstanceHandler.IsAnotherInstanceRunning() && !isGoodUpdate)
                 {
                     MessageBox.Show("Error:\nUnable to start Renegade-X Launcher: Another instance is already running!",
                         "Renegade-X Launcher", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
