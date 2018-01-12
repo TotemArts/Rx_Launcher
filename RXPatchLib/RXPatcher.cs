@@ -21,6 +21,21 @@ namespace RXPatchLib
         public string BaseURL = null;
         public string WebPatchPath = null;
 
+        private static RXPatcher _instance;
+        public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
+
+        private readonly UpdateServerHandler _updateServerHandler = new UpdateServerHandler();
+
+        public void AddNewUpdateServer(string url, string friendlyName)
+        {
+            _updateServerHandler.AddUpdateServer(url, friendlyName);
+        }
+
+        public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
+        {
+            return _updateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
+        }
+
         public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
             BaseURL = baseUrl;
