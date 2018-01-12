@@ -146,15 +146,14 @@ namespace LauncherTwo
                 };
                 InstructionsHash = versionData["game"]["instructions_hash"];
                 GamePatchPath = versionData["game"]["patch_path"];
-                //GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
-                //GamePatchUrls = UpdateServerModelFactory.CreateUpdateServerModels(versionData["game"]["patch_urls"].ToObject<string[]>());
-                foreach (var x in versionData["game"]["patch_urls"].ToObject<dynamic[]>())
-                {
-                    RXPatcher.Instance.AddNewUpdateServer(x["url"], x["friendly_name"]);
-                }
+
+                // Server URL's list & Friendly Names
+                foreach (var x in versionData["game"]["server_urls"].ToObject<dynamic>())
+                    RXPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["friendly_name"].ToString());
             }
-            catch
+            catch(Exception ex)
             {
+                Debug.Print(ex.Message);
                 LatestLauncherVersion = new Version
                 {
                     Name = "Unknown",

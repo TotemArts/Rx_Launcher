@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
+using RXPatchLib;
 
 namespace LauncherTwo
 {
@@ -58,7 +59,8 @@ namespace LauncherTwo
                     var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-                    System.Threading.Tasks.Task task = RXPatchLib.RXPatcher.Instance.ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
+                    RXPatchLib.RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
+                    System.Threading.Tasks.Task task = RXPatchLib.RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
                     var window = new Views.ApplyUpdateWindow(task, RXPatchLib.RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();

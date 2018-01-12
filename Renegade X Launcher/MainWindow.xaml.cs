@@ -230,7 +230,7 @@ namespace LauncherTwo
                 var progress = new Progress<DirectoryPatcherProgressReport>();
                 var cancellationTokenSource = new CancellationTokenSource();
 
-                Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchUrls.Select(url => url.ServerUri.AbsoluteUri).ToArray(), patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+                Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
                 var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
                 window.Owner = this;

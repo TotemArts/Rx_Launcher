@@ -74,6 +74,7 @@
     <Compile Include="SystemTimeProvider.cs" />
     <Compile Include="TooManyRetriesException.cs" />
     <Compile Include="UnitAndScale.cs" />
+    <Compile Include="UpdateServerHandler.cs" />
     <Compile Include="UpdateServerSelector.cs" />
     <Compile Include="WebClientWithTimeout.cs">
       <SubType>Component</SubType>

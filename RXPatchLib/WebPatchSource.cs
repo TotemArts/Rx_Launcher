@@ -117,7 +117,7 @@ namespace RXPatchLib
                             try
                             {
                                 // Download file and wait until finished
-                                await webClient.DownloadFileTaskAsync(new Uri(Patcher.BaseURL + "/" + subPath), filePath);
+                                await webClient.DownloadFileTaskAsync(new Uri($"{Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}"), filePath);
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();
