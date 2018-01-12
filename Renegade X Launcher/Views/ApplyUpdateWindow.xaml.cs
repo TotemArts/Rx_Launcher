@@ -16,7 +16,7 @@ namespace LauncherTwo.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value as DirectoryPatchPhaseProgress == null) return DependencyProperty.UnsetValue;
+            if (!(value is DirectoryPatchPhaseProgress)) return DependencyProperty.UnsetValue;
             var progress = (DirectoryPatchPhaseProgress)value;
             return progress.State == DirectoryPatchPhaseProgress.States.Indeterminate;
         }
@@ -32,7 +32,7 @@ namespace LauncherTwo.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value as DirectoryPatchPhaseProgress == null) return DependencyProperty.UnsetValue;
+            if (!(value is DirectoryPatchPhaseProgress)) return DependencyProperty.UnsetValue;
             var progress = (DirectoryPatchPhaseProgress)value;
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return 0;
