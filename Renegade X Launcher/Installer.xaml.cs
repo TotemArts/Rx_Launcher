@@ -93,6 +93,7 @@ namespace LauncherTwo
             //Create the update window
             var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
             window.Owner = this;
+
             //Show the dialog and wait for completion
             window.ShowDialog();
 

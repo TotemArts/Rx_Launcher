@@ -24,6 +24,7 @@ namespace RXPatchLib
         private static RXPatcher _instance;
         public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
 
+<<<<<<< b2e30413944ea970b03cce03f62fbd53027b45a6
         public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
 
         public void AddNewUpdateServer(string url, string friendlyName)
@@ -34,14 +35,28 @@ namespace RXPatchLib
         public UpdateServerEntry GetNextUpdateServerEntry()
         {
             return UpdateServerHandler.SelectBestPatchServer();
+=======
+        private readonly UpdateServerHandler _updateServerHandler = new UpdateServerHandler();
+
+        public void AddNewUpdateServer(string url, string friendlyName)
+        {
+            _updateServerHandler.AddUpdateServer(url, friendlyName);
+>>>>>>> Instancing RxPatcher + Added UpdateServerHandler for URLs
         }
 
         public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
         {
+<<<<<<< b2e30413944ea970b03cce03f62fbd53027b45a6
             return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
         }
 
         public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseURL, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+=======
+            return _updateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
+        }
+
+        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+>>>>>>> Instancing RxPatcher + Added UpdateServerHandler for URLs
         {
             UpdateServer = baseURL;
 
