@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:LauncherTwo"
         mc:Ignorable="d"
         Title="Installer" Height="720" Width="1280" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
-    <Grid>
+    <!--<Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/Install_Back.jpg"/>
         </Grid.Background>
-    </Grid>
+    </Grid>-->
 </Window>
