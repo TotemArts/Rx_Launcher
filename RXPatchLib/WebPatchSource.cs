@@ -117,7 +117,9 @@ namespace RXPatchLib
                             try
                             {
                                 // Download file and wait until finished
+                                Console.WriteLine($"Starting file transfer: {Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}");
                                 await webClient.DownloadFileTaskAsync(new Uri($"{Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}"), filePath);
+                                Console.WriteLine($"  > COMPLETE");
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();

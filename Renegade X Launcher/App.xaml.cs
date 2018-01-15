@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
@@ -12,8 +13,17 @@ namespace LauncherTwo
     /// </summary>
     public partial class App : Application
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
+
         public void StartupApp(object sender, StartupEventArgs e)
         {
+#if DEBUG
+            AllocConsole();
+            Console.WriteLine(@"STARTING RENEGADE-X LAUNCHER DEBUG CONSOLE");
+#endif
+
             //Determine if the permissionChange is succesfull after launcher update
             bool isGoodUpdate = false;
 
