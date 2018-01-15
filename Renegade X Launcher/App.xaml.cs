@@ -14,8 +14,6 @@ namespace LauncherTwo
     /// </summary>
     public partial class App : Application
     {
-        
-
         public void StartupApp(object sender, StartupEventArgs e)
         {
             //Determine if the permissionChange is succesfull after launcher update
