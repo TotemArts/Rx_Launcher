@@ -7,6 +7,7 @@ using System.Windows;
 using RxLogger;
 using RXPatchLib;
 
+
 namespace LauncherTwo
 {
     /// <summary>
@@ -71,7 +72,6 @@ namespace LauncherTwo
 
                     RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
                     System.Threading.Tasks.Task task = RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
-
 
                     var window = new Views.ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();
