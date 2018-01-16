@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RxLogger;
 
 namespace RXPatchLib
 {
@@ -58,12 +59,13 @@ namespace RXPatchLib
         public UpdateServerEntry SelectBestPatchServer()
         {
             // Find out the best latency server to respond with
+            Logger.Instance.Write("Figuring out what server is the best for you with latency checking... wait.");
             foreach (var entry in _updateServers.Where(x => x.Latency == 0 && !x.IsUsed && !x.HasErrored))
-            {
                 GetServerLatency(entry);
-            }
 
             _updateServers = _updateServers.OrderBy(x => x.Latency).ToList();
+
+            Logger.Instance.Write($"Best server found, in order they are:\r\n{string.Join("\r\n", _updateServers.Select(x => $"{x.FriendlyName} | {x.Latency}"))}");
 
             return _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
         }

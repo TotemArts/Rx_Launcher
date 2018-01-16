@@ -117,9 +117,9 @@ namespace RXPatchLib
                             try
                             {
                                 // Download file and wait until finished
-                                Console.WriteLine($"Starting file transfer: {Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}");
+                                RxLogger.Logger.Instance.Write($"Starting file transfer: {Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}");
                                 await webClient.DownloadFileTaskAsync(new Uri($"{Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}"), filePath);
-                                Console.WriteLine($"  > COMPLETE");
+                                RxLogger.Logger.Instance.Write("  > File Transfer Complete");
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();
@@ -131,6 +131,8 @@ namespace RXPatchLib
                             }
                             catch (WebException e)
                             {
+                                RxLogger.Logger.Instance.Write(
+                                    $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
                                 cancellationToken.ThrowIfCancellationRequested();
                                 return e;
                             }
@@ -154,6 +156,8 @@ namespace RXPatchLib
                     }
                     catch (HashMistmatchException)
                     {
+                        RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
+
                         // Try the next best host; throw an exception if there is none
                         if (Patcher.PopHost() == null)
                             throw new NoReliableHostException();

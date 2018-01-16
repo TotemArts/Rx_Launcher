@@ -312,11 +312,12 @@ namespace LauncherTwo.Views
                 {
                     await patchTask; // Collect exceptions.
                     this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", StatusTitle[0], TargetVersionString);
-                    
+                    RxLogger.Logger.Instance.Write($"Renegade X was successfully {StatusTitle[0]} to version {TargetVersionString}.");
                 }
                 catch (Exception exception)
                 {
                     StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", StatusTitle[0], exception.Message);
+                    RxLogger.Logger.Instance.Write($"Renegade X could not be {StatusTitle[0]}. The following exception occurred:\n\n{exception.Message}");
                 }
                 HasFinished = true;
             });

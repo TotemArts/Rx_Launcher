@@ -204,6 +204,7 @@ namespace LauncherTwo
 
         void ShowGameUpdateWindow(out bool wasUpdated)
         {
+            RxLogger.Logger.Instance.Write("Showing game update window");
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersionName();
             theWindow.GameVersionText.Content = VersionCheck.GetGameVersionName();
@@ -230,8 +231,10 @@ namespace LauncherTwo
                 var progress = new Progress<DirectoryPatcherProgressReport>();
                 var cancellationTokenSource = new CancellationTokenSource();
 
+                RxLogger.Logger.Instance.Write($"Starting game update | TargetDir: {targetDir} | AppDir: {applicationDir} | PatchPath: {patchPath},| PatchVersion: {patchVersion}");
                 Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
+                RxLogger.Logger.Instance.Write("Download complete, Showing ApplyUpdateWindow");
                 var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
                 window.Owner = this;
                 window.ShowDialog();
@@ -357,6 +360,7 @@ namespace LauncherTwo
         private async Task RefreshServersAsync()
         {
             await ServerInfo.ParseJsonServersAsync();
+            RxLogger.Logger.Instance.Write($"{ServerInfo.ActiveServers.Count} servers loaded");
             RefilterServers();
             await ServerInfo.PingActiveServersAsync();
         }
@@ -364,6 +368,7 @@ namespace LauncherTwo
         private void StartRefreshingServers()
         {
 #pragma warning disable 4014
+            RxLogger.Logger.Instance.Write("Refreshing server list");
             RefreshServersAsync();
 #pragma warning restore 4014
         }
