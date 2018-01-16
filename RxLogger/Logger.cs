@@ -94,7 +94,7 @@ namespace RxLogger
             [CallerLineNumber] int callingFileLineNumber = 0)
         {
             // ReSharper disable once LocalizableElement
-            System.IO.File.WriteAllText(_fullPath, $"[{DateTime.Now:dd-mm-yyyy - HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] | {errorLevel.ToString()} - {message}\r\n");
+            System.IO.File.AppendAllText(_fullPath, $"[{DateTime.Now:dd-mm-yyyy - HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] | {errorLevel.ToString()} - {message}\r\n");
             if (_hasConsole)
             {
                 switch (errorLevel)
