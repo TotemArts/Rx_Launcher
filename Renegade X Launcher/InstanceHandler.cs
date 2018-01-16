@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using RxLogger;
 
 namespace LauncherTwo
 {
@@ -18,7 +19,10 @@ namespace LauncherTwo
                 var CurrentRunningApplicationName = Path.GetFileName(CurrentRunningApplicationPath).Replace(".exe", "");
                 var CurrentProc = Process.GetCurrentProcess();
 
+                Logger.Instance.Write("Attempting to find other processes running which are the same as me");
+
                 var processList = Process.GetProcessesByName(CurrentRunningApplicationName);
+                Logger.Instance.Write($"Found {processList.Length} processes which are possibly like me");
 
                 // If we have another process that does not have the same PID and is running from the same directory, then we have a match
                 return processList.Any(process => process.MainModule.FileName == CurrentRunningApplicationPath && process.Id != CurrentProc.Id);

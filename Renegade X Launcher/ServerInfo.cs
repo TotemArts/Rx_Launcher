@@ -15,6 +15,7 @@ using LauncherTwo;
 using System.Dynamic;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using RxLogger;
 
 namespace LauncherTwo
 {
@@ -444,7 +445,7 @@ namespace LauncherTwo
             return map;
         }
 
-        public async static Task PingActiveServersAsync()
+        public static async Task PingActiveServersAsync()
         {
             List<Task> pingTasks = new List<Task>();
             foreach (ServerInfo serverInfo in ActiveServers)
@@ -459,15 +460,13 @@ namespace LauncherTwo
             try
             {
                 PingReply reply = await new Ping().SendPingAsync(serverInfo.IPAddress);
+                Logger.Instance.Write($"Pinging server {serverInfo.IPWithPort} returned {reply.RoundtripTime}ms latency");
                 serverInfo.Ping = (int)reply.RoundtripTime;
-                if (serverInfo.PropertyChanged != null)
-                {
-                    serverInfo.PropertyChanged(serverInfo, new PropertyChangedEventArgs("Ping"));
-                }
+                serverInfo.PropertyChanged?.Invoke(serverInfo, new PropertyChangedEventArgs("Ping"));
             }
             catch (Exception e)
             {
-                Console.WriteLine("Failed to ping server: " + e.ToString());
+                Logger.Instance.Write($"Unable to ping server {serverInfo.IPWithPort} | {e.Message}\r\n{e.StackTrace}", Logger.ErrorLevel.ERR_ERROR);
             }
         }
 

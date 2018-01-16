@@ -75,6 +75,8 @@ namespace RXPatchLib
         /// <returns>Returns the latency as a float</returns>
         private void GetServerLatency(UpdateServerEntry entry)
         {
+            //todo: make this function Async do the client doesnt look paused/broken.
+
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create($"{entry.Uri.AbsoluteUri}/10kb_file");
@@ -91,13 +93,14 @@ namespace RXPatchLib
             {
                 entry.HasErrored = true;
             }
-
+            
             // Push host to queue if valid
             if (response != System.Net.HttpStatusCode.OK) return;
 
             stopWatch.Stop();
             entry.Latency = stopWatch.ElapsedMilliseconds;
-            Console.WriteLine($"Latency for {entry.Uri.AbsoluteUri} ({entry.FriendlyName}) is {entry.Latency}");
+            
+            RxLogger.Logger.Instance.Write($"Latency for {entry.Uri.AbsoluteUri} ({entry.FriendlyName}) is {entry.Latency}");
         }
     }
 }
