@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using RxLogger;
 
 namespace RXPatchLib
 {
@@ -49,8 +52,7 @@ namespace RXPatchLib
             if (_lastBestServerEntry != null)
                 return _lastBestServerEntry;
 
-            _lastBestServerEntry = _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
-            return _lastBestServerEntry;
+            return _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
         }
     }
 }
