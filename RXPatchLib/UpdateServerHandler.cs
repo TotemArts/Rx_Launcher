@@ -31,9 +31,10 @@ namespace RXPatchLib
     /// <summary>
     /// Handles all Update Server URLs and Friendly Names, including getting the best latency server
     /// </summary>
-    internal class UpdateServerHandler
+    public class UpdateServerHandler
     {
         private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
+        private UpdateServerEntry _lastBestServerEntry;
 
         public void AddUpdateServer(string Url, string FriendlyName)
         {
@@ -58,16 +59,11 @@ namespace RXPatchLib
         /// <returns>An UpdateServerEntry of the host found, or Null if no more hosts exist</returns>
         public UpdateServerEntry SelectBestPatchServer()
         {
-            // Find out the best latency server to respond with
-            Logger.Instance.Write("Figuring out what server is the best for you with latency checking... wait.");
-            foreach (var entry in _updateServers.Where(x => x.Latency == 0 && !x.IsUsed && !x.HasErrored))
-                GetServerLatency(entry);
+            if (_lastBestServerEntry != null)
+                return _lastBestServerEntry;
 
-            _updateServers = _updateServers.OrderBy(x => x.Latency).ToList();
-
-            Logger.Instance.Write($"Best server found, in order they are:\r\n{string.Join("\r\n", _updateServers.Select(x => $"{x.FriendlyName} | {x.Latency}"))}");
-
-            return _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+            _lastBestServerEntry = _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+            return _lastBestServerEntry;
         }
 
         /// <summary>
@@ -77,8 +73,6 @@ namespace RXPatchLib
         /// <returns>Returns the latency as a float</returns>
         private void GetServerLatency(UpdateServerEntry entry)
         {
-            //todo: make this function Async do the client doesnt look paused/broken.
-
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create($"{entry.Uri.AbsoluteUri}/10kb_file");
@@ -103,6 +97,20 @@ namespace RXPatchLib
             entry.Latency = stopWatch.ElapsedMilliseconds;
             
             RxLogger.Logger.Instance.Write($"Latency for {entry.Uri.AbsoluteUri} ({entry.FriendlyName}) is {entry.Latency}");
+        }
+
+        public Task PreformLatencyTest()
+        {
+            // Find out the best latency server to respond with
+            Logger.Instance.Write("Figuring out what server is the best for you with latency checking... wait.");
+            foreach (var entry in _updateServers.Where(x => x.Latency == 0 && !x.IsUsed && !x.HasErrored))
+                GetServerLatency(entry);
+
+            _updateServers = _updateServers.OrderBy(x => x.Latency).ToList();
+
+            Logger.Instance.Write($"Best server found, in order they are:\r\n{string.Join("\r\n", _updateServers.Select(x => $"{x.FriendlyName} | {x.Latency}"))}");
+
+            return Task.FromResult<object>(null);
         }
     }
 }
