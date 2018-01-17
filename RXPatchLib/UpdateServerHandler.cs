@@ -15,16 +15,16 @@ namespace RXPatchLib
     public class UpdateServerEntry
     {
         public Uri Uri;
-        public string FriendlyName;
+        public string Name;
         public bool IsUsed;
         public bool HasErrored;
         public string WebPatchPath;
         public long Latency;
 
-        public UpdateServerEntry(string Url, string FriendlyName)
+        public UpdateServerEntry(string Url, string name)
         {
             Uri = new Uri(Url);
-            this.FriendlyName = FriendlyName;
+            Name = name;
         }
     }
 
@@ -96,7 +96,7 @@ namespace RXPatchLib
             stopWatch.Stop();
             entry.Latency = stopWatch.ElapsedMilliseconds;
             
-            RxLogger.Logger.Instance.Write($"Latency for {entry.Uri.AbsoluteUri} ({entry.FriendlyName}) is {entry.Latency}");
+            RxLogger.Logger.Instance.Write($"Latency for {entry.Uri.AbsoluteUri} ({entry.Name}) is {entry.Latency}");
         }
 
         public Task PreformLatencyTest()
@@ -108,7 +108,7 @@ namespace RXPatchLib
 
             _updateServers = _updateServers.OrderBy(x => x.Latency).ToList();
 
-            Logger.Instance.Write($"Best server found, in order they are:\r\n{string.Join("\r\n", _updateServers.Select(x => $"{x.FriendlyName} | {x.Latency}"))}");
+            Logger.Instance.Write($"Best server found, in order they are:\r\n{string.Join("\r\n", _updateServers.Select(x => $"{x.Name} | {x.Latency}"))}");
 
             return Task.FromResult<object>(null);
         }
