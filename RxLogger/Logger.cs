@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,6 +16,8 @@ namespace RxLogger
         // Instancing of this class
         private static Logger _instance;
         public static Logger Instance = _instance ?? (_instance = new Logger());
+
+        private readonly object _lockable = new object();
 
         // AllocConsole is needed
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -93,28 +96,33 @@ namespace RxLogger
             [CallerFilePath] string callingFilePath = "",
             [CallerLineNumber] int callingFileLineNumber = 0)
         {
-            // ReSharper disable once LocalizableElement
-            System.IO.File.AppendAllText(_fullPath, $"[{DateTime.Now:dd-mm-yyyy - HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] | {errorLevel.ToString()} - {message}\r\n");
-            if (_hasConsole)
+            lock (_lockable)
             {
-                switch (errorLevel)
-                {
-                    case ErrorLevel.ERR_ERROR:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        break;
-
-                    case ErrorLevel.ERR_INFO:
-                    case ErrorLevel.ERR_SUCCESS:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-
-                    case ErrorLevel.ERR_WARNING:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        break;
-                }
-
                 // ReSharper disable once LocalizableElement
-                Console.WriteLine($"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] - {message}");
+                System.IO.File.AppendAllText(_fullPath,
+                    $"[{DateTime.Now:dd-mm-yyyy - HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] | {errorLevel.ToString()} - {message}\r\n");
+                if (_hasConsole)
+                {
+                    switch (errorLevel)
+                    {
+                        case ErrorLevel.ERR_ERROR:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+
+                        case ErrorLevel.ERR_INFO:
+                        case ErrorLevel.ERR_SUCCESS:
+                            Console.ForegroundColor = ConsoleColor.White;
+                            break;
+
+                        case ErrorLevel.ERR_WARNING:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            break;
+                    }
+
+                    // ReSharper disable once LocalizableElement
+                    Console.WriteLine(
+                        $"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] - {message}");
+                }
             }
         }
     }

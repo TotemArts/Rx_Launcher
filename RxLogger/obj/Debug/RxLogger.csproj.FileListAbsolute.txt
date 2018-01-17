@@ -2,4 +2,3 @@ C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\bin\Debug
 C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\bin\Debug\RxLogger.pdb
 C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.dll
 C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.pdb
-C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.csprojResolveAssemblyReference.cache
