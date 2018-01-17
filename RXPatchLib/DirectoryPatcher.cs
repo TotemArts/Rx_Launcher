@@ -375,6 +375,9 @@ namespace RXPatchLib
 
             // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
+            var secondPhaseProgress = new DirectoryPatchPhaseProgress();
+            secondPhaseProgress.SetTotals(_tmpActions.Count(m => m.PatchSize == 0), _tmpActions.Count(m => m.PatchSize == 0));
+            secondPhaseProgress.State = DirectoryPatchPhaseProgress.States.Started;
             progress.SetTotals(actions.Count, (from a in actions select a.PatchSize).Sum());
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
@@ -434,9 +437,17 @@ namespace RXPatchLib
                         await thisAction.Execute();
 
                         // Update progress
-                        progress.AdvanceItem(thisAction.PatchSize);
-                        progressCallback(progress);
-
+                        if (thisAction.PatchSize == 0)
+                        {
+                            secondPhaseProgress.AdvanceItem(1);
+                            progressCallback(secondPhaseProgress);
+                        }
+                        else
+                        {
+                            progress.AdvanceItem(thisAction.PatchSize);
+                            progressCallback(progress);
+                        }
+                        
                         // Complete this action
                         lock (_tmpActions)
                         {
