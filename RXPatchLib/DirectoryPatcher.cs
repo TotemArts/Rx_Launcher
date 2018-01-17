@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace RXPatchLib
 {
     interface IFilePatchAction
     {
+        bool isActive { get; set; }
+        bool isComplete { get; set; }
         long PatchSize { get; }
         Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback);
         Task Execute();
@@ -22,7 +25,10 @@ namespace RXPatchLib
         private DirectoryPatcher DirectoryPatcher;
         private string SubPath;
         private bool NeedsBackup;
-        public long PatchSize { get { return 0; } }
+        public long PatchSize => 0;
+
+        public bool isActive { get; set; }
+        public bool isComplete { get; set; }
 
         public RemoveAction(DirectoryPatcher directoryPatcher, string subPath, bool needsBackup)
         {
@@ -41,6 +47,8 @@ namespace RXPatchLib
         {
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
+
+            RxLogger.Logger.Instance.Write($"RemoveAction - {targetPath} - {backupPath}");
 
             // Deletes or moves the file to backupPath, if it exists
             if (File.Exists(targetPath))
@@ -70,6 +78,8 @@ namespace RXPatchLib
         private string PatchSubPath;
         private string Hash;
         public long PatchSize { get; private set; }
+        public bool isActive { get; set; }
+        public bool isComplete { get; set; }
 
         public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long patchSize, string hash)
         {
@@ -92,6 +102,8 @@ namespace RXPatchLib
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string patchPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
 
+            RxLogger.Logger.Instance.Write($"DeltaPatchAction - {tempPath} - {targetPath} - {patchPath}");
+
             // Ensure the temp directory exists, and generate the new file based on the old file and the delta
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
             await DirectoryPatcher.FilePatcher.ApplyPatchAsync(targetPath, tempPath, patchPath);
@@ -110,6 +122,8 @@ namespace RXPatchLib
         private bool NeedsBackup;
         private string Hash;
         public long PatchSize { get; private set; }
+        public bool isActive { get; set; }
+        public bool isComplete { get; set; }
 
         public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long patchSize, string hash)
         {
@@ -133,6 +147,8 @@ namespace RXPatchLib
             string newPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
             string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
+
+            RxLogger.Logger.Instance.Write($"FullReplaceAction - {tempPath} - {newPath} - {targetPath} - {backupPath}");
 
             // Ensure the temp directory exists, and decompress the file
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
@@ -163,6 +179,8 @@ namespace RXPatchLib
         DirectoryPatcher DirectoryPatcher;
         string SubPath;
         DateTime LastWriteTime;
+        public bool isActive { get; set; }
+        public bool isComplete { get; set; }
 
         public long PatchSize
         {
@@ -185,6 +203,8 @@ namespace RXPatchLib
         public Task Execute()
         {
             string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
+
+            RxLogger.Logger.Instance.Write($"ModifiedTimeReplaceAction - {targetPath}");
 
             // Update LastWriteTime
             new FileInfo(targetPath).LastWriteTimeUtc = LastWriteTime;
@@ -350,23 +370,90 @@ namespace RXPatchLib
 
         private static async Task Apply(List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
+            List<IFilePatchAction> _tmpActions = actions.ToList(); // Create a copy of our list
+            List<BackgroundWorker> _bgWorkers = new List<BackgroundWorker>();
+
             // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
             progress.SetTotals(actions.Count, (from a in actions select a.PatchSize).Sum());
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
-            // Execute every patch action
-            foreach (var action in actions)
+            // Create our workers, but clamp the value to 4, we dont want to cook peoples PC's
+            // (on testing with using all cores, it maxed out my 24 core server, but it did patch in about 30 seconds!)
+            RxLogger.Logger.Instance.Write(
+                $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > 4 ? 4 : Environment.ProcessorCount)} of them");
+            for (var i = 0; i < (Environment.ProcessorCount > 4 ?  4 : Environment.ProcessorCount); i++)
             {
-                // Execute action
-                await action.Execute();
-
-                // Update progress
-                progress.AdvanceItem(action.PatchSize);
-                progressCallback(progress);
+                RxLogger.Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
+                _bgWorkers.Add(new BackgroundWorker());
             }
 
+            foreach (var x in _bgWorkers)
+            {
+                RxLogger.Logger.Instance.Write($"Assining DoWork methods to bgworker");
+                x.DoWork += async (sender, args) =>
+                {
+                    // While there are still some in the array to use.
+                    while (_tmpActions.Any(checker => !checker.isComplete))
+                    {
+                        // Execute action
+                        IFilePatchAction thisAction;
+
+                        // Lock our tmpActions variable so we have unique access to it now
+                        lock (_tmpActions)
+                        {
+                            if (_tmpActions.Any(k => !k.isComplete && !k.isActive && k.PatchSize > 0))
+                            {
+                                // If an action is not complete, not active and is above zero patch size
+                                thisAction = _tmpActions.DefaultIfEmpty(null).FirstOrDefault(xx => !xx.isComplete && !xx.isActive && xx.PatchSize > 0);
+                            }
+                            else
+                            {
+                                // We have no actions that are above a patch size of zero, do we have any that are zero that still need doing?
+                                if (_tmpActions.Any(l => !l.isComplete && !l.isActive && l.PatchSize == 0))
+                                {
+                                    thisAction = _tmpActions.DefaultIfEmpty(null).FirstOrDefault(xx => !xx.isComplete && !xx.isActive && xx.PatchSize == 0);
+                                }
+                                else
+                                {
+                                    // We're done, break out of our loop to close this thread
+                                    break;
+                                }
+                            }
+
+                            // Grab an action that is not complete, and not active and has a file size
+                            
+                            if (thisAction == null)
+                                continue;
+
+                            thisAction.isActive = true;
+                        }
+
+                        RxLogger.Logger.Instance.Write($"Starting action with file size of {thisAction.PatchSize}");
+                        await thisAction.Execute();
+
+                        // Update progress
+                        progress.AdvanceItem(thisAction.PatchSize);
+                        progressCallback(progress);
+
+                        // Complete this action
+                        lock (_tmpActions)
+                        {
+                            thisAction.isComplete = true;
+                            thisAction.isActive = false;
+                        }
+                    }
+                };
+
+                x.RunWorkerAsync();
+            }
+
+            while (_tmpActions.Any(x => !x.isComplete))
+            {
+                await Task.Delay(3000);
+            }
+        
             // We're done here; update our State and update progress
             progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
