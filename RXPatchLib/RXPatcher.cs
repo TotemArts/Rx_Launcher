@@ -82,7 +82,7 @@ namespace RXPatchLib
             var bestHost = Selector.Hosts.Dequeue();
             bestHost.WebPatchPath = patchPath;
 
-            Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.FriendlyName);
+            Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
             await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 

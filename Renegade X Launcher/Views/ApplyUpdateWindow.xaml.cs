@@ -283,7 +283,7 @@ namespace LauncherTwo.Views
             if (patcher.BaseURL == null)
                 this.ServerMessage = "pending";
             else
-                this.ServerMessage = patcher.BaseURL.FriendlyName;
+                this.ServerMessage = patcher.BaseURL.Name;
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", StatusTitle[1]);
@@ -296,12 +296,12 @@ namespace LauncherTwo.Views
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
                     // URL could theoretically change at any point
-                    if (this.ServerMessage != patcher.BaseURL.FriendlyName)
+                    if (this.ServerMessage != patcher.BaseURL.Name)
                     {
                         if (patcher.BaseURL == null)
                             this.ServerMessage = "pending";
                         else
-                            this.ServerMessage = patcher.BaseURL.FriendlyName;
+                            this.ServerMessage = patcher.BaseURL.Name;
                     }
 
                     ProgressReport = lastReport;
