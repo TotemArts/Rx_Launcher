@@ -71,7 +71,10 @@ namespace RXPatchLib
             var bestHost = Selector.Hosts.Dequeue();
 
             Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
+<<<<<<< 0f76d246ab5824f55338ec65c14feefe0dcaa56b
 
+=======
+>>>>>>> Missed these files for Name rename
             await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 
