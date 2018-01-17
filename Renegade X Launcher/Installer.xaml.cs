@@ -61,22 +61,6 @@ namespace LauncherTwo
             VersionCheck.GetLatestGameVersionName();
             await VersionCheck.UpdateLatestVersions();
 
-            // Preform a latency test
-            // DISABLE THIS FOR NOW, REVERTING BACK TO QUEUE POP
-            /*
-            var LatencyTestDialog = new ModernDialog
-            {
-                Content = "Please Wait while we find the best possible patch server for you.\r\nThis should not take too long.",
-                Title = "Renegade-X Server Selector",
-                Width = 497,
-                Height = 234
-            };
-            LatencyTestDialog.Show();
-            await Task.Delay(1000);
-            await RXPatcher.Instance.UpdateServerHandler.PreformLatencyTest();
-            LatencyTestDialog.Close();
-            */
-
             //Get the current root path and prepare the installation
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
@@ -93,7 +77,6 @@ namespace LauncherTwo
             //Create the update window
             var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
             window.Owner = this;
-
             //Show the dialog and wait for completion
             window.ShowDialog();
 
@@ -118,7 +101,6 @@ namespace LauncherTwo
                     bool downloadSuccess = false;
 
                     var bestPatchServer = RXPatcher.Instance.GetUpdateServerHandler().SelectBestPatchServer();
-
                     Uri RedistServer = bestPatchServer.Uri;
 
                     //Create new URL based on the patch url (Without the patch part)

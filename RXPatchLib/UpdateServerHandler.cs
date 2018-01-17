@@ -30,7 +30,7 @@ namespace RXPatchLib
     /// </summary>
     public class UpdateServerHandler
     {
-        private readonly List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
+        private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
         private UpdateServerEntry _lastBestServerEntry;
 
         public void AddUpdateServer(string Url, string FriendlyName)
@@ -52,7 +52,8 @@ namespace RXPatchLib
             if (_lastBestServerEntry != null)
                 return _lastBestServerEntry;
 
-            return _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+            _lastBestServerEntry = _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+            return _lastBestServerEntry;
         }
     }
 }
