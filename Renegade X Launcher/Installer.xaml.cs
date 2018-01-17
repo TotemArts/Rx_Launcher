@@ -58,11 +58,12 @@ namespace LauncherTwo
         /// </summary>
         public async void FirstInstall()
         {
-            
             VersionCheck.GetLatestGameVersionName();
             await VersionCheck.UpdateLatestVersions();
 
             // Preform a latency test
+            // DISABLE THIS FOR NOW, REVERTING BACK TO QUEUE POP
+            /*
             var LatencyTestDialog = new ModernDialog
             {
                 Content = "Please Wait while we find the best possible patch server for you.\r\nThis should not take too long.",
@@ -74,6 +75,7 @@ namespace LauncherTwo
             await Task.Delay(1000);
             await RXPatcher.Instance.UpdateServerHandler.PreformLatencyTest();
             LatencyTestDialog.Close();
+            */
 
             //Get the current root path and prepare the installation
             var targetDir = GameInstallation.GetRootPath();

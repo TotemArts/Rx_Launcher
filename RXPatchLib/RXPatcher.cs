@@ -75,7 +75,11 @@ namespace RXPatchLib
                 bestHost = Selector.Hosts.Dequeue().ToString();
             */
 
-            UpdateServerEntry bestHost = UpdateServerHandler.SelectBestPatchServer();
+            //UpdateServerEntry bestHost = UpdateServerHandler.SelectBestPatchServer();
+            var Selector = new UpdateServerSelector();
+            await Selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
+
+            var bestHost = Selector.Hosts.Dequeue();
             bestHost.WebPatchPath = patchPath;
 
             Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.FriendlyName);
