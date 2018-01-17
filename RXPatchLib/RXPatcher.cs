@@ -24,21 +24,21 @@ namespace RXPatchLib
         private static RXPatcher _instance;
         public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
 
-        private readonly UpdateServerHandler _updateServerHandler = new UpdateServerHandler();
+        public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
 
         public void AddNewUpdateServer(string url, string friendlyName)
         {
-            _updateServerHandler.AddUpdateServer(url, friendlyName);
+            UpdateServerHandler.AddUpdateServer(url, friendlyName);
         }
 
         public UpdateServerEntry GetNextUpdateServerEntry()
         {
-            return _updateServerHandler.SelectBestPatchServer();
+            return UpdateServerHandler.SelectBestPatchServer();
         }
 
         public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
         {
-            return _updateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
+            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
         }
 
         public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseURL, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
@@ -62,7 +62,7 @@ namespace RXPatchLib
 
         public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
-            Contract.Assert(_updateServerHandler.GetUpdateServers().Count > 0);
+            Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
 
             /*
@@ -75,7 +75,7 @@ namespace RXPatchLib
                 bestHost = Selector.Hosts.Dequeue().ToString();
             */
 
-            UpdateServerEntry bestHost = _updateServerHandler.SelectBestPatchServer();
+            UpdateServerEntry bestHost = UpdateServerHandler.SelectBestPatchServer();
             bestHost.WebPatchPath = patchPath;
 
             Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.FriendlyName);
@@ -96,7 +96,7 @@ namespace RXPatchLib
         public UpdateServerEntry PopHost()
         {
             BaseURL.HasErrored = true;
-            BaseURL = _updateServerHandler.SelectBestPatchServer();
+            BaseURL = UpdateServerHandler.SelectBestPatchServer();
             return BaseURL;
 
             /*
