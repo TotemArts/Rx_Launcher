@@ -398,7 +398,7 @@ namespace RXPatchLib
                 x.DoWork += async (sender, args) =>
                 {
                     // While there are still some in the array to use.
-                    while (_tmpActions.Any(checker => !checker.isComplete))
+                    while (_tmpActions.Any(checker => !checker.isComplete) && !x.CancellationPending)
                     {
                         // Execute action
                         IFilePatchAction thisAction;
@@ -455,6 +455,8 @@ namespace RXPatchLib
                             thisAction.isActive = false;
                         }
                     }
+
+                    RxLogger.Logger.Instance.Write("Background worker terminated");
                 };
 
                 x.RunWorkerAsync();
@@ -464,9 +466,13 @@ namespace RXPatchLib
             {
                 await Task.Delay(3000);
             }
-        
+
+            // Dispose of all of our workers
+            foreach (var b in _bgWorkers)
+                b.Dispose();
+
             // We're done here; update our State and update progress
-            progress.State = DirectoryPatchPhaseProgress.States.Finished;
+                progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
         }
 
