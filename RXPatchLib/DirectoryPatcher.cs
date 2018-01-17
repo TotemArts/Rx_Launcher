@@ -476,18 +476,6 @@ namespace RXPatchLib
             foreach (var b in _bgWorkers)
                 b.Dispose();
 
-=======
-                };
-
-                x.RunWorkerAsync();
-            }
-
-            while (_tmpActions.Any(x => !x.isComplete))
-            {
-                await Task.Delay(3000);
-            }
-        
->>>>>>> Applying xdelta stage is now multi-threaded
             // We're done here; update our State and update progress
                 progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);

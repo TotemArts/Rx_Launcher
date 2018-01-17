@@ -100,7 +100,7 @@ namespace LauncherTwo
                 {
                     bool downloadSuccess = false;
 
-                    var bestPatchServer = RXPatcher.Instance.GetUpdateServerHandler().SelectBestPatchServer();
+                    var bestPatchServer = RXPatcher.Instance.UpdateServerHandler.SelectBestPatchServer();
                     Uri RedistServer = bestPatchServer.Uri;
 
                     //Create new URL based on the patch url (Without the patch part)

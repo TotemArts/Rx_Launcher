@@ -11,16 +11,16 @@ namespace RXPatchLib
 {
     public class UpdateServerSelector
     {
-        CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private const string TestFile = "10kb_file";
         public Queue<UpdateServerEntry> Hosts;
 
-        public async Task<bool> QueryHost(UpdateServerEntry HostObject)
+        public async Task<bool> QueryHost(UpdateServerEntry hostObject)
         {
-            RxLogger.Logger.Instance.Write($"Attempting to contact host {HostObject.Uri.AbsoluteUri}");
+            RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}");
 
-            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(HostObject.Uri.AbsoluteUri + TestFile);
+            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
             request.Method = "GET";
 
             //Default to "not found"
@@ -31,17 +31,17 @@ namespace RXPatchLib
             }
             catch
             {
-                HostObject.HasErrored = true;
-                RxLogger.Logger.Instance.Write($"The host {HostObject.Uri.AbsoluteUri} seems to be offline");
+                hostObject.HasErrored = true;
+                RxLogger.Logger.Instance.Write($"The host {hostObject.Uri.AbsoluteUri} seems to be offline");
             }
 
             // Push host to queue if valid
             if (response == System.Net.HttpStatusCode.OK)
             {
                 lock (Hosts)
-                    Hosts.Enqueue(HostObject);
+                    Hosts.Enqueue(hostObject);
 
-                RxLogger.Logger.Instance.Write($"Added host {HostObject.Uri.AbsoluteUri} to the hosts queue");
+                RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue");
 
                 return true;
             }
@@ -49,17 +49,17 @@ namespace RXPatchLib
             return false;
         }
 
-        public async Task SelectHosts(List<UpdateServerEntry> InHosts)
+        public async Task SelectHosts(List<UpdateServerEntry> inHosts)
         {
             // Safety check
-            if (InHosts.Count == 0)
+            if (inHosts.Count == 0)
                 throw new Exception("No download servers are available; please try again later.");
 
             // Initialize new Hosts queue
             Hosts = new Queue<UpdateServerEntry>();
 
             // Initialize query to each host
-            List<Task<bool>> tasks = InHosts.Select(QueryHost).ToList();
+            List<Task<bool>> tasks = inHosts.Select(QueryHost).ToList();
 
             // Return when we have our best host; continue populating list in background
             while (tasks.Any())

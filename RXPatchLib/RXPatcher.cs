@@ -24,26 +24,21 @@ namespace RXPatchLib
         private static RXPatcher _instance;
         public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
 
-        private readonly UpdateServerHandler _updateServerHandler = new UpdateServerHandler();
+        public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
 
         public void AddNewUpdateServer(string url, string friendlyName)
         {
-            _updateServerHandler.AddUpdateServer(url, friendlyName);
-        }
-
-        public UpdateServerHandler GetUpdateServerHandler()
-        {
-            return _updateServerHandler;
+            UpdateServerHandler.AddUpdateServer(url, friendlyName);
         }
 
         public UpdateServerEntry GetNextUpdateServerEntry()
         {
-            return _updateServerHandler.SelectBestPatchServer();
+            return UpdateServerHandler.SelectBestPatchServer();
         }
 
         public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
         {
-            return _updateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
+            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
         }
 
         public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
@@ -67,11 +62,11 @@ namespace RXPatchLib
 
         public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
-            Contract.Assert(_updateServerHandler.GetUpdateServers().Count > 0);
+            Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
 
             var Selector = new UpdateServerSelector();
-            await Selector.SelectHosts(_updateServerHandler.GetUpdateServers());
+            await Selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
 
             var bestHost = Selector.Hosts.Dequeue();
 
@@ -94,7 +89,7 @@ namespace RXPatchLib
         public UpdateServerEntry PopHost()
         {
             UpdateServer.HasErrored = true;
-            UpdateServer = _updateServerHandler.SelectBestPatchServer();
+            UpdateServer = UpdateServerHandler.SelectBestPatchServer();
             return UpdateServer;
         }
         
