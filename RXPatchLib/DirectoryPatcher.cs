@@ -438,7 +438,6 @@ namespace RXPatchLib
                         RxLogger.Logger.Instance.Write($"Starting action with file size of {thisAction.PatchSize}");
                         await thisAction.Execute();
 
-                        // Update progress
                         // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
                         // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
                         // We have to check for zero, to ensure that the asyncronus method of performing this action
@@ -477,6 +476,18 @@ namespace RXPatchLib
             foreach (var b in _bgWorkers)
                 b.Dispose();
 
+=======
+                };
+
+                x.RunWorkerAsync();
+            }
+
+            while (_tmpActions.Any(x => !x.isComplete))
+            {
+                await Task.Delay(3000);
+            }
+        
+>>>>>>> Applying xdelta stage is now multi-threaded
             // We're done here; update our State and update progress
                 progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
