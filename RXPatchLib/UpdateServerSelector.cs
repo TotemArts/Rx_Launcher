@@ -18,9 +18,7 @@ namespace RXPatchLib
 
         public async Task<bool> QueryHost(UpdateServerEntry HostObject)
         {
- 
-            // Send GET request to host
-            Debug.Print($"Trying host {HostObject.Uri.AbsoluteUri}");
+            RxLogger.Logger.Instance.Write($"Attempting to contact host {HostObject.Uri.AbsoluteUri}");
 
             System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(HostObject.Uri.AbsoluteUri + TestFile);
             request.Method = "GET";
@@ -33,7 +31,8 @@ namespace RXPatchLib
             }
             catch
             {
-                Trace.WriteLine($"<!><!><!>The host: {HostObject.Uri.AbsoluteUri} is down.");
+                HostObject.HasErrored = true;
+                RxLogger.Logger.Instance.Write($"The host {HostObject.Uri.AbsoluteUri} seems to be offline");
             }
 
             // Push host to queue if valid
@@ -42,7 +41,7 @@ namespace RXPatchLib
                 lock (Hosts)
                     Hosts.Enqueue(HostObject);
 
-                Trace.WriteLine("Added: " + HostObject.Uri);
+                RxLogger.Logger.Instance.Write($"Added host {HostObject.Uri.AbsoluteUri} to the hosts queue");
 
                 return true;
             }
