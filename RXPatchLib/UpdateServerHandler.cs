@@ -31,7 +31,6 @@ namespace RXPatchLib
     public class UpdateServerHandler
     {
         private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
-        private UpdateServerEntry _lastBestServerEntry;
 
         public void AddUpdateServer(string url, string friendlyName)
         {
@@ -49,11 +48,18 @@ namespace RXPatchLib
         /// <returns>An UpdateServerEntry of the host found, or Null if no more hosts exist</returns>
         public UpdateServerEntry SelectBestPatchServer()
         {
-            if (_lastBestServerEntry != null)
-                return _lastBestServerEntry;
+            lock (_updateServers)
+            {
+                var thisServerEntry =
+                    _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+                if (thisServerEntry != null)
+                {
+                    thisServerEntry.IsUsed = true; // Mark is as used so it's not used again
+                    return thisServerEntry;
+                }
 
-            _lastBestServerEntry = _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
-            return _lastBestServerEntry;
+                return null;
+            }
         }
     }
 }

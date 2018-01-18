@@ -247,6 +247,7 @@ namespace RXPatchLib
                 // Add task to task list; used mostly by 'AwaitAllTasksAndFinish'
                 _tasks.Add(task);
 
+                // todo: add a try catch here for the cancel button, otherwise RenX Launcher crashes
                 // Wait for task to complete
                 await task;
 
@@ -289,8 +290,30 @@ namespace RXPatchLib
             PatchSource = patchSource;
         }
 
+        private class InstructionModel
+        {
+            public FilePatchInstruction Instruction;
+            public long Size;
+
+            public InstructionModel(FilePatchInstruction x, long y)
+            {
+                Instruction = x;
+                Size = y;
+            }
+        }
+
         internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructionsHash)
         {
+            // Create our background workers
+            List<BackgroundWorker> bgWorkers = new List<BackgroundWorker>();
+
+            // Spawn 4 workers
+            for (var i = 0; i < 4; i++)
+            {
+                RxLogger.Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
+                bgWorkers.Add(new BackgroundWorker());
+            }
+
             // Download instructions
             await PatchSource.Load("instructions.json", instructionsHash, cancellationToken, (done, total) => {});
 
@@ -308,25 +331,60 @@ namespace RXPatchLib
             // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
             var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
-            var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
+            var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length).ToArray();
             progress.SetTotals(instructions.Count, sizes.Sum());
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
-            // Process each instruction in instructions.json
-            foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
+            // Convert our dynamic instruction object into one we can manage
+            List<InstructionModel> instructionsArray = instructions.Zip(sizes, (i, s) => new {Instruction = i, Size = s}).ToArray().Select(xxx => new InstructionModel(xxx.Instruction, xxx.Size)).ToList();
+
+            RxLogger.Logger.Instance.Write($"There are {instructionsArray.Count} instructions, assinging threads...");
+
+            // loop around all of our workers, creating work for them
+            foreach (var thisBgWorker in bgWorkers)
             {
-                var instruction = pair.Instruction;
-                cancellationToken.ThrowIfCancellationRequested();
-                string targetFilePath = Path.Combine(_targetPath, instruction.Path);
+                thisBgWorker.DoWork += async (sender, args) =>
+                {
+                    while (instructionsArray.Any(l => !l.Instruction.isComplete && !l.Instruction.isActive))
+                    {
+                        InstructionModel thisFilePatchInstruction;
+                        lock (instructionsArray)
+                        {
+                            thisFilePatchInstruction = instructionsArray.DefaultIfEmpty(null).FirstOrDefault(m => !m.Instruction.isActive && !m.Instruction.isComplete);
+                            if (thisFilePatchInstruction != null)
+                                thisFilePatchInstruction.Instruction.isActive = true;
+                        }
 
-                // Determine action(s) to take based on instruction; any new actions get passed to the callback
-                await BuildFilePatchAction(instruction, targetFilePath, callback);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        string targetFilePath = Path.Combine(_targetPath, thisFilePatchInstruction.Instruction.Path);
 
-                // Update progress
-                progress.AdvanceItem(pair.Size);
-                progressCallback(progress);
+                        RxLogger.Logger.Instance.Write($"Executing instruction {thisFilePatchInstruction.Instruction.Path}");
+                        // Determine action(s) to take based on instruction; any new actions get passed to the callback
+                        await BuildFilePatchAction(thisFilePatchInstruction.Instruction, targetFilePath, callback);
+
+                        // Update progress
+                        lock (progress)
+                        {
+                            progress.AdvanceItem(thisFilePatchInstruction.Size);
+                            progressCallback(progress);
+                        }
+
+                        lock (instructionsArray)
+                        {
+                            thisFilePatchInstruction.Instruction.isComplete = true;
+                            thisFilePatchInstruction.Instruction.isActive = false;
+                        }
+
+                        RxLogger.Logger.Instance.Write($"Action Complete {thisFilePatchInstruction.Instruction.Path}");
+                    }
+                };
+
+                thisBgWorker.RunWorkerAsync();
             }
+
+            while ( instructionsArray.Any(k => !k.Instruction.isComplete) )
+                await Task.Delay(3000, cancellationToken);
 
             // We're done here; update our State and update progress
             progress.State = DirectoryPatchPhaseProgress.States.Finished;
@@ -337,6 +395,8 @@ namespace RXPatchLib
         {
             string installedHash = await Sha256.GetFileHashAsync(targetFilePath);
             bool isOld = installedHash == instruction.OldHash;
+
+            instruction.isActive = true;
 
             // Patch file only if it is different from the new version
             if (installedHash != instruction.NewHash)

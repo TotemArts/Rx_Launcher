@@ -116,10 +116,12 @@ namespace RXPatchLib
                         {
                             try
                             {
+                                var thisPatchServer = _patcher.UpdateServerHandler.SelectBestPatchServer();
                                 // Download file and wait until finished
                                 RxLogger.Logger.Instance.Write($"Starting file transfer: {_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
                                 await webClient.DownloadFileTaskAsync(new Uri($"{_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
+                                thisPatchServer.IsUsed = false;
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();
