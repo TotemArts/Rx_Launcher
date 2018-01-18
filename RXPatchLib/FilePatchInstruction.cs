@@ -18,5 +18,7 @@ namespace RXPatchLib
         public long FullReplaceSize;
         public long DeltaSize;
         public bool HasDelta;
+        public bool isComplete;
+        public bool isActive;
     }
 }

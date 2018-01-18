@@ -121,7 +121,7 @@ namespace RxLogger
 
                     // ReSharper disable once LocalizableElement
                     Console.WriteLine(
-                        $"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] - {message}");
+                        $"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] - {message}");
                 }
             }
         }
