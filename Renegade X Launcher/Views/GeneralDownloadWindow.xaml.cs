@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace LauncherTwo.Views
 {
 
-    public partial class GeneralDownloadWindow : RXWindow
+    public partial class GeneralDownloadWindow : RxWindow
     {
         
-        private CancellationTokenSource token;
-        private long sizeOfFile;
+        private readonly CancellationTokenSource _token;
+        private long _sizeOfFile;
 
         internal string Status
         {
@@ -32,18 +32,18 @@ namespace LauncherTwo.Views
         public GeneralDownloadWindow(CancellationTokenSource token, String windowTitle)
         {
             InitializeComponent();
-            this.token = token;
+            this._token = token;
             this.Title = windowTitle;
         }
 
-        public void setStatusLabel(String status)
+        public void SetStatusLabel(String status)
         {
             this.StatusLabelContent.Content = status;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            this.token.Cancel();
+            this._token.Cancel();
         }
 
         public void ToggleProgressBar()
@@ -75,9 +75,9 @@ namespace LauncherTwo.Views
             }
         }
 
-        public void initProgressBar(long sizeOfFile)
+        public void InitProgressBar(long sizeOfFile)
         {
-            this.sizeOfFile = sizeOfFile;
+            this._sizeOfFile = sizeOfFile;
 
             Dispatcher.Invoke(new Action(() => {
                 this.ProgressPercentage.Content = "0%";
@@ -85,13 +85,13 @@ namespace LauncherTwo.Views
             }));
         }
 
-        public void updateProgressBar(long currentAmount)
+        public void UpdateProgressBar(long currentAmount)
         {
             Dispatcher.Invoke(new Action(() => {
                 this.ProgressBar.Value = currentAmount; 
-                if (this.sizeOfFile != 0)
+                if (this._sizeOfFile != 0)
                 {
-                    this.ProgressPercentage.Content = (int)currentAmount / (this.sizeOfFile / 100) + "%";
+                    this.ProgressPercentage.Content = (int)currentAmount / (this._sizeOfFile / 100) + "%";
                 }
                 else
                 {
@@ -100,11 +100,11 @@ namespace LauncherTwo.Views
             }));
         }
 
-        public void updateProgressBar(long currentAmount, long totalAmount)
+        public void UpdateProgressBar(long currentAmount, long totalAmount)
         {
-            this.sizeOfFile = totalAmount;
+            this._sizeOfFile = totalAmount;
             this.ProgressBar.Value = currentAmount;
-            this.ProgressPercentage.Content = (int)currentAmount / (this.sizeOfFile / 100) + "%";
+            this.ProgressPercentage.Content = (int)currentAmount / (this._sizeOfFile / 100) + "%";
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<Window x:Class="LauncherTwo.Views.JoinIPWindow"
+﻿<Window x:Class="LauncherTwo.Views.JoinIpWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="132" Width="312" ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>

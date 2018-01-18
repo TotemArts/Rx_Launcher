@@ -1,4 +1,4 @@
-﻿<parent:RXWindow
+﻿<parent:RxWindow
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:LauncherTwo.Views"
     mc:Ignorable="d"
     x:Class="LauncherTwo.Views.ApplyUpdateWindow"
-    Style="{StaticResource {x:Type parent:RXWindow}}"
+    Style="{StaticResource {x:Type parent:RxWindow}}"
     Padding="12"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     d:DataContext="{d:DesignData /Views/SampleUpdateProgress.xaml}"
@@ -73,4 +73,4 @@
             </StackPanel>
         </Grid>
     </StackPanel>
-</parent:RXWindow>
+</parent:RxWindow>

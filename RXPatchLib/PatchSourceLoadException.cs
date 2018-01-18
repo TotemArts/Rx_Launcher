@@ -7,13 +7,13 @@ namespace RXPatchLib
 {
     class PatchSourceLoadException : Exception
     {
-        private string SubPath;
-        private string Hash;
+        private string _subPath;
+        private string _hash;
 
         public PatchSourceLoadException(string subPath, string hash)
         {
-            SubPath = subPath;
-            Hash = hash;
+            _subPath = subPath;
+            _hash = hash;
         }
     }
 }

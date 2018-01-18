@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-    public class RXPatcher
+    public class RxPatcher
     {
         // Do not use the system temp dir because it may be on a different volume.
         const string BackupSubPath = "backup";
@@ -21,8 +21,8 @@ namespace RXPatchLib
         public UpdateServerEntry UpdateServer = null;
         public string WebPatchPath = null;
 
-        private static RXPatcher _instance;
-        public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
+        private static RxPatcher _instance;
+        public static RxPatcher Instance => _instance ?? (_instance = new RxPatcher());
 
         public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
 
@@ -60,29 +60,28 @@ namespace RXPatchLib
             }
         }
 
-        public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+        public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
         {
             Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
 
-            var Selector = new UpdateServerSelector();
-            await Selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
+            var selector = new UpdateServerSelector();
+            await selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
 
-            var bestHost = Selector.Hosts.Dequeue();
+            var bestHost = selector.Hosts.Dequeue();
 
             Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
-
-            await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
+            await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructionsHash);
         }
 
-        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
         {
             var backupPath = CreateBackupPath(applicationDirPath);
             var tempPath = CreateTempPath(applicationDirPath);
 
             var patchSource = new FileSystemPatchSource(patchPath);
             var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-            await patcher.ApplyPatchAsync(progress, cancellationToken, instructions_hash);
+            await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
         }
 
         

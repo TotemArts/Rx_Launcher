@@ -19,9 +19,7 @@ namespace RXPatchLib
         public async Task<bool> QueryHost(UpdateServerEntry hostObject)
         {
             RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}");
-
             System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
-
             request.Method = "GET";
 
             //Default to "not found"

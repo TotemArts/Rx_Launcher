@@ -25,9 +25,9 @@ namespace LauncherTwo
         {
             None,
             Other,
-            DM,
-            CNC,
-            TS
+            Dm,
+            Cnc,
+            Ts
         }
 
         /// <summary>
@@ -277,12 +277,12 @@ namespace LauncherTwo
         /// </summary>
         public static async Task ParseJsonServersAsync()
         {
-            var NewActiveServers = new List<ServerInfo>();
+            var newActiveServers = new List<ServerInfo>();
 
             try
             {
                 //Grab the string from the RenX Website.
-                string jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RENX_ACTIVE_SERVER_JSON_URL);
+                string jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
 
                 //Turn it into a JSon object that we can parse.
                 var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
@@ -292,59 +292,59 @@ namespace LauncherTwo
                 #region -= Parse JSon Collection
 
 
-                foreach (var Data in results)
+                foreach (var data in results)
                 {
                     try
                     {
-                        ServerInfo NewServer = new ServerInfo();
+                        ServerInfo newServer = new ServerInfo();
                         //SET STRINGS
-                        NewServer.ServerName = Data["Name"] ?? "Missing";
+                        newServer.ServerName = data["Name"] ?? "Missing";
 
-                        NewServer.MapName = Data["Current Map"] ?? "Missing";
+                        newServer.MapName = data["Current Map"] ?? "Missing";
 
-                        NewServer.SimplifiedMapName = GetPrettyMapName(NewServer.MapName);
+                        newServer.SimplifiedMapName = GetPrettyMapName(newServer.MapName);
 
-                        NewServer.MapMode = GetGameMode(NewServer.MapName);
+                        newServer.MapMode = GetGameMode(newServer.MapName);
 
-                        NewServer.GameVersion = Data["Game Version"] ?? "Missing";
+                        newServer.GameVersion = data["Game Version"] ?? "Missing";
 
-                        NewServer.IPAddress = Data["IP"] ?? "Missing";
+                        newServer.IpAddress = data["IP"] ?? "Missing";
 
                         //SET INTS
-                        NewServer.BotCount = Data["Bots"] ?? -1;
+                        newServer.BotCount = data["Bots"] ?? -1;
 
-                        NewServer.PlayerCount = Data["Players"] ?? -1;
+                        newServer.PlayerCount = data["Players"] ?? -1;
 
-                        NewServer.MineLimit = Data.Variables["Mine Limit"] ?? -1;
+                        newServer.MineLimit = data.Variables["Mine Limit"] ?? -1;
 
-                        NewServer.MaxPlayers = Data.Variables["Player Limit"] ?? -1;
+                        newServer.MaxPlayers = data.Variables["Player Limit"] ?? -1;
 
-                        NewServer.VehicleLimit = Data.Variables["Vehicle Limit"] ?? -1;
+                        newServer.VehicleLimit = data.Variables["Vehicle Limit"] ?? -1;
 
-                        NewServer.CrateRespawnRate = Data.Variables["CrateRespawnAfterPickup"] ?? -1;
+                        newServer.CrateRespawnRate = data.Variables["CrateRespawnAfterPickup"] ?? -1;
 
-                        NewServer.TimeLimit = Data.Variables["Time Limit"] ?? -1;
+                        newServer.TimeLimit = data.Variables["Time Limit"] ?? -1;
 
-                        NewServer.Port = Data["Port"] ?? -1;
+                        newServer.Port = data["Port"] ?? -1;
 
                         //SET BOOLS
-                        NewServer.SteamRequired = Data.Variables["bSteamRequired"] ?? false;
+                        newServer.SteamRequired = data.Variables["bSteamRequired"] ?? false;
 
-                        NewServer.PasswordProtected = Data.Variables["bPassworded"] ?? false;
+                        newServer.PasswordProtected = data.Variables["bPassworded"] ?? false;
 
-                        NewServer.AutoBalance = Data.Variables["bAutoBalanceTeams"] ?? false;
+                        newServer.AutoBalance = data.Variables["bAutoBalanceTeams"] ?? false;
 
-                        NewServer.SpawnCrates = Data.Variables["bSpawnCrates"] ?? false;
+                        newServer.SpawnCrates = data.Variables["bSpawnCrates"] ?? false;
 
-                        NewServer.Ranked = Data.Variables["bRanked"] ?? false;
+                        newServer.Ranked = data.Variables["bRanked"] ?? false;
 
                         //SET COUNTRYINFO
-                        string[] CountryInfo = await GrabCountry(NewServer.IPAddress);
-                        NewServer.CountryName = CountryInfo[0];
-                        NewServer.CountryCode = CountryInfo[1];
+                        string[] countryInfo = await GrabCountry(newServer.IpAddress);
+                        newServer.CountryName = countryInfo[0];
+                        newServer.CountryCode = countryInfo[1];
 
                         //All work done, add current serverinfo to the main list
-                        NewActiveServers.Add(NewServer);
+                        newActiveServers.Add(newServer);
                     }
                     catch
                     {
@@ -356,9 +356,9 @@ namespace LauncherTwo
             catch
             {
                 // If a global error occurred (e.g. connectivity/JSON parse error), clear the whole list.
-                NewActiveServers.Clear();
+                newActiveServers.Clear();
             }
-            ActiveServers = NewActiveServers;
+            ActiveServers = newActiveServers;
         }
 
         private static bool ParseBool(String str, bool def = false)
@@ -396,13 +396,13 @@ namespace LauncherTwo
                 return GameMode.None;
 
             if (separated[0].ToUpper() == "DM")
-                return GameMode.DM;
+                return GameMode.Dm;
 
             if (separated[0].ToUpper() == "CNC")
-                return GameMode.CNC;
+                return GameMode.Cnc;
 
             if (separated[0].ToUpper() == "TS")
-                return GameMode.TS;
+                return GameMode.Ts;
 
             return GameMode.Other;
         }
@@ -459,45 +459,45 @@ namespace LauncherTwo
         {
             try
             {
-                PingReply reply = await new Ping().SendPingAsync(serverInfo.IPAddress);
-                Logger.Instance.Write($"Pinging server {serverInfo.IPWithPort} returned {reply.RoundtripTime}ms latency");
+                PingReply reply = await new Ping().SendPingAsync(serverInfo.IpAddress);
+                Logger.Instance.Write($"Pinging server {serverInfo.IpWithPort} returned {reply.RoundtripTime}ms latency");
                 serverInfo.Ping = (int)reply.RoundtripTime;
                 serverInfo.PropertyChanged?.Invoke(serverInfo, new PropertyChangedEventArgs("Ping"));
             }
             catch (Exception e)
             {
-                Logger.Instance.Write($"Unable to ping server {serverInfo.IPWithPort} | {e.Message}\r\n{e.StackTrace}", Logger.ErrorLevel.ERR_ERROR);
+                Logger.Instance.Write($"Unable to ping server {serverInfo.IpWithPort} | {e.Message}\r\n{e.StackTrace}", Logger.ErrorLevel.ErrError);
             }
         }
 
         /// <summary>
         /// Tries to grab the countryname based on the given IPAddress.
         /// </summary>
-        /// <param name="IPAddress">The IPAddress</param>
+        /// <param name="ipAddress">The IPAddress</param>
         /// <returns>The name of the country that belongs to the IPAddress</returns>
-        static async Task<string[]> GrabCountry(string IPAddress)
+        static async Task<string[]> GrabCountry(string ipAddress)
         {
             //GET CountryCode
             //If the Ip is known, we can check the country.
             //Otherwise, assume CountryCode and name is missing
-            if (IPAddress != "Missing")
+            if (ipAddress != "Missing")
             {
-                string[] CountryCode;
+                string[] countryCode;
                 //First check the cache if we already have the current ip, this reduces the call to the api
-                CountryCodeCache.TryGetValue(IPAddress, out CountryCode);
+                CountryCodeCache.TryGetValue(ipAddress, out countryCode);
                 //If the CountryCode was not found in the cache (null), grab it from the api
                 //Else, use the CountryCode from the cache
-                if (CountryCode == null)
+                if (countryCode == null)
                 {
                     try
                     {
                         //Grab the Countrycode and name
-                        string CountryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + IPAddress);
-                        var CountryResults = JsonConvert.DeserializeObject<dynamic>(CountryJson);
+                        string countryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + ipAddress);
+                        var countryResults = JsonConvert.DeserializeObject<dynamic>(countryJson);
 
                         //Add Countrycode and name to cache and return
-                        CountryCodeCache.Add(IPAddress, new string[2] {(string)CountryResults["countryName"], (string)CountryResults["countryCode"]});
-                        return new string[2] { (string)CountryResults["countryName"], (string)CountryResults["countryCode"] };
+                        CountryCodeCache.Add(ipAddress, new string[2] {(string)countryResults["countryName"], (string)countryResults["countryCode"]});
+                        return new string[2] { (string)countryResults["countryName"], (string)countryResults["countryCode"] };
                     }
                     catch
                     {
@@ -507,7 +507,7 @@ namespace LauncherTwo
                 }
                 else
                 {
-                    return CountryCode;
+                    return countryCode;
                 }
             }
             else
@@ -560,78 +560,78 @@ namespace LauncherTwo
             }
         }
 
-        private BitmapImage lockImage;
+        private BitmapImage _lockImage;
         public BitmapImage LockImage
         {
             get
             {
-                if (lockImage == null)
-                    lockImage = new BitmapImage(new Uri("Resources/LockIcon.png", UriKind.Relative));
+                if (_lockImage == null)
+                    _lockImage = new BitmapImage(new Uri("Resources/LockIcon.png", UriKind.Relative));
 
                 if (PasswordProtected)
-                    return lockImage;
+                    return _lockImage;
                 else return null;
             }
         }
 
-        private BitmapImage modeImage;
+        private BitmapImage _modeImage;
 
         public BitmapImage ModeImage
         {
             get
             {
-                if(this.modeImage == null)
+                if(this._modeImage == null)
                 {
                     switch (this.MapMode)
                     {
-                        case GameMode.DM:
-                            this.modeImage = new BitmapImage(new Uri("Resources/dm_modeIcon.png", UriKind.Relative));
+                        case GameMode.Dm:
+                            this._modeImage = new BitmapImage(new Uri("Resources/dm_modeIcon.png", UriKind.Relative));
                             break;
-                        case GameMode.CNC:
-                            this.modeImage = new BitmapImage(new Uri("Resources/cnc_modeIcon.png", UriKind.Relative));
+                        case GameMode.Cnc:
+                            this._modeImage = new BitmapImage(new Uri("Resources/cnc_modeIcon.png", UriKind.Relative));
                             break;
-                        case GameMode.TS:
-                            this.modeImage = new BitmapImage(new Uri("Resources/ts_modeIcon.png", UriKind.Relative));
+                        case GameMode.Ts:
+                            this._modeImage = new BitmapImage(new Uri("Resources/ts_modeIcon.png", UriKind.Relative));
                             break;
                         default:
                             break;
                     }
                 }
-                return this.modeImage;
+                return this._modeImage;
             }
         }
 
-        private BitmapImage rankedImage;
+        private BitmapImage _rankedImage;
 
         public BitmapImage RankedImage
         {
             get
             {
-                if (this.rankedImage == null && this.Ranked)
-                        this.rankedImage = new BitmapImage(new Uri("Resources/RankedIcon.png", UriKind.Relative));
+                if (this._rankedImage == null && this.Ranked)
+                        this._rankedImage = new BitmapImage(new Uri("Resources/RankedIcon.png", UriKind.Relative));
 
-                return this.rankedImage;
+                return this._rankedImage;
             }
         }
 
         // SIDE BAR INFO
-        public string   IPAddress { get; set; }
+        public string   IpAddress { get; set; }
         public int Port { get; set; }
-        public string IPWithPort
+        public string IpWithPort
         {
             get
             {
                 if (Port > 0)
-                    return IPAddress + ":" + Port.ToString();
+                    return IpAddress + ":" + Port.ToString();
                 else
-                    return IPAddress;
+                    return IpAddress;
             }
         }
         public string   GameVersion { get; set; }
         public int      MineLimit { get; set; }
         public bool     SteamRequired { get; set; }
         public bool     PasswordProtected { get; set; }
-        public bool     AllowPM { get; set; }
+        public bool     AllowPm { get; set; }
         public bool     PmTeamOnly { get; set; }
         public int      MaxPlayers { get; set; }
         public int      VehicleLimit { get; set; }
@@ -653,12 +653,12 @@ namespace LauncherTwo
             Ping = -1;
             Port = -1;
 
-            IPAddress = string.Empty;
+            IpAddress = string.Empty;
             GameVersion = string.Empty;
             MineLimit = -1;
             SteamRequired = false;
             PasswordProtected = false;
-            AllowPM = false;
+            AllowPm = false;
             MaxPlayers = -1;
             VehicleLimit = -1;
             AutoBalance = false;

@@ -17,13 +17,13 @@ namespace LauncherTwo.Views
     /// <summary>
     /// Interaction logic for UsernameWindow.xaml
     /// </summary>
-    public partial class JoinIPWindow : Window
+    public partial class JoinIpWindow : Window
     {
-        public string IP = "";
+        public string Ip = "";
         public string Pass = "";
         public bool WantsToJoin = false;
 
-        public JoinIPWindow()
+        public JoinIpWindow()
         {
             InitializeComponent();
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
@@ -31,7 +31,7 @@ namespace LauncherTwo.Views
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            IP = SD_IpBox.Text;
+            Ip = SD_IpBox.Text;
             Pass = SD_PassBox.Text;
             WantsToJoin = true;
             this.Close();

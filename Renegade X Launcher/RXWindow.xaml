@@ -109,7 +109,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="local:RXWindow">
+    <Style TargetType="local:RxWindow">
         <Style.Resources>
             <GridLengthConverter x:Key="glc" />
             <GridLength x:Key="CaptionHeightGridLength">24</GridLength>
@@ -176,14 +176,14 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <Grid.InputBindings>
-                                            <MouseBinding MouseAction="RightClick" Command="{Binding Source={x:Static local:RXWindow.ShowSystemMenuUnderMouseCommand}}"/>
-                                            <MouseBinding MouseAction="LeftClick" Command="{Binding Source={x:Static local:RXWindow.DragMoveCommand}}"/>
-                                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding Source={x:Static local:RXWindow.ToggleMaximizedCommand}}"/>
+                                            <MouseBinding MouseAction="RightClick" Command="{Binding Source={x:Static local:RxWindow.ShowSystemMenuUnderMouseCommand}}"/>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding Source={x:Static local:RxWindow.DragMoveCommand}}"/>
+                                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding Source={x:Static local:RxWindow.ToggleMaximizedCommand}}"/>
                                         </Grid.InputBindings>
 
                                         <Image Grid.Column="0" Height="18" Width="18" Margin="3" Source="{TemplateBinding Icon}" WindowChrome.IsHitTestVisibleInChrome="True">
                                             <Image.InputBindings>
-                                                <MouseBinding MouseAction="LeftClick" Command="{Binding Source={x:Static local:RXWindow.ShowSystemMenuUnderIconCommand}}"/>
+                                                <MouseBinding MouseAction="LeftClick" Command="{Binding Source={x:Static local:RxWindow.ShowSystemMenuUnderIconCommand}}"/>
                                                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding Source={x:Static SystemCommands.CloseWindowCommand}}"/>
                                             </Image.InputBindings>
                                         </Image>

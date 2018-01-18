@@ -11,36 +11,36 @@ namespace RXPatchLib
 {
     public class XdeltaPatchBuilder
     {
-        public long _SourceBufferSize = 512 * 1024 * 1024;
+        public long SourceBufferSize = 512 * 1024 * 1024;
         public long SourceWindowSize {
-            get { return _SourceBufferSize; }
-            set { if (value < 1) throw new InvalidOperationException(); _SourceBufferSize = value; }
+            get { return SourceBufferSize; }
+            set { if (value < 1) throw new InvalidOperationException(); SourceBufferSize = value; }
         }
 
-        private int _CompressionLevel = 9;
+        private int _compressionLevel = 9;
         public int CompressionLevel {
-            get { return _CompressionLevel; }
-            set { if (value < 0 || value > 9) throw new InvalidOperationException(); _CompressionLevel = value; }
+            get { return _compressionLevel; }
+            set { if (value < 0 || value > 9) throw new InvalidOperationException(); _compressionLevel = value; }
         }
 
-        private string SecondaryLevelCompression = "lzma";
+        private readonly string _secondaryLevelCompression = "lzma";
 
-        private XdeltaPatchSystem PatchSystem;
+        private readonly XdeltaPatchSystem _patchSystem;
 
         public XdeltaPatchBuilder(XdeltaPatchSystem patchSystem)
         {
-            PatchSystem = patchSystem;
+            _patchSystem = patchSystem;
         }
 
         public async Task CreatePatchAsync(string oldPath, string newPath, string patchPath)
         {
             try
             {
-                await PatchSystem.RunCommandAsync(
+                await _patchSystem.RunCommandAsync(
                     "-e",
                     "-B" + SourceWindowSize.ToString(),
                     "-" + CompressionLevel,
-                    "-S", SecondaryLevelCompression,
+                    "-S", _secondaryLevelCompression,
                     "-s", oldPath,
                     "-f",
                     "-A", "",
@@ -57,11 +57,11 @@ namespace RXPatchLib
         {
             try
             {
-                await PatchSystem.RunCommandAsync(
+                await _patchSystem.RunCommandAsync(
                     "-e",
                     "-B" + SourceWindowSize.ToString(),
                     "-" + CompressionLevel,
-                    "-S", SecondaryLevelCompression,
+                    "-S", _secondaryLevelCompression,
                     "-f",
                     "-A", "",
                     newPath,

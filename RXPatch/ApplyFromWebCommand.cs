@@ -43,10 +43,10 @@ namespace RXPatch
                 return 1;
             }
 
-            RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
+            RxPatcher.Instance.AddNewUpdateServer(remainingArguments[0], "");
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, new CancellationToken(), null) // intentionally skipping instructions.json verification
+                (progress) => RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, new CancellationToken(), null) // intentionally skipping instructions.json verification
             );
 
             return 0;
