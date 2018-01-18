@@ -21,9 +21,9 @@ namespace RXPatchLib
         public string WebPatchPath;
         public long Latency;
 
-        public UpdateServerEntry(string Url, string name)
+        public UpdateServerEntry(string url, string name)
         {
-            Uri = new Uri(Url);
+            Uri = new Uri(url);
             Name = name;
         }
     }
@@ -36,11 +36,11 @@ namespace RXPatchLib
         private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
         private UpdateServerEntry _lastBestServerEntry;
 
-        public void AddUpdateServer(string Url, string FriendlyName)
+        public void AddUpdateServer(string url, string friendlyName)
         {
             try
             {
-                _updateServers.Add(new UpdateServerEntry(Url, FriendlyName));
+                _updateServers.Add(new UpdateServerEntry(url, friendlyName));
             }
             catch
             {

@@ -9,40 +9,40 @@ namespace RXPatchLibTest
     [TestClass]
     public class RetryStrategyTest
     {
-        DateTime StartTime = new DateTime(2015, 1, 2, 3, 4, 5, 678);
-        ITimeProvider TimeProvider;
-        RetryStrategy RetryStrategy;
-        int Attempts;
+        readonly DateTime _startTime = new DateTime(2015, 1, 2, 3, 4, 5, 678);
+        ITimeProvider _timeProvider;
+        RetryStrategy _retryStrategy;
+        int _attempts;
 
         [TestInitialize]
         public void Initialize()
         {
-            TimeProvider = new StaticTimeProvider(StartTime);
-            RetryStrategy = new RetryStrategy(TimeProvider);
-            Attempts = 0;
+            _timeProvider = new StaticTimeProvider(_startTime);
+            _retryStrategy = new RetryStrategy(_timeProvider);
+            _attempts = 0;
         }
 
         [TestMethod]
         public void TestWithoutRetries()
         {
-            RetryStrategy.Run(() => { ++Attempts; return Task.FromResult<Exception>(null); });
-            Assert.AreEqual(1, Attempts);
+            _retryStrategy.Run(() => { ++_attempts; return Task.FromResult<Exception>(null); });
+            Assert.AreEqual(1, _attempts);
         }
 
         [TestMethod]
         public void TestWithSingleRetry()
         {
             RunWithFailures(1, new TimeSpan(0, 0, 0));
-            Assert.AreEqual(2, Attempts);
-            Assert.AreEqual(new TimeSpan(0, 0, 1 * 4), TimeProvider.Now - StartTime);
+            Assert.AreEqual(2, _attempts);
+            Assert.AreEqual(new TimeSpan(0, 0, 1 * 4), _timeProvider.Now - _startTime);
         }
 
         [TestMethod]
         public void TestWithFewQuickRetries()
         {
             RunWithFailures(5, new TimeSpan(0, 0, 0));
-            Assert.AreEqual(6, Attempts);
-            Assert.AreEqual(new TimeSpan(0, 0, 5 * 4), TimeProvider.Now - StartTime);
+            Assert.AreEqual(6, _attempts);
+            Assert.AreEqual(new TimeSpan(0, 0, 5 * 4), _timeProvider.Now - _startTime);
         }
 
         [TestMethod]
@@ -55,8 +55,8 @@ namespace RXPatchLibTest
             }
             catch (TooManyRetriesException e)
             {
-                Assert.AreEqual(6, Attempts);
-                Assert.AreEqual(new TimeSpan(0, 0, 5 * 4), TimeProvider.Now - StartTime);
+                Assert.AreEqual(6, _attempts);
+                Assert.AreEqual(new TimeSpan(0, 0, 5 * 4), _timeProvider.Now - _startTime);
                 CollectionAssert.AreEquivalent(new string[] {
                     "attempt 1",
                     "attempt 2",
@@ -72,25 +72,25 @@ namespace RXPatchLibTest
         public void TestWithManySlowRetries()
         {
             RunWithFailures(10, new TimeSpan(0, 0, 4));
-            Assert.AreEqual(11, Attempts);
-            Assert.AreEqual(new TimeSpan(0, 0, 10 * (4 + 4)), TimeProvider.Now - StartTime);
+            Assert.AreEqual(11, _attempts);
+            Assert.AreEqual(new TimeSpan(0, 0, 10 * (4 + 4)), _timeProvider.Now - _startTime);
         }
 
         private void RunWithFailures(int failureCount, TimeSpan timeBeforeFailure)
         {
             try
             {
-                RetryStrategy.Run(() =>
+                _retryStrategy.Run(() =>
                 {
-                    ++Attempts;
-                    if (Attempts == failureCount + 1)
+                    ++_attempts;
+                    if (_attempts == failureCount + 1)
                     {
                         return Task.FromResult<Exception>(null);
                     }
                     else
                     {
-                        TimeProvider.Delay(timeBeforeFailure);
-                        return Task.FromResult<Exception>(new Exception("attempt " + Attempts));
+                        _timeProvider.Delay(timeBeforeFailure);
+                        return Task.FromResult<Exception>(new Exception("attempt " + _attempts));
                     }
                 }).Wait();
             }

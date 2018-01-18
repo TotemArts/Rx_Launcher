@@ -1,4 +1,4 @@
-﻿<parent:RXWindow
+﻿<parent:RxWindow
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:parent="clr-namespace:LauncherTwo"
@@ -13,7 +13,7 @@
     MinHeight="0"
     MinWidth="0"
     ResizeMode="NoResize" d:DesignHeight="201.373">
-    <parent:RXWindow.Resources>
+    <parent:RxWindow.Resources>
         <Style x:Key="MinimizeTitleBarButton" TargetType="{x:Type UserControl}"/>
         <Style x:Key="MaximizeTitleBarButton" TargetType="{x:Type UserControl}"/>
         <Style x:Key="RestoreTitleBarButton" TargetType="{x:Type UserControl}"/>
@@ -22,10 +22,10 @@
         <Color x:Key="RenX_Window_Border_Color">#CC65787D</Color>
         <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
         <SolidColorBrush x:Key="RenX_Window_Border_Color_Brush" Color="{DynamicResource RenX_Window_Border_Color}"/>
-    </parent:RXWindow.Resources>
-    <parent:RXWindow.Style>
-        <StaticResource ResourceKey="{x:Type parent:RXWindow}"/>
-    </parent:RXWindow.Style>
+    </parent:RxWindow.Resources>
+    <parent:RxWindow.Style>
+        <StaticResource ResourceKey="{x:Type parent:RxWindow}"/>
+    </parent:RxWindow.Style>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Margin="3,0" Foreground="{DynamicResource RenXFontColorBrush}" Height="21" Width="70" Click="ApplyAndClose" IsDefault="True" Content="OK"/>
@@ -45,4 +45,4 @@
         </Border>
 
     </DockPanel>
-</parent:RXWindow>
+</parent:RxWindow>

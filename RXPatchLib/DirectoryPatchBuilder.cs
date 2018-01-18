@@ -11,17 +11,17 @@ namespace RXPatchLib
 {
     public class DirectoryPatchBuilder : IDisposable
     {
-        SHA256CryptoServiceProvider CryptoProvider = new SHA256CryptoServiceProvider();
-        XdeltaPatchBuilder PatchBuilder;
+        readonly SHA256CryptoServiceProvider _cryptoProvider = new SHA256CryptoServiceProvider();
+        readonly XdeltaPatchBuilder _patchBuilder;
 
         public DirectoryPatchBuilder(XdeltaPatchBuilder patchBuilder)
         {
-            PatchBuilder = patchBuilder;
+            _patchBuilder = patchBuilder;
         }
 
         public void Dispose()
         {
-            if (CryptoProvider != null) CryptoProvider.Dispose();
+            if (_cryptoProvider != null) _cryptoProvider.Dispose();
         }
 
         string GetHash(string path)
@@ -30,7 +30,7 @@ namespace RXPatchLib
                 return null;
 
             using (var stream = File.OpenRead(path))
-                return BitConverter.ToString(CryptoProvider.ComputeHash(stream)).Replace("-", string.Empty);
+                return BitConverter.ToString(_cryptoProvider.ComputeHash(stream)).Replace("-", string.Empty);
         }
 
         public async Task CreatePatchAsync(string oldRootPath, string newRootPath, string patchPath)
@@ -71,8 +71,8 @@ namespace RXPatchLib
                 {
                     // Copy and compress newPath to fullPath
                     string fullPath = patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash;
-                    await PatchBuilder.CompressAsync(newPath, fullPath);
-                    compressedHash = await SHA256.GetFileHashAsync(fullPath);
+                    await _patchBuilder.CompressAsync(newPath, fullPath);
+                    compressedHash = await Sha256.GetFileHashAsync(fullPath);
                     fullReplaceSize = new FileInfo(fullPath).Length;
 
                     // Write delta to deltaPath if the old file differs from the new one
@@ -80,7 +80,7 @@ namespace RXPatchLib
                     {
                         // Create delta
                         string deltaPath = patchPath + Path.DirectorySeparatorChar + "delta" + Path.DirectorySeparatorChar + newHash + "_from_" + oldHash;
-                        await PatchBuilder.CreatePatchAsync(oldPath, newPath, deltaPath);
+                        await _patchBuilder.CreatePatchAsync(oldPath, newPath, deltaPath);
 
                         // Only keep the delta if it's smaller than the full download
                         if (new FileInfo(deltaPath).Length >= new FileInfo(fullPath).Length)
@@ -89,7 +89,7 @@ namespace RXPatchLib
                         }
                         else
                         {
-                            deltaHash = await SHA256.GetFileHashAsync(deltaPath);
+                            deltaHash = await Sha256.GetFileHashAsync(deltaPath);
                             deltaSize = new FileInfo(deltaPath).Length;
                             hasDelta = true;
                         }
@@ -121,7 +121,7 @@ namespace RXPatchLib
                 RxLogger.Logger.Instance.Write($"Writing Instructions_hash.txt out to {patchPath + Path.DirectorySeparatorChar}instructions_hash.txt");
                 // Write SHA256 hash of instructions.json to instructions_hash.txt
                 File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt",
-                    await SHA256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
+                    await Sha256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
             }
             catch(Exception ex)
             {

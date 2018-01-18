@@ -90,14 +90,14 @@ namespace LauncherTwo.Views
 
     public class DirectoryPatchPhaseProgressWithSpeed
     {
-        private DirectoryPatchPhaseProgress _ProgressReport;
-        private SpeedComputer _SpeedComputer = new SpeedComputer();
+        private DirectoryPatchPhaseProgress _progressReport;
+        private readonly SpeedComputer _speedComputer = new SpeedComputer();
 
         public long BytesPerSecond
         {
             get
             {
-                return _SpeedComputer.BytesPerSecond;
+                return _speedComputer.BytesPerSecond;
             }
         }
 
@@ -105,12 +105,12 @@ namespace LauncherTwo.Views
         {
             get
             {
-                return _ProgressReport;
+                return _progressReport;
             }
             set
             {
-                _ProgressReport = value;
-                _SpeedComputer.AddSample(_ProgressReport.Size.Done);
+                _progressReport = value;
+                _speedComputer.AddSample(_progressReport.Size.Done);
             }
         }
     }
@@ -152,18 +152,18 @@ namespace LauncherTwo.Views
         }
     }
 
-    public partial class ApplyUpdateWindow : RXWindow, INotifyPropertyChanged
+    public partial class ApplyUpdateWindow : RxWindow, INotifyPropertyChanged
     {
-        private bool _HasFinished;
+        private bool _hasFinished;
         public bool HasFinished
         {
             get
             {
-                return _HasFinished;
+                return _hasFinished;
             }
             private set
             {
-                _HasFinished = value;
+                _hasFinished = value;
                 NotifyPropertyChanged("HasFinished");
             }
         }
@@ -171,78 +171,78 @@ namespace LauncherTwo.Views
         {
             get
             {
-                return _ProgressReport != null ? _ProgressReport.IsCancellationPossible : false;
+                return _progressReport != null ? _progressReport.IsCancellationPossible : false;
             }
         }
-        private string _StatusMessage;
+        private string _statusMessage;
         public string StatusMessage
         {
             get
             {
-                return _StatusMessage;
+                return _statusMessage;
             }
             private set
             {
-                _StatusMessage = value;
+                _statusMessage = value;
                 NotifyPropertyChanged("StatusMessage");
             }
         }
-        private string _ServerMessage;
+        private string _serverMessage;
         public string ServerMessage
         {
             get
             {
-                return _ServerMessage;
+                return _serverMessage;
             }
             private set
             {
-                _ServerMessage = value;
+                _serverMessage = value;
                 NotifyPropertyChanged("ServerMessage");
             }
         }
-        public string _TargetVersionString;
+        private string _targetVersionString;
         public string TargetVersionString
         {
             get
             {
-                return _TargetVersionString;
+                return _targetVersionString;
             }
             private set
             {
-                _TargetVersionString = value;
+                _targetVersionString = value;
                 NotifyPropertyChanged("TargetVersionString");
             }
         }
 
-        public DirectoryPatcherProgressReport _ProgressReport;
+        private DirectoryPatcherProgressReport _progressReport;
         public DirectoryPatcherProgressReport ProgressReport
         {
             get
             {
-                return _ProgressReport;
+                return _progressReport;
             }
             private set
             {
-                _ProgressReport = value;
-                LoadProgressWithSpeed.ProgressReport = _ProgressReport.Load;
+                _progressReport = value;
+                LoadProgressWithSpeed.ProgressReport = _progressReport.Load;
                 NotifyPropertyChanged("ProgressReport");
                 NotifyPropertyChanged("LoadProgressWithSpeed");
                 NotifyPropertyChanged("IsCancellationPossible");
             }
         }
 
-        private DirectoryPatchPhaseProgressWithSpeed _LoadProgressWithSpeed = new DirectoryPatchPhaseProgressWithSpeed();
+        private readonly DirectoryPatchPhaseProgressWithSpeed _loadProgressWithSpeed = new DirectoryPatchPhaseProgressWithSpeed();
         public DirectoryPatchPhaseProgressWithSpeed LoadProgressWithSpeed
         {
             get
             {
-                return _LoadProgressWithSpeed;
+                return _loadProgressWithSpeed;
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private CancellationTokenSource CancellationTokenSource;
+        private readonly CancellationTokenSource _cancellationTokenSource;
 
         public enum UpdateWindowType
         {
@@ -262,13 +262,13 @@ namespace LauncherTwo.Views
         /// <param name="isInstall">Is this the first install</param>
         
         
-        public ApplyUpdateWindow(Task patchTask, RXPatcher patcher, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
+        public ApplyUpdateWindow(Task patchTask, RxPatcher patcher, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
         {
             TargetVersionString = targetVersionString;
-            CancellationTokenSource = cancellationTokenSource;
-            string[] StatusTitle = new string[]{"updated", "update"};
+            _cancellationTokenSource = cancellationTokenSource;
+            string[] statusTitle = new string[]{"updated", "update"};
 
-            Dictionary<UpdateWindowType, string[]> StatusTitleDict = new Dictionary<UpdateWindowType, string[]>()
+            Dictionary<UpdateWindowType, string[]> statusTitleDict = new Dictionary<UpdateWindowType, string[]>()
             {
                 {UpdateWindowType.Install, new string[]{"installed", "installation" } },
                 {UpdateWindowType.Update, new string[]{"updated", "update" } },
@@ -276,17 +276,17 @@ namespace LauncherTwo.Views
                 {UpdateWindowType.Reset, new string[]{"modified", "modification" } }
             };
 
-            StatusTitleDict.TryGetValue(type, out StatusTitle);
+            statusTitleDict.TryGetValue(type, out statusTitle);
 
-            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", StatusTitle[0]);
+            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", statusTitle[0]);
 
-            if (patcher.BaseURL == null)
+            if (patcher.BaseUrl == null)
                 this.ServerMessage = "pending";
             else
-                this.ServerMessage = patcher.BaseURL.Name;
+                this.ServerMessage = patcher.BaseUrl.Name;
 
             InitializeComponent();
-            this.Title = string.Format("Renegade X {0} ", StatusTitle[1]);
+            this.Title = string.Format("Renegade X {0} ", statusTitle[1]);
 
             DirectoryPatcherProgressReport lastReport = new DirectoryPatcherProgressReport();
             progress.ProgressChanged += (o, report) => lastReport = report;
@@ -296,12 +296,12 @@ namespace LauncherTwo.Views
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
                     // URL could theoretically change at any point
-                    if (this.ServerMessage != patcher.BaseURL.Name)
+                    if (this.ServerMessage != patcher.BaseUrl.Name)
                     {
-                        if (patcher.BaseURL == null)
+                        if (patcher.BaseUrl == null)
                             this.ServerMessage = "pending";
                         else
-                            this.ServerMessage = patcher.BaseURL.Name;
+                            this.ServerMessage = patcher.BaseUrl.Name;
                     }
 
                     ProgressReport = lastReport;
@@ -311,13 +311,13 @@ namespace LauncherTwo.Views
                 try
                 {
                     await patchTask; // Collect exceptions.
-                    this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", StatusTitle[0], TargetVersionString);
-                    RxLogger.Logger.Instance.Write($"Renegade X was successfully {StatusTitle[0]} to version {TargetVersionString}.");
+                    this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", statusTitle[0], TargetVersionString);
+                    RxLogger.Logger.Instance.Write($"Renegade X was successfully {statusTitle[0]} to version {TargetVersionString}.");
                 }
                 catch (Exception exception)
                 {
-                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", StatusTitle[0], exception.Message);
-                    RxLogger.Logger.Instance.Write($"Renegade X could not be {StatusTitle[0]}. The following exception occurred:\n\n{exception.Message}");
+                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], exception.Message);
+                    RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}");
                 }
                 HasFinished = true;
             });
@@ -338,7 +338,7 @@ namespace LauncherTwo.Views
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            CancellationTokenSource.Cancel();
+            _cancellationTokenSource.Cancel();
             this.StatusMessage = "Operation cancelled by User";
         }
 

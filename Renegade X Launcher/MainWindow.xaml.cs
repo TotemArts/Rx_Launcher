@@ -19,28 +19,28 @@ using System.Diagnostics;
 
 namespace LauncherTwo
 {
-    public partial class MainWindow : RXWindow, INotifyPropertyChanged
+    public partial class MainWindow : RxWindow, INotifyPropertyChanged
     {
-        public const bool SHOW_DEBUG = false;
-        public bool version_mismatch = false;
+        public const bool ShowDebug = false;
+        public bool VersionMismatch = false;
 
         /// <summary>
         /// Boolean that holds the state of the default movie.
         /// </summary>
-        private Boolean DefaultMoviePlays = false;
+        private Boolean _defaultMoviePlays = false;
 
-        public const int SERVER_REFRESH_RATE = 60; // 60 sec
-        public const int SERVER_AUTO_PING_RATE = 60; // unused
-        public static readonly int MAX_PLAYER_COUNT = 64;
+        public const int ServerRefreshRate = 60; // 60 sec
+        public const int ServerAutoPingRate = 60; // unused
+        public static readonly int MaxPlayerCount = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
-        private DispatcherTimer refreshTimer;
-        private EngineInstance _GameInstance;
+        private DispatcherTimer _refreshTimer;
+        private EngineInstance _gameInstance;
         public EngineInstance GameInstance
         {
-            get { return _GameInstance; }
+            get { return _gameInstance; }
             set
             {
-                _GameInstance = value;
+                _gameInstance = value;
                 NotifyPropertyChanged("GameInstance");
                 NotifyPropertyChanged("IsLaunchingPossible");
             }
@@ -57,33 +57,33 @@ namespace LauncherTwo
 
         public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName() + " | Players online: " + this.TotalPlayersOnline; } }
 
-        private int _TotalPlayersOnline = 0;
-        public int TotalPlayersOnline {get { return this._TotalPlayersOnline; } private set
+        private int _totalPlayersOnline = 0;
+        public int TotalPlayersOnline {get { return this._totalPlayersOnline; } private set
             {
-                this._TotalPlayersOnline = value;
+                this._totalPlayersOnline = value;
                 this.NotifyPropertyChanged("TitleValue");       
             } }
-        public bool IsLaunchingPossible { get { return GameInstance == null && version_mismatch == false; } }
+        public bool IsLaunchingPossible { get { return GameInstance == null && VersionMismatch == false; } }
 
-        const string MESSAGE_JOINGAME = "Establishing Battlefield Control... Standby...";
-        const string MESSAGE_CANTSTARTGAME = "Error starting game executable.";
-        const string MESSAGE_IDLE = "Welcome back commander.";
+        const string MessageJoingame = "Establishing Battlefield Control... Standby...";
+        const string MessageCantstartgame = "Error starting game executable.";
+        const string MessageIdle = "Welcome back commander.";
 
-        const string MESSAGE_INSTALL = "It looks like this is the first time you're running Renegade X or your installation is corrupted.\nDo you wish to install the game?";
-        const string MESSAGE_NOT_INSTALLED = "You will not be able to play the game until the installation is finished!\nThis message will continue to appear untill installation is succesfull.";
-        const string MESSAGE_REDIST_INSTALL = "You will now be prompted to install the Unreal Engine dependancies.\nThis is needed for the successfull installation of Renegade X.";
+        const string MessageInstall = "It looks like this is the first time you're running Renegade X or your installation is corrupted.\nDo you wish to install the game?";
+        const string MessageNotInstalled = "You will not be able to play the game until the installation is finished!\nThis message will continue to appear untill installation is succesfull.";
+        const string MessageRedistInstall = "You will now be prompted to install the Unreal Engine dependancies.\nThis is needed for the successfull installation of Renegade X.";
 
 
-        private BitmapImage chkBoxOnImg;
-        private BitmapImage chkBoxOffImg;
-        public BitmapImage GetChkBxImg (bool Value)
+        private BitmapImage _chkBoxOnImg;
+        private BitmapImage _chkBoxOffImg;
+        public BitmapImage GetChkBxImg (bool value)
         {
-            if (chkBoxOnImg == null)
-                chkBoxOnImg = new BitmapImage(new Uri("Resources/Checkbox_ON.png", UriKind.Relative));
-            if (chkBoxOffImg == null)
-                chkBoxOffImg = new BitmapImage(new Uri("Resources/Checkbox_OFF.png", UriKind.Relative));
+            if (_chkBoxOnImg == null)
+                _chkBoxOnImg = new BitmapImage(new Uri("Resources/Checkbox_ON.png", UriKind.Relative));
+            if (_chkBoxOffImg == null)
+                _chkBoxOffImg = new BitmapImage(new Uri("Resources/Checkbox_OFF.png", UriKind.Relative));
 
-            return Value ? chkBoxOnImg : chkBoxOffImg;
+            return value ? _chkBoxOnImg : _chkBoxOffImg;
         }
 
 
@@ -91,8 +91,8 @@ namespace LauncherTwo
 
 
         #region -= Filters =-
-        private int filter_MaxPlayers = MAX_PLAYER_COUNT; // Default to max
-        private int filter_MinPlayers = 0;
+        private int _filterMaxPlayers = MaxPlayerCount; // Default to max
+        private int _filterMinPlayers = 0;
         #endregion -= Filters =-
 
 
@@ -106,10 +106,10 @@ namespace LauncherTwo
             {
                 StartCheckingVersions();
 
-                refreshTimer = new DispatcherTimer();
-                refreshTimer.Interval = new TimeSpan(0, 0, SERVER_REFRESH_RATE);
-                refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
-                refreshTimer.Start();
+                _refreshTimer = new DispatcherTimer();
+                _refreshTimer.Interval = new TimeSpan(0, 0, ServerRefreshRate);
+                _refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
+                _refreshTimer.Start();
                 StartRefreshingServers();
 
                 if (VersionCheck.GetGameVersionName() == "Unknown")
@@ -232,10 +232,10 @@ namespace LauncherTwo
                 var cancellationTokenSource = new CancellationTokenSource();
 
                 RxLogger.Logger.Instance.Write($"Starting game update | TargetDir: {targetDir} | AppDir: {applicationDir} | PatchPath: {patchPath},| PatchVersion: {patchVersion}");
-                Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+                Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
                 RxLogger.Logger.Instance.Write("Download complete, Showing ApplyUpdateWindow");
-                var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
+                var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
                 window.Owner = this;
                 window.ShowDialog();
 
@@ -296,8 +296,8 @@ namespace LauncherTwo
                 if (sv_ServerSearch.Text != "")
                 {
                     if (info.ServerName.ToLower().Contains(sv_ServerSearch.Text.ToLower()) ||
-                        info.IPAddress == sv_ServerSearch.Text ||
-                        info.IPWithPort == sv_ServerSearch.Text)
+                        info.IpAddress == sv_ServerSearch.Text ||
+                        info.IpWithPort == sv_ServerSearch.Text)
                     {
                         OFilteredServerList.Add(info);
                     }
@@ -306,23 +306,23 @@ namespace LauncherTwo
                     OFilteredServerList.Add(info);
             }
 
-            bool SameVersionOnly = (SD_Filter_SameVersionOnly.IsChecked.HasValue) ? SD_Filter_SameVersionOnly.IsChecked.Value : false;
+            bool sameVersionOnly = (SD_Filter_SameVersionOnly.IsChecked.HasValue) ? SD_Filter_SameVersionOnly.IsChecked.Value : false;
 
             for (int i = OFilteredServerList.Count - 1; i > -1; i--)
             {
-                if (OFilteredServerList[i].PlayerCount < filter_MinPlayers)
+                if (OFilteredServerList[i].PlayerCount < _filterMinPlayers)
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
                 }
 
-                if (OFilteredServerList[i].PlayerCount > filter_MaxPlayers)
+                if (OFilteredServerList[i].PlayerCount > _filterMaxPlayers)
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
                 }
 
-                if (SameVersionOnly && VersionCheck.GetGameVersionName() != "" && OFilteredServerList[i].GameVersion != VersionCheck.GetGameVersionName())
+                if (sameVersionOnly && VersionCheck.GetGameVersionName() != "" && OFilteredServerList[i].GameVersion != VersionCheck.GetGameVersionName())
                 {
                     OFilteredServerList.RemoveAt(i);
                     continue;
@@ -331,7 +331,7 @@ namespace LauncherTwo
 
             if (previousSelectedServer != null)
             {
-                SetSelectedServer(previousSelectedServer.IPWithPort);
+                SetSelectedServer(previousSelectedServer.IpWithPort);
             }
         }
 
@@ -344,7 +344,7 @@ namespace LauncherTwo
         {
             foreach (ServerInfo item in ServerInfoGrid.Items)
             {
-                if (item.IPWithPort == ipWithPort)
+                if (item.IpWithPort == ipWithPort)
                 {
                     ServerInfoGrid.SelectedItem = item;
                     break;
@@ -378,10 +378,10 @@ namespace LauncherTwo
             if (SD_MinPlayerSlider == null)
                 return;
 
-            if (filter_MaxPlayers != (int)SD_MaxPlayerSlider.Value)
+            if (_filterMaxPlayers != (int)SD_MaxPlayerSlider.Value)
             {
-                filter_MaxPlayers = (int)SD_MaxPlayerSlider.Value;
-                SD_MaxPlayerDile.Content = filter_MaxPlayers;
+                _filterMaxPlayers = (int)SD_MaxPlayerSlider.Value;
+                SD_MaxPlayerDile.Content = _filterMaxPlayers;
                 RefilterServers();
             }
         }
@@ -391,10 +391,10 @@ namespace LauncherTwo
             if (SD_MinPlayerSlider == null)
                 return;
 
-            if (filter_MinPlayers != (int)SD_MinPlayerSlider.Value)
+            if (_filterMinPlayers != (int)SD_MinPlayerSlider.Value)
             {
-                filter_MinPlayers = (int)SD_MinPlayerSlider.Value;
-                SD_MinPlayerDile.Content = filter_MinPlayers;
+                _filterMinPlayers = (int)SD_MinPlayerSlider.Value;
+                SD_MinPlayerDile.Content = _filterMinPlayers;
                 RefilterServers();
             }
 
@@ -413,19 +413,19 @@ namespace LauncherTwo
             //Movie mappreview code
             if (File.Exists(GameInstallation.GetRootPath() + "\\PreviewVids\\" + selected.MapName + ".mp4"))
             {
-                this.DefaultMoviePlays = false;
+                this._defaultMoviePlays = false;
                 sv_MapPreviewVid.Source = new Uri(GameInstallation.GetRootPath() + "\\PreviewVids\\" + selected.MapName + ".mp4");
                 sv_MapPreviewVid.Play();
             }
-            else if (!this.DefaultMoviePlays)
+            else if (!this._defaultMoviePlays)
             {
                 sv_MapPreviewVid.Source = new Uri(GameInstallation.GetRootPath() + "\\PreviewVids\\Default.mp4");
-                this.DefaultMoviePlays = true;
+                this._defaultMoviePlays = true;
                 sv_MapPreviewVid.Play();
             }
 
-            SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPWithPort);
-            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPWithPort) != "" ? Cursors.Hand : null;
+            SD_ClanHeader.Source = BannerTools.GetBanner(selected.IpWithPort);
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IpWithPort) != "" ? Cursors.Hand : null;
 
             SD_Name.Content = selected.ServerName;
             SD_GameLength.Content = selected.TimeLimit.ToString();
@@ -449,14 +449,14 @@ namespace LauncherTwo
             // Set version mismatch message visibility and join button opacity
             if (VersionCheck.GetGameVersionName() == selected.GameVersion)
             {
-                version_mismatch = false;
+                VersionMismatch = false;
                 SD_VersionMismatch.Visibility = Visibility.Hidden;
                 this.Join_Server_Btn.Background.Opacity = 1.0;
                 this.Join_Server_Btn.Content = "Join Server";
             }
             else
             {
-                version_mismatch = true;
+                VersionMismatch = true;
                 SD_VersionMismatch.Visibility = Visibility.Visible;
                 this.Join_Server_Btn.Background.Opacity = 0.5;
                 this.Join_Server_Btn.Content = "Server Version Mismatch";
@@ -477,7 +477,7 @@ namespace LauncherTwo
         private void SD_ClanHeader_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ServerInfo selected = GetSelectedServer();
-            BannerTools.LaunchBannerLink(selected != null ? selected.IPWithPort : null);
+            BannerTools.LaunchBannerLink(selected != null ? selected.IpWithPort : null);
         }
 
         private void SD_EditUsernameBtn_Click(object sender, RoutedEventArgs e)
@@ -508,7 +508,7 @@ namespace LauncherTwo
 
                 GameInstanceStartupParameters startupParameters = new GameInstanceStartupParameters();
                 startupParameters.Username = Properties.Settings.Default.Username;
-                startupParameters.IPEndpoint = ipEndpoint;
+                startupParameters.IpEndpoint = ipEndpoint;
                 startupParameters.Password = password;
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
 
@@ -516,11 +516,11 @@ namespace LauncherTwo
 
                 await GameInstance.Task;
 
-                SetMessageboxText(MESSAGE_IDLE);
+                SetMessageboxText(MessageIdle);
             }
             catch
             {
-                SetMessageboxText(MESSAGE_CANTSTARTGAME);
+                SetMessageboxText(MessageCantstartgame);
             }
             finally
             {
@@ -556,8 +556,8 @@ namespace LauncherTwo
 
                 IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
                 var localIps = host.AddressList.Where((a) => a.AddressFamily == AddressFamily.InterNetwork);
-                string localIPString = string.Join("\n", from ip in localIps select ip.ToString());
-                MessageBox.Show(String.Format("The server was started and will continue to run in the background. You can connect to it via LAN by pressing \"Join IP\" in the launcher, and then entering one of the IP addresses below.\n\n{0}\n\nIf you want to play over the internet, you can use the server list in the launcher or in game. Note that you likely need to forward port 7777 in your router and/or firewall to make internet games work.\n\nNote that launching the server via the launcher is intended for LAN servers, and some online functionality (such as leaderboard statistics) is disabled.", localIPString));
+                string localIpString = string.Join("\n", from ip in localIps select ip.ToString());
+                MessageBox.Show(String.Format("The server was started and will continue to run in the background. You can connect to it via LAN by pressing \"Join IP\" in the launcher, and then entering one of the IP addresses below.\n\n{0}\n\nIf you want to play over the internet, you can use the server list in the launcher or in game. Note that you likely need to forward port 7777 in your router and/or firewall to make internet games work.\n\nNote that launching the server via the launcher is intended for LAN servers, and some online functionality (such as leaderboard statistics) is disabled.", localIpString));
             }
             catch
             {
@@ -586,12 +586,12 @@ namespace LauncherTwo
 
         private async void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
         {
-            JoinIPWindow IPWindow = new JoinIPWindow();
-            IPWindow.Owner = this;
-            IPWindow.ShowDialog();
-            if (IPWindow.WantsToJoin)
+            JoinIpWindow ipWindow = new JoinIpWindow();
+            ipWindow.Owner = this;
+            ipWindow.ShowDialog();
+            if (ipWindow.WantsToJoin)
             {
-                await StartGameInstance(IPWindow.IP, IPWindow.Pass);
+                await StartGameInstance(ipWindow.Ip, ipWindow.Pass);
             }
         }
 
@@ -633,8 +633,8 @@ namespace LauncherTwo
         /// <param name="args"></param>
         void MediaEndedHandler(object sender, RoutedEventArgs args)
         {
-            var PreviewMovie = (sender as MediaElement);
-            PreviewMovie.Position = System.TimeSpan.Zero;
+            var previewMovie = (sender as MediaElement);
+            previewMovie.Position = System.TimeSpan.Zero;
         }
 
         private void SD_UpdateGame_Click(object sender, RoutedEventArgs e)
@@ -674,7 +674,7 @@ namespace LauncherTwo
             //Show the dialog that asks to install the game
             ModernDialog firstInstallDialog = new ModernDialog();
             firstInstallDialog.Title = "Installation";
-            firstInstallDialog.Content = MESSAGE_INSTALL;
+            firstInstallDialog.Content = MessageInstall;
             firstInstallDialog.Buttons = new Button[] { firstInstallDialog.YesButton, firstInstallDialog.NoButton };
             firstInstallDialog.ShowDialog();
             //Check if the user wants to install
@@ -691,7 +691,7 @@ namespace LauncherTwo
                 //Show dialog that the game is not playable untill installation is completed
                 ModernDialog notInstalledDialog = new ModernDialog();
                 notInstalledDialog.Title = "Installation";
-                notInstalledDialog.Content = MESSAGE_NOT_INSTALLED;
+                notInstalledDialog.Content = MessageNotInstalled;
                 notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
                 notInstalledDialog.ShowDialog();
             }
@@ -699,24 +699,24 @@ namespace LauncherTwo
 
         private async void JoinSelectedServer()
         {
-            ServerInfo SelectedServerInfo = GetSelectedServer();
-            if (SelectedServerInfo != null)
+            ServerInfo selectedServerInfo = GetSelectedServer();
+            if (selectedServerInfo != null)
             {
                 string password = null;
                 if (GetSelectedServer().PasswordProtected)
                 {
-                    PasswordWindow PassWindow = new PasswordWindow();
-                    PassWindow.Owner = this;
-                    PassWindow.ShowDialog();
-                    if (!PassWindow.WantsToJoin)
+                    PasswordWindow passWindow = new PasswordWindow();
+                    passWindow.Owner = this;
+                    passWindow.ShowDialog();
+                    if (!passWindow.WantsToJoin)
                     {
                         return;
                     }
-                    password = PassWindow.Password;
+                    password = passWindow.Password;
                 }
 
                 this.WindowState = WindowState.Minimized;
-                await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start 
+                await StartGameInstance(GetSelectedServer().IpWithPort, password); //<-Start 
                 this.WindowState = WindowState.Normal;
             }
         }

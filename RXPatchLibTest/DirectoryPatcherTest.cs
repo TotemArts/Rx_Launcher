@@ -14,21 +14,21 @@ namespace RXPatchLibTest
     [TestClass]
     public class DirectoryPatcherTest
     {
-        static TemporaryDirectory PatchDir;
-        static string[] PatchDirFiles;
-        DateTime DummyLastWriteTime = new DateTime(2015, 1, 2, 3, 4, 5, 678);
-        TemporaryDirectory TargetDir;
-        TemporaryDirectory BackupDir;
-        TemporaryDirectory TempDir;
-        XdeltaPatcher FilePatcher;
-        FileSystemPatchSource PatchSource;
-        DirectoryPatcher DirectoryPatcher;
+        static TemporaryDirectory _patchDir;
+        static string[] _patchDirFiles;
+        readonly DateTime _dummyLastWriteTime = new DateTime(2015, 1, 2, 3, 4, 5, 678);
+        TemporaryDirectory _targetDir;
+        TemporaryDirectory _backupDir;
+        TemporaryDirectory _tempDir;
+        XdeltaPatcher _filePatcher;
+        FileSystemPatchSource _patchSource;
+        DirectoryPatcher _directoryPatcher;
 
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            PatchDir = new TemporaryDirectory();
+            _patchDir = new TemporaryDirectory();
 
             using (var oldFile = new TemporaryFile())
             using (var newDeltaFile = new TemporaryFile())
@@ -37,53 +37,53 @@ namespace RXPatchLibTest
                 File.WriteAllText(oldFile.Path, "old");
                 File.WriteAllText(newDeltaFile.Path, "new_delta");
                 File.WriteAllText(newFullFile.Path, "new_full");
-                string oldHash = SHA256.Get(Encoding.UTF8.GetBytes("old"));
-                string newDeltaHash = SHA256.Get(Encoding.UTF8.GetBytes("new_delta"));
-                string newFullHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full"));
+                string oldHash = Sha256.Get(Encoding.UTF8.GetBytes("old"));
+                string newDeltaHash = Sha256.Get(Encoding.UTF8.GetBytes("new_delta"));
+                string newFullHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full"));
 
-                Directory.CreateDirectory(Path.Combine(PatchDir.Path, "delta"));
-                Directory.CreateDirectory(Path.Combine(PatchDir.Path, "full"));
+                Directory.CreateDirectory(Path.Combine(_patchDir.Path, "delta"));
+                Directory.CreateDirectory(Path.Combine(_patchDir.Path, "full"));
                 var patchBuilder = new XdeltaPatchBuilder(XdeltaPatchSystemFactory.Preferred);
-                patchBuilder.CreatePatchAsync(oldFile.Path, newDeltaFile.Path, Path.Combine(PatchDir.Path, "delta/" + newDeltaHash + "_from_" + oldHash)).Wait();
-                patchBuilder.CompressAsync(newFullFile.Path, Path.Combine(PatchDir.Path, "full/" + newFullHash)).Wait();
-                PatchDirFiles = DirectoryPathIterator.GetChildPathsRecursive(PatchDir.Path).ToArray();
+                patchBuilder.CreatePatchAsync(oldFile.Path, newDeltaFile.Path, Path.Combine(_patchDir.Path, "delta/" + newDeltaHash + "_from_" + oldHash)).Wait();
+                patchBuilder.CompressAsync(newFullFile.Path, Path.Combine(_patchDir.Path, "full/" + newFullHash)).Wait();
+                _patchDirFiles = DirectoryPathIterator.GetChildPathsRecursive(_patchDir.Path).ToArray();
             }
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            PatchDir.Dispose();
+            _patchDir.Dispose();
         }
 
         [TestInitialize]
         public void Initialize()
         {
-            TargetDir = new TemporaryDirectory();
-            BackupDir = new TemporaryDirectory();
-            TempDir = new TemporaryDirectory();
-            FilePatcher = new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred);
-            PatchSource = new FileSystemPatchSource(PatchDir.Path);
-            DirectoryPatcher = new DirectoryPatcher(FilePatcher, TargetDir.Path, BackupDir.Path, TempDir.Path, PatchSource);
+            _targetDir = new TemporaryDirectory();
+            _backupDir = new TemporaryDirectory();
+            _tempDir = new TemporaryDirectory();
+            _filePatcher = new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred);
+            _patchSource = new FileSystemPatchSource(_patchDir.Path);
+            _directoryPatcher = new DirectoryPatcher(_filePatcher, _targetDir.Path, _backupDir.Path, _tempDir.Path, _patchSource);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            TargetDir.Dispose();
-            BackupDir.Dispose();
-            TempDir.Dispose();
+            _targetDir.Dispose();
+            _backupDir.Dispose();
+            _tempDir.Dispose();
         }
 
         private async Task ApplyPatchWithInstructions(IEnumerable<FilePatchInstruction> instructions)
         {
             var instructionsJson = JsonConvert.SerializeObject(instructions);
-            var instructionsFilename = Path.Combine(PatchDir.Path, "instructions.json");
+            var instructionsFilename = Path.Combine(_patchDir.Path, "instructions.json");
             File.WriteAllText(instructionsFilename, instructionsJson);
 
             try
             {
-                await DirectoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken(), await SHA256.GetFileHashAsync(instructionsFilename));
+                await _directoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken(), await Sha256.GetFileHashAsync(instructionsFilename));
             }
             finally
             {
@@ -93,15 +93,15 @@ namespace RXPatchLibTest
 
         private void TestInvariants()
         {
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(TempDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(PatchDirFiles, DirectoryPathIterator.GetChildPathsRecursive(PatchDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_tempDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(_patchDirFiles, DirectoryPathIterator.GetChildPathsRecursive(_patchDir.Path).ToArray());
             TestTargetFileDatesInvariant();
         }
 
         private void TestTargetFileDatesInvariant()
         {
-            var files = DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray();
-            var offenders = files.Where(x => new FileInfo(Path.Combine(TargetDir.Path, x)).LastWriteTimeUtc != DummyLastWriteTime);
+            var files = DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray();
+            var offenders = files.Where(x => new FileInfo(Path.Combine(_targetDir.Path, x)).LastWriteTimeUtc != _dummyLastWriteTime);
             CollectionAssert.AreEquivalent(new string[] { }, offenders.ToArray());
         }
 
@@ -115,21 +115,21 @@ namespace RXPatchLibTest
         [TestMethod]
         public async Task TestApplyPatchRemoveOld()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "old");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "old");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
                     NewHash = null,
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
         }
 
@@ -140,39 +140,39 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
                     NewHash = null,
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
         }
 
         [TestMethod]
         public async Task TestApplyPatchRemoveModified()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "modified");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "modified");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
                     NewHash = null,
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(BackupDir.Path, "file")));
+            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(_backupDir.Path, "file")));
         }
 
         [TestMethod]
@@ -183,129 +183,129 @@ namespace RXPatchLibTest
                 {
                     Path = "file",
                     OldHash = null,
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchAddNew()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "new_nopatch");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "new_nopatch");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
                     OldHash = null,
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_nopatch", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_nopatch", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchAddModified()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "modified");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "modified");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
                     OldHash = null,
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
-            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(BackupDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
+            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(_backupDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchWithDeltaOld()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "old");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "old");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_delta")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_delta")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = true,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_delta", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_delta", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchWithDeltaNew()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "new_nopatch");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "new_nopatch");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = true,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_nopatch", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_nopatch", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchWithDeltaModified()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "modified");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "modified");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = true,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
-            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(BackupDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
+            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(_backupDir.Path, "file")));
         }
 
         [TestMethod]
@@ -315,85 +315,85 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = true,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchWithoutDeltaOld()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "old");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "old");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchWithoutDeltaNew()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "new_nopatch");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "new_nopatch");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_nopatch")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_nopatch", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_nopatch", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
 
         [TestMethod]
         public async Task TestApplyPatchWithoutDeltaModified()
         {
-            File.WriteAllText(Path.Combine(TargetDir.Path, "file"), "modified");
+            File.WriteAllText(Path.Combine(_targetDir.Path, "file"), "modified");
             var instructions = new FilePatchInstruction[] {
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
-            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(BackupDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
+            Assert.AreEqual("modified", File.ReadAllText(Path.Combine(_backupDir.Path, "file")));
         }
 
         [TestMethod]
@@ -403,18 +403,18 @@ namespace RXPatchLibTest
                 new FilePatchInstruction()
                 {
                     Path = "file",
-                    OldHash = SHA256.Get(Encoding.UTF8.GetBytes("old")),
-                    NewHash = SHA256.Get(Encoding.UTF8.GetBytes("new_full")),
-                    OldLastWriteTime = DummyLastWriteTime,
-                    NewLastWriteTime = DummyLastWriteTime,
+                    OldHash = Sha256.Get(Encoding.UTF8.GetBytes("old")),
+                    NewHash = Sha256.Get(Encoding.UTF8.GetBytes("new_full")),
+                    OldLastWriteTime = _dummyLastWriteTime,
+                    NewLastWriteTime = _dummyLastWriteTime,
                     HasDelta = false,
                 }
             };
             await ApplyPatchWithInstructions(instructions);
-            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(TargetDir.Path).ToArray());
-            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(BackupDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { "file" }, DirectoryPathIterator.GetChildPathsRecursive(_targetDir.Path).ToArray());
+            CollectionAssert.AreEquivalent(new string[] { }, DirectoryPathIterator.GetChildPathsRecursive(_backupDir.Path).ToArray());
             TestInvariants();
-            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(TargetDir.Path, "file")));
+            Assert.AreEqual("new_full", File.ReadAllText(Path.Combine(_targetDir.Path, "file")));
         }
     }
 }

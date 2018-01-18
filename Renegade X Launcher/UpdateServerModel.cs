@@ -14,11 +14,11 @@ namespace LauncherTwo
         /// <summary>
         /// Creates an UpdateServerModel
         /// </summary>
-        /// <param name="Url">An Uri containing the server</param>
-        public UpdateServerModel(Uri Url)
+        /// <param name="url">An Uri containing the server</param>
+        public UpdateServerModel(Uri url)
         {
-            this.CleanServerName = Url.Host;
-            this.ServerUri = Url;
+            this.CleanServerName = url.Host;
+            this.ServerUri = url;
         }
     }   
 
@@ -30,16 +30,16 @@ namespace LauncherTwo
         /// <summary>
         /// Create a UpdateServerModel array to be uses within various components
         /// </summary>
-        /// <param name="Urls">a string array containing all the url's of the servers</param>
+        /// <param name="urls">a string array containing all the url's of the servers</param>
         /// <returns>An array of UpdateServermodels</returns>
-        public static UpdateServerModel[] CreateUpdateServerModels(string[] Urls)
+        public static UpdateServerModel[] CreateUpdateServerModels(string[] urls)
         {
-            List<UpdateServerModel> UpdateServers = new List<UpdateServerModel>();
-            foreach (string Url in Urls)
+            List<UpdateServerModel> updateServers = new List<UpdateServerModel>();
+            foreach (string url in urls)
             {
-                UpdateServers.Add(new UpdateServerModel(new Uri(Url)));
+                updateServers.Add(new UpdateServerModel(new Uri(url)));
             }
-            return UpdateServers.ToArray();
+            return updateServers.ToArray();
 
         }
 

@@ -1,10 +1,10 @@
-﻿<parent:RXWindow
+﻿<parent:RxWindow
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:parent="clr-namespace:LauncherTwo"
     xmlns:local="clr-namespace:LauncherTwo.Views"
     x:Class="LauncherTwo.Views.GeneralDownloadWindow"
-    Style="{StaticResource {x:Type parent:RXWindow}}"
+    Style="{StaticResource {x:Type parent:RxWindow}}"
     Padding="12"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     Title="General Download"
@@ -72,4 +72,4 @@
 
 
     </Grid>
-</parent:RXWindow>
+</parent:RxWindow>

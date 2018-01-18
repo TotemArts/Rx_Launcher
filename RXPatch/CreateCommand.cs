@@ -12,12 +12,12 @@ namespace RXPatch
 {
     class CreateCommand : ConsoleCommand
     {
-        bool RemoveOutput = false;
+        bool _removeOutput = false;
 
         public CreateCommand()
         {
             IsCommand("create", "Create patch");
-            HasOption("removeoutput", "Remove contents of output directory on startup.", value => RemoveOutput = value != null);
+            HasOption("removeoutput", "Remove contents of output directory on startup.", value => _removeOutput = value != null);
             HasAdditionalArguments(1, "<config file path>");
         }
 
@@ -81,7 +81,7 @@ namespace RXPatch
                 return 1;
             }
 
-            if (RemoveOutput)
+            if (_removeOutput)
             {
                 DirectoryEx.DeleteContents(patchInfo.PatchPath);
             }
@@ -90,7 +90,7 @@ namespace RXPatch
                 Console.Error.WriteLine("Warning: Output path already exists. Use --removeoutput to erase its contents.");
             }
 
-            await new RXPatchBuilder().CreatePatchAsync(patchInfo);
+            await new RxPatchBuilder().CreatePatchAsync(patchInfo);
             return 0;
         }
     }

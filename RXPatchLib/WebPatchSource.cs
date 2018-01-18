@@ -12,35 +12,35 @@ namespace RXPatchLib
 {
     class WebPatchSource : IPatchSource, IDisposable
     {
-        Dictionary<string, Task> LoadTasks = new Dictionary<string, Task>();
-        RXPatcher Patcher;
-        string DownloadPath;
-        bool IsDownloading = false;
-        object IsDownloadingLock = new object();
+        readonly Dictionary<string, Task> _loadTasks = new Dictionary<string, Task>();
+        readonly RxPatcher _patcher;
+        readonly string _downloadPath;
+        bool _isDownloading = false;
+        readonly object _isDownloadingLock = new object();
 
-        public WebPatchSource(RXPatcher patcher, string downloadPath)
+        public WebPatchSource(RxPatcher patcher, string downloadPath)
         {
-            Patcher = patcher;
-            DownloadPath = downloadPath;
+            _patcher = patcher;
+            _downloadPath = downloadPath;
         }
 
         public void Dispose()
         {
-            Debug.Assert(Task.WhenAll(LoadTasks.Values).IsCompleted);
+            Debug.Assert(Task.WhenAll(_loadTasks.Values).IsCompleted);
         }
 
         public string GetSystemPath(string subPath)
         {
-            return Path.Combine(DownloadPath, subPath);
+            return Path.Combine(_downloadPath, subPath);
         }
 
         public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
         {
             Task task;
-            if (!LoadTasks.TryGetValue(subPath, out task))
+            if (!_loadTasks.TryGetValue(subPath, out task))
             {
                 task = LoadNew(subPath, hash, cancellationToken, progressCallback);
-                LoadTasks[subPath] = task;
+                _loadTasks[subPath] = task;
             }
             return task;
         }
@@ -49,11 +49,11 @@ namespace RXPatchLib
         {
             while (true)
             {
-                lock (IsDownloadingLock)
+                lock (_isDownloadingLock)
                 {
-                    if (!IsDownloading)
+                    if (!_isDownloading)
                     {
-                        IsDownloading = true;
+                        _isDownloading = true;
                         break;
                     }
                 }
@@ -64,8 +64,8 @@ namespace RXPatchLib
 
         private void UnlockDownload()
         {
-            lock (IsDownloadingLock)
-                IsDownloading = false;
+            lock (_isDownloadingLock)
+                _isDownloading = false;
         }
 
         public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
@@ -76,11 +76,11 @@ namespace RXPatchLib
             if (File.Exists(filePath))
             {
                 // If the file exists and is correct, return without redownloading.
-                if (hash != null && await SHA256.GetFileHashAsync(filePath) == hash)
+                if (hash != null && await Sha256.GetFileHashAsync(filePath) == hash)
                 {
                     // Update progress (probably unncessary)
-                    long FileSize = new FileInfo(filePath).Length;
-                    progressCallback(FileSize, FileSize);
+                    long fileSize = new FileInfo(filePath).Length;
+                    progressCallback(fileSize, fileSize);
 
                     return;
                 }
@@ -117,14 +117,14 @@ namespace RXPatchLib
                             try
                             {
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(new Uri($"{Patcher.BaseURL.Uri.AbsoluteUri}/{Patcher.BaseURL.WebPatchPath}/{subPath}"), filePath);
+                                RxLogger.Logger.Instance.Write($"Starting file transfer: {_patcher.BaseUrl.Uri.AbsoluteUri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}");
+                                await webClient.DownloadFileTaskAsync(new Uri($"{_patcher.BaseUrl.Uri.AbsoluteUri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}"), filePath);
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();
 
-                                if (hash != null && await SHA256.GetFileHashAsync(filePath) != hash)
+                                if (hash != null && await Sha256.GetFileHashAsync(filePath) != hash)
                                     throw new HashMistmatchException(); // Hash mismatch; throw exception
 
                                 return null;
@@ -143,7 +143,7 @@ namespace RXPatchLib
                     catch (TooManyRetriesException)
                     {
                         // Try the next best host; throw an exception if there is none
-                        if (Patcher.PopHost() == null)
+                        if (_patcher.PopHost() == null)
                         {
                             // Unlock download to leave in clean state.
                             UnlockDownload();
@@ -159,7 +159,7 @@ namespace RXPatchLib
                         RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
                         // Try the next best host; throw an exception if there is none
-                        if (Patcher.PopHost() == null)
+                        if (_patcher.PopHost() == null)
                             throw new NoReliableHostException();
 
                         // Reset progress and requeue download

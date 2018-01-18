@@ -8,7 +8,7 @@ using System.IO;
 
 namespace RXPatchLib
 {
-    public class SHA256
+    public class Sha256
     {
         public static async Task<string> GetFileHashAsync(string path)
         {

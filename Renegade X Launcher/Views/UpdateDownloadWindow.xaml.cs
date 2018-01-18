@@ -20,20 +20,20 @@ namespace LauncherTwo.Views
     public partial class UpdateDownloadWindow : Window
     {
         public bool UpdateFinished = false;
-        private string PatchUrl;
-        private string PatchHash;
+        private readonly string _patchUrl;
+        private readonly string _patchHash;
 
         public UpdateDownloadWindow(string patchUrl, string patchHash)
         {
-            PatchUrl = patchUrl;
-            PatchHash = patchHash;
+            _patchUrl = patchUrl;
+            _patchHash = patchHash;
             InitializeComponent();
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
         }
 
         private void OnActivated(object sender, EventArgs e)
         {
-            SelfUpdater.StartUpdate(this, PatchUrl, PatchHash);
+            SelfUpdater.StartUpdate(this, _patchUrl, _patchHash);
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)

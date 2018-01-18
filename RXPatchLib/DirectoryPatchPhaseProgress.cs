@@ -9,44 +9,44 @@ namespace RXPatchLib
     [Serializable]
     public class DirectoryPatchPhaseProgressItem
     {
-        private DirectoryPatchPhaseProgress Parent;
-        private long _Done;
-        private long _Total;
+        private readonly DirectoryPatchPhaseProgress _parent;
+        private long _done;
+        private long _total;
 
         public DirectoryPatchPhaseProgressItem(DirectoryPatchPhaseProgress parent)
         {
-            Parent = parent;
-            _Done = 0;
-            _Total = 0;
+            _parent = parent;
+            _done = 0;
+            _total = 0;
         }
         public long Done
         {
             get
             {
-                return _Done;
+                return _done;
             }
             set
             {
-                Parent.Size.Done += value - _Done;
-                _Done = value;
+                _parent.Size.Done += value - _done;
+                _done = value;
             }
         }
         public long Total
         {
             get
             {
-                return _Total;
+                return _total;
             }
             set
             {
-                Parent.Size.Total += value - _Total;
-                _Total = value;
+                _parent.Size.Total += value - _total;
+                _total = value;
             }
         }
         public void Finish()
         {
             Done = Total;
-            ++Parent.Items.Done;
+            ++_parent.Items.Done;
         }
     }
     [Serializable]
@@ -59,8 +59,6 @@ namespace RXPatchLib
             Started,
             Finished,
         }
-
-        public States _State;
 
         public States State { get; set; }
         public DiscreteProgress Items { get; set; }

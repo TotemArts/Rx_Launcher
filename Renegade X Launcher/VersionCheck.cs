@@ -20,10 +20,10 @@ namespace LauncherTwo
     }
     public static class VersionCheck
     {
-        static Version LauncherVersion;
-        static Version GameVersion;
-        static Version LatestLauncherVersion;
-        static Version LatestGameVersion;
+        static readonly Version _launcherVersion;
+        static Version _gameVersion;
+        static Version _latestLauncherVersion;
+        static Version _latestGameVersion;
 
         public static string InstructionsHash;
         public static string GamePatchPath = null;
@@ -34,7 +34,7 @@ namespace LauncherTwo
 
         static VersionCheck()
         {
-            LauncherVersion = new Version
+            _launcherVersion = new Version
             {
                 Name = "0.77-dev",
                 Number = 077
@@ -43,26 +43,26 @@ namespace LauncherTwo
 
         public static string GetLauncherVersionName()
         {
-            return LauncherVersion.Name;
+            return _launcherVersion.Name;
         }
 
         public static string GetGameVersionName()
         {
-            if (GameVersion == null)
+            if (_gameVersion == null)
                 UpdateGameVersion();
-            return GameVersion.Name;
+            return _gameVersion.Name;
         }
 
         public static string GetLatestLauncherVersionName()
         {
-            return LatestLauncherVersion.Name;
+            return _latestLauncherVersion.Name;
         }
 
         public static string GetLatestGameVersionName()
         {
-            if (LatestGameVersion != null)
+            if (_latestGameVersion != null)
             {
-                return LatestGameVersion.Name;
+                return _latestGameVersion.Name;
             }
             else
             {
@@ -72,27 +72,27 @@ namespace LauncherTwo
 
         public static void UpdateGameVersion()
         {
-            const string INI_PATH = "\\UDKGame\\Config\\DefaultRenegadeX.ini";
-            const string VERSION_PREFIX = "GameVersion=";
-            const string VERSION_NUMBER_PREFIX = "GameVersionNumber=";
+            const string iniPath = "\\UDKGame\\Config\\DefaultRenegadeX.ini";
+            const string versionPrefix = "GameVersion=";
+            const string versionNumberPrefix = "GameVersionNumber=";
 
             try
             {
                 string versionName = null;
                 int? versionNumber = null;
-                string filename = GameInstallation.GetRootPath() + INI_PATH;
+                string filename = GameInstallation.GetRootPath() + iniPath;
                 foreach (var line in File.ReadAllLines(filename))
                 {
-                    if (line.StartsWith(VERSION_PREFIX))
+                    if (line.StartsWith(versionPrefix))
                     {
                         versionName = line
-                            .Replace(VERSION_PREFIX, "")
+                            .Replace(versionPrefix, "")
                             .Replace("\"", "");
                     }
-                    else if (line.StartsWith(VERSION_NUMBER_PREFIX))
+                    else if (line.StartsWith(versionNumberPrefix))
                     {
                         versionNumber = int.Parse(line
-                            .Replace(VERSION_NUMBER_PREFIX, "")
+                            .Replace(versionNumberPrefix, "")
                             .Replace("\"", ""));
                     }
                 }
@@ -105,7 +105,7 @@ namespace LauncherTwo
 
                 if (versionName == null) throw new Exception("No version number found.");
                 if (versionNumber == null) throw new Exception("No version number found.");
-                GameVersion = new Version
+                _gameVersion = new Version
                 {
                     Name = versionName,
                     Number = versionNumber.Value,
@@ -114,7 +114,7 @@ namespace LauncherTwo
             }
             catch
             {
-                GameVersion = new Version
+                _gameVersion = new Version
                 {
                     Name = "Unknown",
                     Number = 0,
@@ -130,7 +130,7 @@ namespace LauncherTwo
                 var versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
 
                 // Launcher
-                LatestLauncherVersion = new Version
+                _latestLauncherVersion = new Version
                 {
                     Name = versionData["launcher"]["version_name"],
                     Number = versionData["launcher"]["version_number"],
@@ -139,7 +139,7 @@ namespace LauncherTwo
                 LauncherPatchHash = versionData["launcher"]["patch_hash"];
 
                 // Game
-                LatestGameVersion = new Version
+                _latestGameVersion = new Version
                 {
                     Name = versionData["game"]["version_name"],
                     Number = versionData["game"]["version_number"],
@@ -149,17 +149,17 @@ namespace LauncherTwo
 
                 // Server URL's list & Friendly Names
                 foreach (var x in versionData["game"]["server_urls"].ToObject<dynamic>())
-                    RXPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["friendly_name"].ToString());
+                    RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["friendly_name"].ToString());
             }
             catch(Exception ex)
             {
                 Debug.Print(ex.Message);
-                LatestLauncherVersion = new Version
+                _latestLauncherVersion = new Version
                 {
                     Name = "Unknown",
                     Number = 0,
                 };
-                LatestGameVersion = new Version
+                _latestGameVersion = new Version
                 {
                     Name = "Unknown",
                     Number = 0,
@@ -169,12 +169,12 @@ namespace LauncherTwo
 
         public static bool IsLauncherOutOfDate()
         {
-            return LatestLauncherVersion.Number > LauncherVersion.Number;
+            return _latestLauncherVersion.Number > _launcherVersion.Number;
         }
 
         public static bool IsGameOutOfDate()
         {
-            return LatestGameVersion.Number > GameVersion.Number;
+            return _latestGameVersion.Number > _gameVersion.Number;
         }
     }
 }
