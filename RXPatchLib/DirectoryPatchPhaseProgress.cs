@@ -63,6 +63,7 @@ namespace RXPatchLib
         public States State { get; set; }
         public DiscreteProgress Items { get; set; }
         public DiscreteProgress Size { get; set; }
+        public byte DownloadThreads { get; set; }
 
         public DirectoryPatchPhaseProgress()
         {

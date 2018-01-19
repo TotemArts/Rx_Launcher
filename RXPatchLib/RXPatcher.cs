@@ -96,23 +96,16 @@ namespace RXPatchLib
             var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
             await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
         }
-
         
         public UpdateServerEntry PopHost()
         {
-            BaseUrl.HasErrored = true;
-            BaseUrl = UpdateServerHandler.SelectBestPatchServer();
+            // Lock Hosts queue and dequeue next host to BaseURL.
+            if (UpdateServerSelector != null && UpdateServerSelector.Hosts.Count != 0)
+                lock (UpdateServerSelector.Hosts)
+                    BaseUrl = UpdateServerSelector.Hosts.Dequeue();
+
+            // Lock Hosts queue and dequeue next host to BaseURL.
             return BaseUrl;
-
-            /*
-            // Lock Hosts queue and dequeue next host to BaseURL.
-            if (Selector != null && Selector.Hosts.Count != 0)
-                lock (Selector.Hosts)
-                    BaseURL = Selector.Hosts.Dequeue().ToString() + WebPatchPath;
-
-            // Lock Hosts queue and dequeue next host to BaseURL.
-            return BaseURL;
-            */
         }
         
 

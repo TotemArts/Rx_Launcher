@@ -16,7 +16,7 @@ namespace RXPatchLib
         bool IsActive { get; set; }
         bool IsComplete { get; set; }
         long PatchSize { get; }
-        Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback);
+        Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback);
         Task Execute();
     }
 
@@ -37,7 +37,7 @@ namespace RXPatchLib
             _needsBackup = needsBackup;
         }
 
-        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             // Nothing to download; return CompletedTask
             return TaskExtensions.CompletedTask;
@@ -90,7 +90,7 @@ namespace RXPatchLib
             PatchSize = patchSize;
         }
 
-        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             // Downloads delta; Hash is 'DeltaHash'
             return _directoryPatcher.PatchSource.Load(_patchSubPath, _hash, cancellationToken, progressCallback);
@@ -135,7 +135,7 @@ namespace RXPatchLib
             PatchSize = patchSize;
         }
 
-        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             // Downloads full; Hash is 'CompressedHash' since full versions of files are compressed
             return _directoryPatcher.PatchSource.Load(_patchSubPath, _hash, cancellationToken, progressCallback);
@@ -194,7 +194,7 @@ namespace RXPatchLib
             _lastWriteTime = lastWriteTime;
         }
 
-        public Task Load(CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             // Nothing to download; return CompletedTask
             return TaskExtensions.CompletedTask;
@@ -237,10 +237,11 @@ namespace RXPatchLib
                 progressItem.Total = action.PatchSize;
 
                 // Starts loading an action
-                var task = action.Load(_cancellationToken, (done, total) => {
+                var task = action.Load(_cancellationToken, (done, total, totalThreads) => {
                     // Anonymous function to update progress
                     Debug.Assert(total == progressItem.Total);
                     progressItem.Done = done;
+                    _progress.DownloadThreads = totalThreads;
                     _progressCallback(_progress);
                 });
 
@@ -303,7 +304,7 @@ namespace RXPatchLib
         internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructions_hash)
         {
             // Download instructions
-            await PatchSource.Load("instructions.json", instructions_hash, cancellationToken, (done, total) => { });
+            await PatchSource.Load("instructions.json", instructions_hash, cancellationToken, (done, total, totalThreads) => { });
 
             // Open downloaded instructions.json and copy its contents to headerFileContents
             string headerFileContents;
@@ -579,7 +580,7 @@ namespace RXPatchLib
                 b.Dispose();
 
             // We're done here; update our State and update progress
-                progress.State = DirectoryPatchPhaseProgress.States.Finished;
+            progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
         }
 
