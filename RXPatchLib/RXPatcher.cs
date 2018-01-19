@@ -85,14 +85,17 @@ namespace RXPatchLib
             await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
         }
 
-        
         public UpdateServerEntry PopHost()
         {
-            UpdateServer.HasErrored = true;
-            UpdateServer = UpdateServerHandler.SelectBestPatchServer();
+            // Lock Hosts queue and dequeue next host to BaseURL.
+            if (UpdateServerSelector != null && UpdateServerSelector.Hosts.Count != 0)
+                lock (UpdateServerSelector.Hosts)
+                    UpdateServer = UpdateServerSelector.Hosts.Dequeue();
+
+            // Lock Hosts queue and dequeue next host to BaseURL.
             return UpdateServer;
         }
-        
+
         private static string CreateBackupPath(string applicationDirPath)
         {
             string dirName = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture);

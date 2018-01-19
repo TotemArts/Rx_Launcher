@@ -81,7 +81,7 @@ namespace LauncherTwo.Views
                 //var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 //return string.Format("{0} / {1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return string.Format("{0}%", perc.ToString("0.##"));
+                return $"Downloading using {progress.DownloadThreads} threads ({perc:##.##}%)";
             }
         }
 
@@ -263,8 +263,6 @@ namespace LauncherTwo.Views
         /// <param name="targetVersionString">The version to update to</param>
         /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
         /// <param name="isInstall">Is this the first install</param>
-        
-        
         public ApplyUpdateWindow(Task patchTask, RxPatcher patcher, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
         {
             TargetVersionString = targetVersionString;
@@ -298,15 +296,6 @@ namespace LauncherTwo.Views
             {
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
-                    // URL could theoretically change at any point
-                    if (this.ServerMessage != patcher.UpdateServer.Name)
-                    {
-                        if (patcher.UpdateServer == null)
-                            this.ServerMessage = "pending";
-                        else
-                            this.ServerMessage = patcher.UpdateServer.Name;
-                    }
-
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;

@@ -4,7 +4,6 @@ C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug
 C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.pdb
 C:\Users\AlienX\Documents\GitHub\Rx_Launcher\RxLogger\bin\Debug\RxLogger.dll
 C:\Users\AlienX\Documents\GitHub\Rx_Launcher\RxLogger\bin\Debug\RxLogger.pdb
-C:\Users\AlienX\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.csprojResolveAssemblyReference.cache
 C:\Users\AlienX\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.dll
 C:\Users\AlienX\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.pdb
 C:\Users\administrator.AGNDOMAIN\Documents\GitHub\Rx_Launcher\RxLogger\obj\Debug\RxLogger.csprojResolveAssemblyReference.cache

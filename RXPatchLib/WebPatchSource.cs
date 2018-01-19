@@ -35,7 +35,7 @@ namespace RXPatchLib
             return Path.Combine(_downloadPath, subPath);
         }
 
-        public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             Task task;
             if (!_loadTasks.TryGetValue(subPath, out task))
@@ -53,7 +53,7 @@ namespace RXPatchLib
                 lock (_isDownloadingLock)
                 {
                     //if (!_isDownloading)
-                    if (_downloadsRunning < 8)
+                    if (_downloadsRunning < 128)
                     {
                         _isDownloading = true;
                         _downloadsRunning++;
@@ -76,7 +76,7 @@ namespace RXPatchLib
             }
         }
 
-        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             string filePath = GetSystemPath(subPath);
 
@@ -88,7 +88,7 @@ namespace RXPatchLib
                 {
                     // Update progress (probably unncessary)
                     long fileSize = new FileInfo(filePath).Length;
-                    progressCallback(fileSize, fileSize);
+                    progressCallback(fileSize, fileSize, _downloadsRunning);
 
                     return;
                 }
@@ -109,7 +109,7 @@ namespace RXPatchLib
 
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
-                    progressCallback(args.BytesReceived, args.TotalBytesToReceive);
+                    progressCallback(args.BytesReceived, args.TotalBytesToReceive, _downloadsRunning);
                 };
 
                 new_host_selected:
@@ -126,9 +126,9 @@ namespace RXPatchLib
                             {
                                 var rnd = new Random();
                                 var xyz = _patcher.UpdateServerSelector.Hosts.ToArray();
-                                var thisPatchServer = xyz[rnd.Next(0, 3)];
+                                var thisPatchServer = xyz[rnd.Next(0, (xyz.Length < 4 ? xyz.Length : 4))];
                                 if (thisPatchServer == null)
-                                    throw new Exception("Unable to find a better update server");
+                                    throw new Exception("Unable to find a suitable update server");
 
                                 thisPatchServer.IsUsed = true;
 
