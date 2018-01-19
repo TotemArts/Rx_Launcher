@@ -25,6 +25,7 @@ namespace RXPatchLib
         public static RxPatcher Instance => _instance ?? (_instance = new RxPatcher());
 
         public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
+        public UpdateServerSelector UpdateServerSelector = new UpdateServerSelector();
 
         public void AddNewUpdateServer(string url, string friendlyName)
         {
