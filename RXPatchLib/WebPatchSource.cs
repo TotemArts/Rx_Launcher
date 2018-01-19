@@ -132,9 +132,12 @@ namespace RXPatchLib
 
                                 thisPatchServer.IsUsed = true;
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Downloads running: {_downloadsRunning+1} | Starting file transfer: {thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}");
+                                RxLogger.Logger.Instance.Write(
+                                    $"Downloads running: {_downloadsRunning + 1} | Starting file transfer: {thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}");
 
-                                await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}"), filePath);
+                                await webClient.DownloadFileTaskAsync(
+                                    new Uri($"{thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}"),
+                                    filePath);
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
                                 thisPatchServer.IsUsed = false;
 
@@ -173,7 +176,8 @@ namespace RXPatchLib
                     }
                     catch (HashMistmatchException)
                     {
-                        RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
+                        RxLogger.Logger.Instance.Write(
+                            $"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
@@ -181,6 +185,20 @@ namespace RXPatchLib
 
                         // Reset progress and requeue download
                         await LoadNew(subPath, hash, cancellationToken, progressCallback);
+                    }
+                    catch (WebException e)
+                    {
+                        // Try the next best host; throw an exception if there is none
+                        if (_patcher.PopHost() == null)
+                        {
+                            // Unlock download to leave in clean state.
+                            UnlockDownload();
+
+                            throw new NoReliableHostException();
+                        }
+
+                        // Proceed execution with next mirror
+                        goto new_host_selected;
                     }
                 }
             }
