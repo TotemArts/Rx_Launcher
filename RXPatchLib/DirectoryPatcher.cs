@@ -300,6 +300,52 @@ namespace RXPatchLib
             }
         }
 
+        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructions_hash)
+        {
+            // Download instructions
+            await PatchSource.Load("instructions.json", instructions_hash, cancellationToken, (done, total) => { });
+
+            // Open downloaded instructions.json and copy its contents to headerFileContents
+            string headerFileContents;
+            using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var streamReader = new StreamReader(file, Encoding.UTF8))
+            {
+                headerFileContents = streamReader.ReadToEnd();
+            }
+
+            // Deserialize JSON data from headerFileContents
+            List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
+
+            // Initialize progress-related variables
+            var progress = new DirectoryPatchPhaseProgress();
+            var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
+            var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
+            progress.SetTotals(instructions.Count, sizes.Sum());
+            progress.State = DirectoryPatchPhaseProgress.States.Started;
+            progressCallback(progress);
+
+            // Process each instruction in instructions.json
+            foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
+            {
+                var instruction = pair.Instruction;
+                cancellationToken.ThrowIfCancellationRequested();
+                string targetFilePath = Path.Combine(_targetPath, instruction.Path);
+
+                // Determine action(s) to take based on instruction; any new actions get passed to the callback
+                await BuildFilePatchAction(instruction, targetFilePath, callback);
+
+                // Update progress
+                progress.AdvanceItem(pair.Size);
+                progressCallback(progress);
+            }
+
+            // We're done here; update our State and update progress
+            progress.State = DirectoryPatchPhaseProgress.States.Finished;
+            progressCallback(progress);
+        }
+
+
+        /*
         internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructionsHash)
         {
             // Create our background workers
@@ -388,6 +434,7 @@ namespace RXPatchLib
             progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
         }
+        */
 
         private async Task BuildFilePatchAction(FilePatchInstruction instruction, string targetFilePath, Action<IFilePatchAction> callback)
         {

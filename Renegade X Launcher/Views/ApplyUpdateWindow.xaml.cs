@@ -34,6 +34,7 @@ namespace LauncherTwo.Views
         {
             if (!(value is DirectoryPatchPhaseProgress)) return DependencyProperty.UnsetValue;
             var progress = (DirectoryPatchPhaseProgress)value;
+            //RxLogger.Logger.Instance.Write($"PhaseProgressPercentageConverter -> Value = {progress.Items.Done} / {progress.Items.Total} | {progress.State}");
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return 0;
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
@@ -60,6 +61,8 @@ namespace LauncherTwo.Views
             var progress = value as DirectoryPatchPhaseProgress;
             if (progress == null)
                 return "unknown";
+
+            //RxLogger.Logger.Instance.Write($"PhaseProgressPercentageConverter -> Value = {progress.Items.Done} / {progress.Items.Total} | {progress.State}");
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return "not started";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Finished)

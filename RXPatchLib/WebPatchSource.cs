@@ -17,6 +17,7 @@ namespace RXPatchLib
         readonly string _downloadPath;
         bool _isDownloading = false;
         readonly object _isDownloadingLock = new object();
+        private byte _downloadsRunning = 0;
 
         public WebPatchSource(RxPatcher patcher, string downloadPath)
         {
@@ -51,21 +52,28 @@ namespace RXPatchLib
             {
                 lock (_isDownloadingLock)
                 {
-                    if (!_isDownloading)
+                    //if (!_isDownloading)
+                    if (_downloadsRunning < 8)
                     {
                         _isDownloading = true;
+                        _downloadsRunning++;
+                        Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | ACCEPTING DOWNLOAD");
                         break;
                     }
                 }
 
-                await Task.Delay(100);
+                await Task.Delay(1000);
             }
         }
 
         private void UnlockDownload()
         {
             lock (_isDownloadingLock)
+            {
+                _downloadsRunning--;
+                Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | DOWNLOAD COMPLETE");
                 _isDownloading = false;
+            }
         }
 
         public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
@@ -116,9 +124,16 @@ namespace RXPatchLib
                         {
                             try
                             {
-                                var thisPatchServer = _patcher.UpdateServerHandler.SelectBestPatchServer();
+                                var rnd = new Random();
+                                var xyz = _patcher.UpdateServerSelector.Hosts.ToArray();
+                                var thisPatchServer = xyz[rnd.Next(0, 3)];
+                                if (thisPatchServer == null)
+                                    throw new Exception("Unable to find a better update server");
+
+                                thisPatchServer.IsUsed = true;
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}");
+                                RxLogger.Logger.Instance.Write($"Downloads running: {_downloadsRunning+1} | Starting file transfer: {thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}");
+
                                 await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}"), filePath);
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
                                 thisPatchServer.IsUsed = false;
