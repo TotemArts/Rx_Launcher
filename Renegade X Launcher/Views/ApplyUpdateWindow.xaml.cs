@@ -75,11 +75,14 @@ namespace LauncherTwo.Views
             }
             else if ( progress.DownloadThreads == 0 )
             {
+                // If downloadThreads are zero, then we must be not in the downloading stage
+                // this will ensure we update the progress string correctly
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
                 return $"{perc:0.##}%";
             }
             else if ( progress.DownloadThreads > 0 )
             {
+                // DownloadThreads is above zero, we are in download phase, update the progress string accordingly
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
                 return $"Downloading using {progress.DownloadThreads} threads ({perc:0.##}%)";
             }
@@ -297,20 +300,11 @@ namespace LauncherTwo.Views
             DirectoryPatcherProgressReport lastReport = new DirectoryPatcherProgressReport();
             progress.ProgressChanged += (o, report) => lastReport = report;
 
+            // Here we start the actual patching process, the whole thing from verification to applying.
             Task backgroundTask = Task.Factory.StartNew(async () =>
             {
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
-                    // URL could theoretically change at any point
-                    /*
-                    if (this.ServerMessage != patcher.BaseUrl.Name)
-                    {
-                        if (patcher.BaseUrl == null)
-                            this.ServerMessage = "pending";
-                        else
-                            this.ServerMessage = patcher.BaseUrl.Name;
-                    }
-                    */
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;

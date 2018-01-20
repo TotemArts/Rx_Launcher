@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-
+    /// <summary>
+    /// Overwrites for the WebClient to specify our own timeout when the downloader attempts to grab files
+    /// </summary>
     class MyWebClient : WebClient
     {
         protected override WebRequest GetWebRequest(Uri address)
@@ -26,9 +28,8 @@ namespace RXPatchLib
         readonly Dictionary<string, Task> _loadTasks = new Dictionary<string, Task>();
         readonly RxPatcher _patcher;
         readonly string _downloadPath;
-        bool _isDownloading = false;
         readonly object _isDownloadingLock = new object();
-        private byte _downloadsRunning = 0;
+        private byte _downloadsRunning;
 
         public WebPatchSource(RxPatcher patcher, string downloadPath)
         {
@@ -57,16 +58,20 @@ namespace RXPatchLib
             return task;
         }
 
+        /// <summary>
+        /// Locks a download thread so that it may not attempt to download again
+        /// This controls concurrent downloading
+        /// </summary>
+        /// <returns>The return value can be ignored</returns>
         private async Task LockDownload()
         {
             while (true)
             {
                 lock (_isDownloadingLock)
                 {
-                    //if (!_isDownloading)
+                    // This is where the threading of concurrent downloads happens, currently hardcoded to 12 but easily changed.
                     if (_downloadsRunning < 12)
                     {
-                        _isDownloading = true;
                         _downloadsRunning++;
                         Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | ACCEPTING DOWNLOAD");
                         break;
@@ -77,13 +82,15 @@ namespace RXPatchLib
             }
         }
 
+        /// <summary>
+        /// Unlocks a concurrent download thread to allow another one to start
+        /// </summary>
         private void UnlockDownload()
         {
             lock (_isDownloadingLock)
             {
                 _downloadsRunning--;
                 Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | DOWNLOAD COMPLETE");
-                _isDownloading = false;
             }
         }
 
@@ -117,14 +124,18 @@ namespace RXPatchLib
 
             using (var webClient = new MyWebClient())
             {
-                webClient.Proxy = null;
+                webClient.Proxy = null; // Were not using a proxy server, let's ensure that.
 
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
+                    // Notify the RenX Updater window of a downloads progress
                     progressCallback(args.BytesReceived, args.TotalBytesToReceive, _downloadsRunning);
+
+                    // Notify our debug window of a downloads progress
                     AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
                 };
 
+                // goto labels are the devil, you should be ashamed of using this, whoever you are. :P
                 new_host_selected:
 
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
@@ -138,31 +149,47 @@ namespace RXPatchLib
                             {
                                 var rnd = new Random();
                                 var xyz = _patcher.UpdateServerSelector.Hosts.ToArray();
+
+                                /*
+                                 * I'm sure this is not the best way of doing this, however it does select the best top n+4 servers from the queue to download from
+                                 * at random, this does mean soemtimes you might download from one mirror more than others, but it still does
+                                 * a pretty good job at equalisising downloads between servers
+                                 *
+                                 * Note: As the queue is dynamically changing during the initial download, we have to check the length of the queue and adjudst accordingly.
+                                 */
                                 var thisPatchServer = xyz[rnd.Next(0, (xyz.Length < 4 ? xyz.Length : 4))];
                                 if (thisPatchServer == null)
                                     throw new Exception("Unable to find a suitable update server");
 
+                                // Add a new download to the debugging window
                                 AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
 
+                                // Mark this patch server as currently used (is active)
                                 thisPatchServer.IsUsed = true;
+
                                 // Download file and wait until finished
                                 RxLogger.Logger.Instance.Write(
                                     $"Downloads running: {_downloadsRunning + 1} | Starting file transfer: {thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}");
 
+                                // If the user is cancelling the download, break here, there is no point in contiuning.
                                 if (cancellationToken.IsCancellationRequested)
                                 {
                                     webClient.Dispose();
                                     return null;
                                 }
+
+                                // Download the file
                                 await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}"),filePath);
 
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
-                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
-                                thisPatchServer.IsUsed = false;
+                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid); // Remove the download from the debug window
+                                thisPatchServer.IsUsed = false; //reset the is used flag for the server
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();
 
+                                // Check our hash, if it's not the same we re-queue
+                                // todo: add a retry count to the file instruction, this is needed because if the servers file is actually broken you'll be in an infiniate download loop
                                 if (hash != null && await Sha256.GetFileHashAsync(filePath) != hash)
                                     throw new HashMistmatchException(); // Hash mismatch; throw exception
 
@@ -221,26 +248,6 @@ namespace RXPatchLib
                     }
                 }
             }
-
-            /* TODO
-            if (UseProxy)
-            {
-                request.Proxy = new WebProxy(ProxyServer + ":" + ProxyPort.ToString());
-                if (ProxyUsername.Length > 0)
-                    request.Proxy.Credentials = new NetworkCredential(ProxyUsername, ProxyPassword);
-            }
-
-            WebResponse response = request.GetResponse();
-            //result.MimeType = res.ContentType;
-            //result.LastModified = response.LastModified;
-            if (!resuming)//(Size == 0)
-            {
-                //resuming = false;
-                Size = (int)response.ContentLength;
-                SizeInKB = (int)Size / 1024;
-            }
-            acceptRanges = String.Compare(response.Headers["Accept-Ranges"], "bytes", true) == 0;
-             * */
         }
     }
 }

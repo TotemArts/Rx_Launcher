@@ -249,9 +249,6 @@ namespace RXPatchLib
                 // Add task to task list; used mostly by 'AwaitAllTasksAndFinish'
                 _tasks.Add(task);
 
-                // todo: add a try catch here for the cancel button, otherwise RenX Launcher crashes
-                // Wait for task to complete
-
                 var guid = Guid.NewGuid();
                 RxLogger.Logger.Instance.Write($"{guid} | Executing Task {task} | _tasks count: {_tasks.Count}");
                 try
@@ -260,6 +257,9 @@ namespace RXPatchLib
                 }
                 catch (Exception ex)
                 {
+                    // The RenX client seems to crash around here when the cancel button is pressed
+                    // while it does crash, it does however achieve our goal of stopping the download
+                    // (I'm not saying that it's right, i just dont know how to fix it right now.)
                     RxLogger.Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
                 }
                 _cancellationToken.ThrowIfCancellationRequested();
@@ -358,98 +358,6 @@ namespace RXPatchLib
             progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
         }
-
-
-        /*
-        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructionsHash)
-        {
-            // Create our background workers
-            List<BackgroundWorker> bgWorkers = new List<BackgroundWorker>();
-
-            // Spawn 4 workers
-            for (var i = 0; i < 4; i++)
-            {
-                RxLogger.Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
-                bgWorkers.Add(new BackgroundWorker());
-            }
-
-            // Download instructions
-            await PatchSource.Load("instructions.json", instructionsHash, cancellationToken, (done, total) => {});
-
-            // Open downloaded instructions.json and copy its contents to headerFileContents
-            string headerFileContents;
-            using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var streamReader = new StreamReader(file, Encoding.UTF8))
-            {
-                headerFileContents = streamReader.ReadToEnd();
-            }
-
-            // Deserialize JSON data from headerFileContents
-            List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
-
-            // Initialize progress-related variables
-            var progress = new DirectoryPatchPhaseProgress();
-            var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
-            var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length).ToArray();
-            progress.SetTotals(instructions.Count, sizes.Sum());
-            progress.State = DirectoryPatchPhaseProgress.States.Started;
-            progressCallback(progress);
-
-            // Convert our dynamic instruction object into one we can manage
-            List<InstructionModel> instructionsArray = instructions.Zip(sizes, (i, s) => new {Instruction = i, Size = s}).ToArray().Select(xxx => new InstructionModel(xxx.Instruction, xxx.Size)).ToList();
-
-            RxLogger.Logger.Instance.Write($"There are {instructionsArray.Count} instructions, assinging threads...");
-
-            // loop around all of our workers, creating work for them
-            foreach (var thisBgWorker in bgWorkers)
-            {
-                thisBgWorker.DoWork += async (sender, args) =>
-                {
-                    while (instructionsArray.Any(l => !l.Instruction.isComplete && !l.Instruction.isActive))
-                    {
-                        InstructionModel thisFilePatchInstruction;
-                        lock (instructionsArray)
-                        {
-                            thisFilePatchInstruction = instructionsArray.DefaultIfEmpty(null).FirstOrDefault(m => !m.Instruction.isActive && !m.Instruction.isComplete);
-                            if (thisFilePatchInstruction != null)
-                                thisFilePatchInstruction.Instruction.isActive = true;
-                        }
-
-                        cancellationToken.ThrowIfCancellationRequested();
-                        string targetFilePath = Path.Combine(_targetPath, thisFilePatchInstruction.Instruction.Path);
-
-                        RxLogger.Logger.Instance.Write($"Executing instruction {thisFilePatchInstruction.Instruction.Path}");
-                        // Determine action(s) to take based on instruction; any new actions get passed to the callback
-                        await BuildFilePatchAction(thisFilePatchInstruction.Instruction, targetFilePath, callback);
-
-                        // Update progress
-                        lock (progress)
-                        {
-                            progress.AdvanceItem(thisFilePatchInstruction.Size);
-                            progressCallback(progress);
-                        }
-
-                        lock (instructionsArray)
-                        {
-                            thisFilePatchInstruction.Instruction.isComplete = true;
-                            thisFilePatchInstruction.Instruction.isActive = false;
-                        }
-
-                        RxLogger.Logger.Instance.Write($"Action Complete {thisFilePatchInstruction.Instruction.Path}");
-                    }
-                };
-
-                thisBgWorker.RunWorkerAsync();
-            }
-
-            while ( instructionsArray.Any(k => !k.Instruction.isComplete) )
-                await Task.Delay(3000, cancellationToken);
-
-            // We're done here; update our State and update progress
-            progress.State = DirectoryPatchPhaseProgress.States.Finished;
-            progressCallback(progress);
-        }
-        */
 
         private async Task BuildFilePatchAction(FilePatchInstruction instruction, string targetFilePath, Action<IFilePatchAction> callback)
         {
