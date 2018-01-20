@@ -3,6 +3,7 @@ using System.Net;
 
 namespace RXPatchLib
 {
+    [System.ComponentModel.DesignerCategory("Code")]
     public class WebClientWithTimeout : WebClient
     {
         /// <summary>
