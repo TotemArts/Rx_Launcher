@@ -27,6 +27,11 @@ namespace RXPatchLib
         public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
         public UpdateServerSelector UpdateServerSelector = new UpdateServerSelector();
 
+        public RxPatcher()
+        {
+            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
+        }
+
         public void AddNewUpdateServer(string url, string friendlyName)
         {
             UpdateServerHandler.AddUpdateServer(url, friendlyName);
