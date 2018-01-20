@@ -11,6 +11,9 @@ namespace RXPatchLib.AXDebug
             InitializeComponent();
         }
 
+        /*
+         * For more information on these methods, please refer to the AxDebuggerHandler.cs file
+         */
         public void AddDownload(Guid guid, string filepath, string serverUri)
         {
             string[] clm = {guid.ToString(), filepath, serverUri, "Download Pending", "0"};
