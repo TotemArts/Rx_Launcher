@@ -347,6 +347,7 @@ namespace LauncherTwo.Views
         {
             _cancellationTokenSource.Cancel();
             this.StatusMessage = "Operation cancelled by User";
+            Application.Current.Shutdown();
         }
 
         private void NotifyPropertyChanged(string propertyName)

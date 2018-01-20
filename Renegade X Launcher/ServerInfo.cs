@@ -281,16 +281,29 @@ namespace LauncherTwo
 
             try
             {
+                string jsonText = "";
                 //Grab the string from the RenX Website.
-                string jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
+                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl}");
+                try
+                {
+                    jsonText =
+                        await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
+                }
+                catch (Exception ex)
+                {
+                    RxLogger.Logger.Instance.Write($"Server JSON Downloading Issue: {ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
+                }
+
+                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl} Complete");
+
+                if (jsonText == "")
+                    return;
 
                 //Turn it into a JSon object that we can parse.
                 var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
 
-
                 //For each object we have to try to get its components.
                 #region -= Parse JSon Collection
-
 
                 foreach (var data in results)
                 {
@@ -346,9 +359,9 @@ namespace LauncherTwo
                         //All work done, add current serverinfo to the main list
                         newActiveServers.Add(newServer);
                     }
-                    catch
+                    catch(Exception ex)
                     {
-                        // If a server failed to parse, skip it.
+                        RxLogger.Logger.Instance.Write($"Server JSON Loading Issue: {ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
                     }
                 }
                 #endregion

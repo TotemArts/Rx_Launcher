@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RxLogger;
 
 namespace RXPatchLib
 {
@@ -253,7 +254,16 @@ namespace RXPatchLib
 
                 var guid = Guid.NewGuid();
                 RxLogger.Logger.Instance.Write($"{guid} | Executing Task {task} | _tasks count: {_tasks.Count}");
-                await task;
+                try
+                {
+                    await task;
+                }
+                catch (Exception ex)
+                {
+                    RxLogger.Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
+                }
+                _cancellationToken.ThrowIfCancellationRequested();
+
                 RxLogger.Logger.Instance.Write($"{guid} | Task Finished");
 
                 // Update progress
@@ -603,6 +613,7 @@ namespace RXPatchLib
             {
                 loadPhase.StartLoading(action);
                 actions.Add(action);
+                cancellationToken.ThrowIfCancellationRequested();
             }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress), instructionsHash);
 
             // Wait for downloads to finish

@@ -81,7 +81,6 @@ namespace LauncherTwo
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
             var patchPath = VersionCheck.GamePatchPath;
-            var patchUrls = VersionCheck.GamePatchUrls;
             var patchVersion = VersionCheck.GetLatestGameVersionName();
 
             //Create an empty var containing the progress report from the patcher
@@ -167,7 +166,6 @@ namespace LauncherTwo
                                     {
                                         MessageBox.Show("Could not cleanup the redist file. This won't hinder the game.");
                                     }
-
                                 }
                             }
                         }

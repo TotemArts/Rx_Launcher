@@ -88,7 +88,7 @@
             this.ControlBox = false;
             this.Controls.Add(this.lstDownloads);
             this.Name = "FrmAgnDebug";
-            this.Text = "Concurrent Downloading Debug";
+            this.Text = "AlienX\'s Concurrent Downloading Debug Dialog";
             this.ResumeLayout(false);
 
         }
