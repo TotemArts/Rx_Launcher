@@ -13,6 +13,7 @@ namespace RXPatchLib
     /// <summary>
     /// Overwrites for the WebClient to specify our own timeout when the downloader attempts to grab files
     /// </summary>
+    [System.ComponentModel.DesignerCategory("Code")]
     class MyWebClient : WebClient
     {
         protected override WebRequest GetWebRequest(Uri address)
@@ -157,7 +158,7 @@ namespace RXPatchLib
                                  *
                                  * Note: As the queue is dynamically changing during the initial download, we have to check the length of the queue and adjudst accordingly.
                                  */
-                                var thisPatchServer = xyz[rnd.Next(0, (xyz.Length < 4 ? xyz.Length : 4))];
+                                var thisPatchServer = xyz[rnd.Next(0, (xyz.Length < 4 ? xyz.Length-1 : 4))];
                                 if (thisPatchServer == null)
                                     throw new Exception("Unable to find a suitable update server");
 
