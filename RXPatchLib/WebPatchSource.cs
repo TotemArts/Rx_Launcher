@@ -130,7 +130,6 @@ namespace RXPatchLib
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     RetryStrategy retryStrategy = new RetryStrategy();
-
                     try
                     {
                         await retryStrategy.Run(async () =>
@@ -150,6 +149,7 @@ namespace RXPatchLib
                                 // Download file and wait until finished
                                 RxLogger.Logger.Instance.Write($"Starting file transfer: {_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
                                 await webClient.DownloadFileTaskAsync(new Uri($"{_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
 
                                 AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
