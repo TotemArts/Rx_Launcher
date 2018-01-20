@@ -10,6 +10,17 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
+
+    class MyWebClient : WebClient
+    {
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var w = base.GetWebRequest(address);
+            w.Timeout = 10 * 1000;
+            return w;
+        }
+    }
+
     class WebPatchSource : IPatchSource, IDisposable
     {
         readonly Dictionary<string, Task> _loadTasks = new Dictionary<string, Task>();
@@ -53,7 +64,7 @@ namespace RXPatchLib
                 lock (_isDownloadingLock)
                 {
                     //if (!_isDownloading)
-                    if (_downloadsRunning < 128)
+                    if (_downloadsRunning < 12)
                     {
                         _isDownloading = true;
                         _downloadsRunning++;
@@ -79,6 +90,7 @@ namespace RXPatchLib
         public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             string filePath = GetSystemPath(subPath);
+            var guid = Guid.NewGuid();
 
             // Check if the file exists
             if (File.Exists(filePath))
@@ -103,13 +115,14 @@ namespace RXPatchLib
             // Since I can't await within a lock...
             await LockDownload();
 
-            using (var webClient = new WebClient())
+            using (var webClient = new MyWebClient())
             {
                 webClient.Proxy = null;
 
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
                     progressCallback(args.BytesReceived, args.TotalBytesToReceive, _downloadsRunning);
+                    AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
                 };
 
                 new_host_selected:
@@ -130,6 +143,8 @@ namespace RXPatchLib
                                 if (thisPatchServer == null)
                                     throw new Exception("Unable to find a suitable update server");
 
+                                AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
+
                                 thisPatchServer.IsUsed = true;
                                 // Download file and wait until finished
                                 RxLogger.Logger.Instance.Write(
@@ -139,6 +154,7 @@ namespace RXPatchLib
                                     new Uri($"{thisPatchServer.Uri}/{_patcher.BaseUrl.WebPatchPath}/{subPath}"),
                                     filePath);
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
+                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                                 thisPatchServer.IsUsed = false;
 
                                 // File finished downoading successfully; allow next download to start and check hash
