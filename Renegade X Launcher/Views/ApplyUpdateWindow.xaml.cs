@@ -34,7 +34,7 @@ namespace LauncherTwo.Views
         {
             if (!(value is DirectoryPatchPhaseProgress)) return DependencyProperty.UnsetValue;
             var progress = (DirectoryPatchPhaseProgress)value;
-            //RxLogger.Logger.Instance.Write($"PhaseProgressPercentageConverter -> Value = {progress.Items.Done} / {progress.Items.Total} | {progress.State}");
+
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return 0;
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
@@ -62,7 +62,6 @@ namespace LauncherTwo.Views
             if (progress == null)
                 return "unknown";
 
-            //RxLogger.Logger.Instance.Write($"PhaseProgressPercentageConverter -> Value = {progress.Items.Done} / {progress.Items.Total} | {progress.State}");
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return "not started";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Finished)
@@ -71,17 +70,23 @@ namespace LauncherTwo.Views
                 return "pending";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
             {
-                //var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
-                //return string.Format("{0} / ~{1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return string.Format("{0}%", perc.ToString("0.##"));
+                return $"{perc:0.##}%";
+            }
+            else if ( progress.DownloadThreads == 0 )
+            {
+                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
+                return $"{perc:0.##}%";
+            }
+            else if ( progress.DownloadThreads > 0 )
+            {
+                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
+                return $"Downloading using {progress.DownloadThreads} threads ({perc:0.##}%)";
             }
             else
             {
-                //var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
-                //return string.Format("{0} / {1} {2}", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit);
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return $"Downloading using {progress.DownloadThreads} threads ({perc:##.##}%)";
+                return $"{perc:0.##}%";
             }
         }
 

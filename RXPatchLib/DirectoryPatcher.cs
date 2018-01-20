@@ -250,7 +250,11 @@ namespace RXPatchLib
 
                 // todo: add a try catch here for the cancel button, otherwise RenX Launcher crashes
                 // Wait for task to complete
+
+                var guid = Guid.NewGuid();
+                RxLogger.Logger.Instance.Write($"{guid} | Executing Task {task} | _tasks count: {_tasks.Count}");
                 await task;
+                RxLogger.Logger.Instance.Write($"{guid} | Task Finished");
 
                 // Update progress
                 progressItem.Finish();
