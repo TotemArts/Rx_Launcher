@@ -88,9 +88,7 @@
     <Compile Include="WebClientWithTimeout.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebPatchSource.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="WebPatchSource.cs" />
     <Compile Include="XdeltaPatcher.cs" />
     <Compile Include="XdeltaPatchSystem.cs" />
     <Compile Include="ProcessEx.cs" />
