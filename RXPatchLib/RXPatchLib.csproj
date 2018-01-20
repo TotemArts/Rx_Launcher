@@ -85,9 +85,7 @@
     <Compile Include="UnitAndScale.cs" />
     <Compile Include="UpdateServerHandler.cs" />
     <Compile Include="UpdateServerSelector.cs" />
-    <Compile Include="WebClientWithTimeout.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="WebClientWithTimeout.cs" />
     <Compile Include="WebPatchSource.cs" />
     <Compile Include="XdeltaPatcher.cs" />
     <Compile Include="XdeltaPatchSystem.cs" />
