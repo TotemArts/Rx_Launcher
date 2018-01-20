@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace RXPatchLib.AXDebug
 {
@@ -12,11 +13,10 @@ namespace RXPatchLib.AXDebug
         // Form Container
         private readonly FrmAgnDebug _frmAgnDebug = new FrmAgnDebug();
 
-
         public AxDebuggerHandler()
         {
-            // Init the form here
-            _frmAgnDebug.Show();
+            if ( Environment.GetCommandLineArgs().Any(x => x.Equals("--log", StringComparison.OrdinalIgnoreCase)) )
+                _frmAgnDebug.Show();
         }
 
         public void AddDownload(Guid guid, string filepath, string serverUri)
@@ -37,7 +37,6 @@ namespace RXPatchLib.AXDebug
         public void Dispose()
         {
             _frmAgnDebug.Close();
-            _frmAgnDebug.Dispose();
         }
     }
 }
