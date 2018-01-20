@@ -36,6 +36,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,6 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AXDebug\AxDebuggerHandler.cs" />
+    <Compile Include="AXDebug\FrmAGNDebug.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AXDebug\FrmAGNDebug.Designer.cs">
+      <DependentUpon>FrmAGNDebug.cs</DependentUpon>
+    </Compile>
     <Compile Include="DirectoryPatcherProgress.cs" />
     <Compile Include="DirectoryPatchPhaseProgress.cs" />
     <Compile Include="DiscreteProgress.cs" />
@@ -79,7 +88,9 @@
     <Compile Include="WebClientWithTimeout.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebPatchSource.cs" />
+    <Compile Include="WebPatchSource.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="XdeltaPatcher.cs" />
     <Compile Include="XdeltaPatchSystem.cs" />
     <Compile Include="ProcessEx.cs" />
@@ -102,6 +113,11 @@
       <Project>{407a95b5-b682-4785-9813-49b5fb614c8e}</Project>
       <Name>RxLogger</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AXDebug\FrmAGNDebug.resx">
+      <DependentUpon>FrmAGNDebug.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

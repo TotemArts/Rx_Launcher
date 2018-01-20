@@ -24,10 +24,9 @@
         <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="RestoreTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="CloseTitleBarButton" TargetType="UserControl"/>
-        
+
         <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
 
-        
         <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
         <local:PhaseProgressPercentageConverter x:Key="PhaseProgressPercentageConverter"/>
         <local:PhaseProgressStringConverter x:Key="PhaseProgressStringConverter"/>
