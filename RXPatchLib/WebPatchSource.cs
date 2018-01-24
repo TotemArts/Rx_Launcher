@@ -32,6 +32,8 @@ namespace RXPatchLib
         readonly object _isDownloadingLock = new object();
         private byte _downloadsRunning;
 
+        private const int MaxDownloadThreads = 12;
+
         public WebPatchSource(RxPatcher patcher, string downloadPath)
         {
             _patcher = patcher;
@@ -71,7 +73,7 @@ namespace RXPatchLib
                 lock (_isDownloadingLock)
                 {
                     // This is where the threading of concurrent downloads happens, currently hardcoded to 12 but easily changed.
-                    if (_downloadsRunning < 12)
+                    if (_downloadsRunning < MaxDownloadThreads)
                     {
                         _downloadsRunning++;
                         Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | ACCEPTING DOWNLOAD");
