@@ -18,8 +18,6 @@ namespace RXPatchLib
         public string Name;
         public bool IsUsed;
         public bool HasErrored;
-        public string WebPatchPath;
-        public long Latency;
 
         public UpdateServerEntry(string Url, string name)
         {
@@ -38,14 +36,7 @@ namespace RXPatchLib
 
         public void AddUpdateServer(string Url, string FriendlyName)
         {
-            try
-            {
-                _updateServers.Add(new UpdateServerEntry(Url, FriendlyName));
-            }
-            catch
-            {
-                // ignored
-            }
+            _updateServers.Add(new UpdateServerEntry(Url, FriendlyName));
         }
 
         public List<UpdateServerEntry> GetUpdateServers()
@@ -64,53 +55,6 @@ namespace RXPatchLib
 
             _lastBestServerEntry = _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
             return _lastBestServerEntry;
-        }
-
-        /// <summary>
-        /// Tests the latency of the remote server for the user
-        /// </summary>
-        /// <param name="entry">The UpdateServerEntry object to test against</param>
-        /// <returns>Returns the latency as a float</returns>
-        private void GetServerLatency(UpdateServerEntry entry)
-        {
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create($"{entry.Uri.AbsoluteUri}/10kb_file");
-            request.Method = "GET";
-            request.Timeout = 1500;
-
-            //Default to "not found"
-            System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
-            try
-            {
-                response = ((System.Net.HttpWebResponse) request.GetResponse()).StatusCode;
-            }
-            catch(Exception ex)
-            {
-                entry.HasErrored = true;
-            }
-            
-            // Push host to queue if valid
-            if (response != System.Net.HttpStatusCode.OK) return;
-
-            stopWatch.Stop();
-            entry.Latency = stopWatch.ElapsedMilliseconds;
-            
-            RxLogger.Logger.Instance.Write($"Latency for {entry.Uri.AbsoluteUri} ({entry.Name}) is {entry.Latency}");
-        }
-
-        public Task PreformLatencyTest()
-        {
-            // Find out the best latency server to respond with
-            Logger.Instance.Write("Figuring out what server is the best for you with latency checking... wait.");
-            foreach (var entry in _updateServers.Where(x => x.Latency == 0 && !x.IsUsed && !x.HasErrored))
-                GetServerLatency(entry);
-
-            _updateServers = _updateServers.OrderBy(x => x.Latency).ToList();
-
-            Logger.Instance.Write($"Best server found, in order they are:\r\n{string.Join("\r\n", _updateServers.Select(x => $"{x.Name} | {x.Latency}"))}");
-
-            return Task.FromResult<object>(null);
         }
     }
 }
