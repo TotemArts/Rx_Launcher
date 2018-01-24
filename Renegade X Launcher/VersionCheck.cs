@@ -149,7 +149,7 @@ namespace LauncherTwo
 
                 // Server URL's list & Friendly Names
                 foreach (var x in versionData["game"]["server_urls"].ToObject<dynamic>())
-                    RXPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["friendly_name"].ToString());
+                    RXPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
             }
             catch(Exception ex)
             {
