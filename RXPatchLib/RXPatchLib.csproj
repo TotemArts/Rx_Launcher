@@ -87,8 +87,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="xdelta3-3.0.8.x86-32.exe" />
-    <Content Include="xdelta3-3.0.8.x86-64.exe" />
     <Content Include="xdelta3-3.1.0-i686.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
