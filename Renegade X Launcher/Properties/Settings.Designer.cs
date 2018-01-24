@@ -76,8 +76,7 @@ namespace LauncherTwo.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("https://static.renegade-x.com/launcher_data/version/release.json")]
         public string VersionUrl {
             get {
-                return "http://www.agngaming.com/renx_launcher/release.json";
-                //return ((string)(this["VersionUrl"]));
+                return ((string)(this["VersionUrl"]));
             }
         }
         
