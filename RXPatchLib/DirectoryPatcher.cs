@@ -278,6 +278,8 @@ namespace RXPatchLib
         public string GetBackupPath(string subPath) { return Path.Combine(BackupPath, subPath); }
         public string GetTempPath(string subPath) { return Path.Combine(TempPath, subPath); }
 
+        private const int MaximumDeltaThreads = 4;
+
         public DirectoryPatcher(XdeltaPatcher filePatcher, string targetPath, string backupPath, string tempPath, IPatchSource patchSource)
         {
             FilePatcher = filePatcher;
@@ -386,7 +388,7 @@ namespace RXPatchLib
             // (on testing with using all cores, it maxed out my 24 core server, but it did patch in about 30 seconds!)
             RxLogger.Logger.Instance.Write(
                 $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > 4 ? 4 : Environment.ProcessorCount)} of them");
-            for (var i = 0; i < (Environment.ProcessorCount > 4 ?  4 : Environment.ProcessorCount); i++)
+            for (var i = 0; i < (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount); i++)
             {
                 RxLogger.Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
                 _bgWorkers.Add(new BackgroundWorker());
@@ -394,7 +396,7 @@ namespace RXPatchLib
 
             foreach (var x in _bgWorkers)
             {
-                RxLogger.Logger.Instance.Write($"Assining DoWork methods to bgworker");
+                RxLogger.Logger.Instance.Write($"Assigning DoWork methods to bgworker");
                 x.DoWork += async (sender, args) =>
                 {
                     // While there are still some in the array to use.
@@ -437,6 +439,10 @@ namespace RXPatchLib
                         await thisAction.Execute();
 
                         // Update progress
+                        // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
+                        // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
+                        // We have to check for zero, to ensure that the asyncronus method of performing this action
+                        // does not attempt to move/rename/etc a file before it has been actually downloaded.
                         if (thisAction.PatchSize == 0)
                         {
                             secondPhaseProgress.AdvanceItem(1);
@@ -464,7 +470,7 @@ namespace RXPatchLib
 
             while (_tmpActions.Any(x => !x.isComplete))
             {
-                await Task.Delay(3000);
+                await Task.Delay(1000);
             }
 
             // Dispose of all of our workers
