@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
+using RxLogger;
 
 namespace LauncherTwo
 {
@@ -11,16 +13,25 @@ namespace LauncherTwo
     /// </summary>
     public partial class App : Application
     {
+        
+
         public void StartupApp(object sender, StartupEventArgs e)
         {
             //Determine if the permissionChange is succesfull after launcher update
             bool isGoodUpdate = false;
 
+            Logger.Instance.Write("Application starting up...");
+
             foreach (string a in e.Args)
             {
+                if (a.Equals("--log", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Instance.StartLogConsole();
+                }
                 if (a.StartsWith("--patch-result="))
                 {
                     string code = a.Substring("--patch-result=".Length);
+                    Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
                     //If the code !=0 -> there is something wrong with the patching of the launcher
                     if (code != "0")
                     {
@@ -40,6 +51,7 @@ namespace LauncherTwo
                 }
                 else if (a.StartsWith("--firstInstall")) //Init the first install
                 {
+                    Logger.Instance.Write("Startup parameters 'firstInstall' found - Starting RenX Installer");
                     Installer x = new Installer();
                     x.Show();
                     x.FirstInstall();
@@ -58,10 +70,10 @@ namespace LauncherTwo
                     var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-                    var patcher = new RXPatchLib.RXPatcher();
-                    System.Threading.Tasks.Task task = patcher.ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
+                    RXPatchLib.RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
+                    System.Threading.Tasks.Task task = RXPatchLib.RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
-                    var window = new Views.ApplyUpdateWindow(task, patcher, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
+                    var window = new Views.ApplyUpdateWindow(task, RXPatchLib.RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();
 
                     VersionCheck.UpdateGameVersion();
@@ -96,6 +108,7 @@ namespace LauncherTwo
                     Current.Shutdown();
                 }
 
+                Logger.Instance.Write("Initial application startup complete, Creating new MainWindow");
                 new MainWindow().Show();
             }
             /*else

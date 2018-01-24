@@ -40,6 +40,8 @@ namespace RXPatchLib
 
             var instructions = new List<FilePatchInstruction>();
 
+            RxLogger.Logger.Instance.Write($"There are {instructions.Count} instructions in this update package");
+
             Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "full");
             Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "delta");
 
@@ -110,11 +112,21 @@ namespace RXPatchLib
             }
 
             // Write instructions
-            string instructionsString = JsonConvert.SerializeObject(instructions);
-            File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions.json", instructionsString);
+            try
+            {
+                RxLogger.Logger.Instance.Write($"Writing Instruction.json out to {patchPath + Path.DirectorySeparatorChar}instructions.json");
+                string instructionsString = JsonConvert.SerializeObject(instructions);
+                File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions.json", instructionsString);
 
-            // Write SHA256 hash of instructions.json to instructions_hash.txt
-            File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt", await SHA256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
+                RxLogger.Logger.Instance.Write($"Writing Instructions_hash.txt out to {patchPath + Path.DirectorySeparatorChar}instructions_hash.txt");
+                // Write SHA256 hash of instructions.json to instructions_hash.txt
+                File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt",
+                    await SHA256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
+            }
+            catch(Exception ex)
+            {
+                RxLogger.Logger.Instance.Write($"Exception while attempting to write instruction JSON or Hash file.\r\n{ex.Message}\r\n{ex.StackTrace}");
+            }
         }
     }
 }

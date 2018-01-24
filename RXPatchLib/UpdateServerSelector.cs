@@ -14,32 +14,34 @@ namespace RXPatchLib
         CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         private const string TestFile = "10kb_file";
-        public Queue<Uri> Hosts;
+        public Queue<UpdateServerEntry> Hosts;
 
-        public async Task<bool> QueryHost(Uri InHost)
+        public async Task<bool> QueryHost(UpdateServerEntry HostObject)
         {
-            // Send GET request to host
-            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(InHost + TestFile);
+            RxLogger.Logger.Instance.Write($"Attempting to contact host {HostObject.Uri.AbsoluteUri}");
+
+            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(HostObject.Uri.AbsoluteUri + TestFile);
             request.Method = "GET";
 
             //Default to "not found"
             System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
             try
             {
-                response = ((System.Net.HttpWebResponse) await request.GetResponseAsync()).StatusCode;
+                response = ((System.Net.HttpWebResponse)await request.GetResponseAsync()).StatusCode;
             }
             catch
             {
-                Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", InHost));
+                HostObject.HasErrored = true;
+                RxLogger.Logger.Instance.Write($"The host {HostObject.Uri.AbsoluteUri} seems to be offline");
             }
 
             // Push host to queue if valid
             if (response == System.Net.HttpStatusCode.OK)
             {
                 lock (Hosts)
-                    Hosts.Enqueue(InHost);
+                    Hosts.Enqueue(HostObject);
 
-                Trace.WriteLine("Added: " + InHost);
+                RxLogger.Logger.Instance.Write($"Added host {HostObject.Uri.AbsoluteUri} to the hosts queue");
 
                 return true;
             }
@@ -47,17 +49,17 @@ namespace RXPatchLib
             return false;
         }
 
-        public async Task SelectHosts(ICollection<Uri> InHosts)
+        public async Task SelectHosts(List<UpdateServerEntry> InHosts)
         {
             // Safety check
             if (InHosts.Count == 0)
                 throw new Exception("No download servers are available; please try again later.");
 
             // Initialize new Hosts queue
-            Hosts = new Queue<Uri>();
+            Hosts = new Queue<UpdateServerEntry>();
 
             // Initialize query to each host
-            List<Task<bool>> tasks = InHosts.Select(host => QueryHost(host)).ToList();
+            List<Task<bool>> tasks = InHosts.Select(QueryHost).ToList();
 
             // Return when we have our best host; continue populating list in background
             while (tasks.Any())

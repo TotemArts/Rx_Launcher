@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Net;
 using Newtonsoft.Json;
+using RXPatchLib;
 
 
 namespace LauncherTwo
@@ -145,11 +146,14 @@ namespace LauncherTwo
                 };
                 InstructionsHash = versionData["game"]["instructions_hash"];
                 GamePatchPath = versionData["game"]["patch_path"];
-                //GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
-                GamePatchUrls = UpdateServerModelFactory.CreateUpdateServerModels(versionData["game"]["patch_urls"].ToObject<string[]>());
+
+                // Server URL's list & Friendly Names
+                foreach (var x in versionData["game"]["server_urls"].ToObject<dynamic>())
+                    RXPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
             }
-            catch
+            catch(Exception ex)
             {
+                Debug.Print(ex.Message);
                 LatestLauncherVersion = new Version
                 {
                     Name = "Unknown",

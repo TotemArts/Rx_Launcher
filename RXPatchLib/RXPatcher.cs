@@ -17,13 +17,33 @@ namespace RXPatchLib
         const string DownloadSubPath = "download"; // Note that this directory will be automatically emptied after patching.
         const string TempSubPath = "apply"; // Note that this directory will be automatically emptied after patching.
 
-        public UpdateServerSelector Selector = null;
-        public string BaseURL = null;
+        //public UpdateServerSelector Selector = null;
+        public UpdateServerEntry UpdateServer = null;
         public string WebPatchPath = null;
 
-        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+        private static RXPatcher _instance;
+        public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
+
+        public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
+
+        public void AddNewUpdateServer(string url, string friendlyName)
         {
-            BaseURL = baseUrl;
+            UpdateServerHandler.AddUpdateServer(url, friendlyName);
+        }
+
+        public UpdateServerEntry GetNextUpdateServerEntry()
+        {
+            return UpdateServerHandler.SelectBestPatchServer();
+        }
+
+        public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
+        {
+            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
+        }
+
+        public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseURL, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+        {
+            UpdateServer = baseURL;
 
             var backupPath = CreateBackupPath(applicationDirPath);
             var downloadPath = CreateDownloadPath(applicationDirPath);
@@ -40,21 +60,18 @@ namespace RXPatchLib
             }
         }
 
-        public async Task ApplyPatchFromWeb(string[] baseUrls, string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
+        public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
-            Contract.Assert(baseUrls.Length > 0);
+            Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
-            var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
 
-            Selector = new UpdateServerSelector();
-            await Selector.SelectHosts(hosts);
+            var Selector = new UpdateServerSelector();
+            await Selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
 
-            string bestHost;
-            lock (Selector.Hosts)
-                bestHost = Selector.Hosts.Dequeue().ToString();
+            var bestHost = Selector.Hosts.Dequeue();
 
-            Console.WriteLine("#######HOST: {0}", bestHost);
-            await ApplyPatchFromWeb(bestHost + WebPatchPath, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
+            Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
+            await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 
         public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
@@ -67,19 +84,14 @@ namespace RXPatchLib
             await patcher.ApplyPatchAsync(progress, cancellationToken, instructions_hash);
         }
 
-        public string PopHost()
+        
+        public UpdateServerEntry PopHost()
         {
-            BaseURL = null;
-
-            // Lock Hosts queue and dequeue next host to BaseURL.
-            if (Selector != null && Selector.Hosts.Count != 0)
-                lock (Selector.Hosts)
-                    BaseURL = Selector.Hosts.Dequeue().ToString() + WebPatchPath;
-
-            // Lock Hosts queue and dequeue next host to BaseURL.
-            return BaseURL;
+            UpdateServer.HasErrored = true;
+            UpdateServer = UpdateServerHandler.SelectBestPatchServer();
+            return UpdateServer;
         }
-
+        
         private static string CreateBackupPath(string applicationDirPath)
         {
             string dirName = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture);

@@ -74,6 +74,7 @@
     <Compile Include="SystemTimeProvider.cs" />
     <Compile Include="TooManyRetriesException.cs" />
     <Compile Include="UnitAndScale.cs" />
+    <Compile Include="UpdateServerHandler.cs" />
     <Compile Include="UpdateServerSelector.cs" />
     <Compile Include="WebClientWithTimeout.cs">
       <SubType>Component</SubType>
@@ -86,15 +87,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="xdelta3-3.0.8.x86-32.exe">
+    <Content Include="xdelta3-3.1.0-i686.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="xdelta3-3.0.8.x86-64.exe">
+    <Content Include="xdelta3-3.1.0-x86_64.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RxLogger\RxLogger.csproj">
+      <Project>{407a95b5-b682-4785-9813-49b5fb614c8e}</Project>
+      <Name>RxLogger</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

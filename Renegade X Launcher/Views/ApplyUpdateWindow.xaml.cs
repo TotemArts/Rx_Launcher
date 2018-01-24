@@ -16,7 +16,7 @@ namespace LauncherTwo.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value as DirectoryPatchPhaseProgress == null) return DependencyProperty.UnsetValue;
+            if (!(value is DirectoryPatchPhaseProgress)) return DependencyProperty.UnsetValue;
             var progress = (DirectoryPatchPhaseProgress)value;
             return progress.State == DirectoryPatchPhaseProgress.States.Indeterminate;
         }
@@ -32,7 +32,7 @@ namespace LauncherTwo.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value as DirectoryPatchPhaseProgress == null) return DependencyProperty.UnsetValue;
+            if (!(value is DirectoryPatchPhaseProgress)) return DependencyProperty.UnsetValue;
             var progress = (DirectoryPatchPhaseProgress)value;
             if (progress.State == DirectoryPatchPhaseProgress.States.Unstarted)
                 return 0;
@@ -280,10 +280,10 @@ namespace LauncherTwo.Views
 
             this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", StatusTitle[0]);
 
-            if (patcher.BaseURL == null || patcher.BaseURL == "")
+            if (patcher.UpdateServer == null)
                 this.ServerMessage = "pending";
             else
-                this.ServerMessage = patcher.BaseURL;
+                this.ServerMessage = patcher.UpdateServer.Name;
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", StatusTitle[1]);
@@ -296,12 +296,12 @@ namespace LauncherTwo.Views
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
                     // URL could theoretically change at any point
-                    if (this.ServerMessage != patcher.BaseURL)
+                    if (this.ServerMessage != patcher.UpdateServer.Name)
                     {
-                        if (patcher.BaseURL == null)
+                        if (patcher.UpdateServer == null)
                             this.ServerMessage = "pending";
                         else
-                            this.ServerMessage = patcher.BaseURL;
+                            this.ServerMessage = patcher.UpdateServer.Name;
                     }
 
                     ProgressReport = lastReport;
@@ -312,11 +312,12 @@ namespace LauncherTwo.Views
                 {
                     await patchTask; // Collect exceptions.
                     this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", StatusTitle[0], TargetVersionString);
-                    
+                    RxLogger.Logger.Instance.Write($"Renegade X was successfully {StatusTitle[0]} to version {TargetVersionString}.");
                 }
                 catch (Exception exception)
                 {
                     StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", StatusTitle[0], exception.Message);
+                    RxLogger.Logger.Instance.Write($"Renegade X could not be {StatusTitle[0]}. The following exception occurred:\n\n{exception.Message}");
                 }
                 HasFinished = true;
             });

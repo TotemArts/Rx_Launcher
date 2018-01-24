@@ -58,10 +58,25 @@ namespace LauncherTwo
         /// </summary>
         public async void FirstInstall()
         {
-            
             VersionCheck.GetLatestGameVersionName();
             await VersionCheck.UpdateLatestVersions();
-            
+
+            // Preform a latency test
+            // DISABLE THIS FOR NOW, REVERTING BACK TO QUEUE POP
+            /*
+            var LatencyTestDialog = new ModernDialog
+            {
+                Content = "Please Wait while we find the best possible patch server for you.\r\nThis should not take too long.",
+                Title = "Renegade-X Server Selector",
+                Width = 497,
+                Height = 234
+            };
+            LatencyTestDialog.Show();
+            await Task.Delay(1000);
+            await RXPatcher.Instance.UpdateServerHandler.PreformLatencyTest();
+            LatencyTestDialog.Close();
+            */
+
             //Get the current root path and prepare the installation
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
@@ -73,105 +88,99 @@ namespace LauncherTwo
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-            var patcher = new RXPatcher();
-            Task task = patcher.ApplyPatchFromWeb(patchUrls.Select(url => url.ServerUri.AbsoluteUri).ToArray(), patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
-
+            Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
             //Create the update window
-            var window = new ApplyUpdateWindow(task, patcher, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
-            //window.Owner = this;
+            var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
+            window.Owner = this;
             //Show the dialog and wait for completion
             window.ShowDialog();
+
+            RxLogger.Logger.Instance.Write($"Install complete, task state isCompleted = {task.IsCompleted}");
             
             if (task.IsCompleted == true)
             {
                 VersionCheck.UpdateGameVersion();
                 //Create the UE3 redist dialog
+
+                RxLogger.Logger.Instance.Write("Creating the UE3 Redist package dialog");
                 ModernDialog UERedistDialog = new ModernDialog();
                 UERedistDialog.Title = "UE3 Redistributable";
                 UERedistDialog.Content = MESSAGE_REDIST_INSTALL;
                 UERedistDialog.Buttons = new Button[] { UERedistDialog.OkButton, UERedistDialog.CancelButton };
                 UERedistDialog.ShowDialog();
 
+                RxLogger.Logger.Instance.Write($"Did the user want to install the UE3 Redist? - {UERedistDialog.DialogResult.Value}");
+
                 if (UERedistDialog.DialogResult.Value == true)
                 {
-                    //Determine which server has best ping
-                    var PatchUrls = VersionCheck.GamePatchUrls;
-                    var hosts = PatchUrls.Select(url => url.ServerUri).ToArray();
-
-                    RXPatchLib.UpdateServerSelector Selector = new RXPatchLib.UpdateServerSelector();
-                    await Selector.SelectHosts(hosts); //NEed to suppress the ui from showing here
-
                     bool downloadSuccess = false;
 
-                    while (Selector.Hosts.Count > 0)
+                    var bestPatchServer = RXPatcher.Instance.UpdateServerHandler.SelectBestPatchServer();
+
+                    Uri RedistServer = bestPatchServer.Uri;
+
+                    //Create new URL based on the patch url (Without the patch part)
+                    String RedistUrl = RedistServer + "redists/UE3Redist.exe";
+                    string SystemPath = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
+
+                    //Create canceltokens to stop the downloaderthread if neccesary
+                    CancellationTokenSource downloaderTokenSource = new CancellationTokenSource();
+                    CancellationToken downloaderToken = downloaderTokenSource.Token;
+
+                    //Redist downloader statuswindow
+                    GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(downloaderTokenSource, "UE3Redist download");
+                    RedistWindow.Show();
+
+                    //Start downloading redist
+                    RxLogger.Logger.Instance.Write($"Downloading UE3 Redist from {RedistServer.AbsoluteUri}");
+                    downloadSuccess = await DownloadRedist(RedistUrl, SystemPath, downloaderToken, (received, size) =>
                     {
-                        Uri RedistServer = Selector.Hosts.Dequeue();
+                        RedistWindow.updateProgressBar(received, size);
+                    });
+                    RxLogger.Logger.Instance.Write("UE3 Redist Download Complete");
 
-                        //Create new URL based on the patch url (Without the patch part)
-                        String RedistUrl = RedistServer + "redists/UE3Redist.exe";
-                        string SystemPath = GameInstallation.GetRootPath() + "Launcher\\Redist\\UE3Redist.exe";
+                    RedistWindow.Close();
 
-                        //Create canceltokens to stop the downloaderthread if neccesary
-                        CancellationTokenSource downloaderTokenSource = new CancellationTokenSource();
-                        CancellationToken downloaderToken = downloaderTokenSource.Token;
-
-                        //Redist downloader statuswindow
-                        GeneralDownloadWindow RedistWindow = new GeneralDownloadWindow(downloaderTokenSource, "UE3Redist download");
-                        RedistWindow.Show();
-
-                        //Start downloading redist
-                        downloadSuccess = await DownloadRedist(RedistUrl, SystemPath, downloaderToken, (received, size) =>
+                    if (downloadSuccess)
+                    {
+                        //When done, execute the UE3Redist here
+                        try
                         {
-                            RedistWindow.updateProgressBar(received, size);
-                        });
-
-                        RedistWindow.Close();
-
-                        if (downloadSuccess)
-                        {
-                            //When done, execute the UE3Redist here
-                            try
+                            using (Process UE3Redist = Process.Start(SystemPath))
                             {
-                                using (Process UE3Redist = Process.Start(SystemPath))
+                                UE3Redist.WaitForExit();
+                                if (UE3Redist.ExitCode != 0)//If redist install fails, notify the user
                                 {
-                                    UE3Redist.WaitForExit();
-                                    if (UE3Redist.ExitCode != 0)//If redist install fails, notify the user
+                                    MessageBox.Show("Error while installing the UE3 Redist.");
+                                }
+                                else//Everything done! save installed flag and restart
+                                {
+                                    Properties.Settings.Default.Installed = true;
+                                    Properties.Settings.Default.Save();
+                                    try
                                     {
-                                        MessageBox.Show("Error while installing the UE3 Redist.");
+                                        System.IO.File.Delete(SystemPath);
+                                        System.IO.Directory.Delete(GameInstallation.GetRootPath() + "Launcher\\Redist\\");
                                     }
-                                    else//Everything done! save installed flag and restart
+                                    catch (Exception)
                                     {
-                                        Properties.Settings.Default.Installed = true;
-                                        Properties.Settings.Default.Save();
-                                        try
-                                        {
-                                            System.IO.File.Delete(SystemPath);
-                                            System.IO.Directory.Delete(GameInstallation.GetRootPath() + "Launcher\\Redist\\");
-                                        }
-                                        catch (Exception)
-                                        {
-                                            MessageBox.Show("Could not cleanup the redist file. This won't hinder the game.");
-                                        }
+                                        MessageBox.Show("Could not cleanup the redist file. This won't hinder the game.");
+                                    }
 
-                                    }
                                 }
                             }
-                            catch
-                            {
-                                MessageBox.Show("Error while executing the UE3 Redist.");
-                            }
-                            finally
-                            {
-                                //Restart launcher
-                                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                                Application.Current.Shutdown();
-                            }
-
-                            break;
                         }
-
-                        // If downloadSuccess is false, then this will move on to the next best mirror and try to download the redist again until it either succeeds or runs out of mirrors.
+                        catch
+                        {
+                            MessageBox.Show("Error while executing the UE3 Redist.");
+                        }
+                        finally
+                        {
+                            //Restart launcher
+                            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                            Application.Current.Shutdown();
+                        }
                     }
 
                     if (downloadSuccess == false)

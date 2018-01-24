@@ -288,6 +288,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RxLogger\RxLogger.csproj">
+      <Project>{407a95b5-b682-4785-9813-49b5fb614c8e}</Project>
+      <Name>RxLogger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RXPatchLib\RXPatchLib.csproj">
       <Project>{e465d232-ee02-495d-8391-bfdafe350cf0}</Project>
       <Name>RXPatchLib</Name>
