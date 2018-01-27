@@ -24,41 +24,31 @@ namespace RXPatchLib
         private static RXPatcher _instance;
         public static RXPatcher Instance => _instance ?? (_instance = new RXPatcher());
 
-<<<<<<< b2e30413944ea970b03cce03f62fbd53027b45a6
-        public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
-
-        public void AddNewUpdateServer(string url, string friendlyName)
-        {
-            UpdateServerHandler.AddUpdateServer(url, friendlyName);
-        }
-
-        public UpdateServerEntry GetNextUpdateServerEntry()
-        {
-            return UpdateServerHandler.SelectBestPatchServer();
-=======
         private readonly UpdateServerHandler _updateServerHandler = new UpdateServerHandler();
 
         public void AddNewUpdateServer(string url, string friendlyName)
         {
             _updateServerHandler.AddUpdateServer(url, friendlyName);
->>>>>>> Instancing RxPatcher + Added UpdateServerHandler for URLs
+        }
+
+        public UpdateServerHandler GetUpdateServerHandler()
+        {
+            return _updateServerHandler;
+        }
+
+        public UpdateServerEntry GetNextUpdateServerEntry()
+        {
+            return _updateServerHandler.SelectBestPatchServer();
         }
 
         public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
         {
-<<<<<<< b2e30413944ea970b03cce03f62fbd53027b45a6
-            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
-        }
-
-        public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseURL, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
-=======
             return _updateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
         }
 
-        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
->>>>>>> Instancing RxPatcher + Added UpdateServerHandler for URLs
+        public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
         {
-            UpdateServer = baseURL;
+            UpdateServer = baseUrl;
 
             var backupPath = CreateBackupPath(applicationDirPath);
             var downloadPath = CreateDownloadPath(applicationDirPath);
@@ -67,7 +57,7 @@ namespace RXPatchLib
             using (var patchSource = new WebPatchSource(this, downloadPath))
             {
                 var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-                await patcher.ApplyPatchAsync(progress, cancellationToken, instructions_hash);
+                await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
                 DirectoryEx.DeleteContents(downloadPath);
                 DirectoryEx.DeleteContents(tempPath);
 
@@ -77,15 +67,16 @@ namespace RXPatchLib
 
         public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructions_hash)
         {
-            Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
+            Contract.Assert(_updateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
 
             var Selector = new UpdateServerSelector();
-            await Selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
+            await Selector.SelectHosts(_updateServerHandler.GetUpdateServers());
 
             var bestHost = Selector.Hosts.Dequeue();
 
             Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
+
             await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructions_hash);
         }
 
@@ -103,7 +94,7 @@ namespace RXPatchLib
         public UpdateServerEntry PopHost()
         {
             UpdateServer.HasErrored = true;
-            UpdateServer = UpdateServerHandler.SelectBestPatchServer();
+            UpdateServer = _updateServerHandler.SelectBestPatchServer();
             return UpdateServer;
         }
         

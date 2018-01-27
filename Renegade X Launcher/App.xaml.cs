@@ -5,6 +5,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
 using RxLogger;
+using RXPatchLib;
 
 namespace LauncherTwo
 {
@@ -43,7 +44,7 @@ namespace LauncherTwo
                             SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());
                             isGoodUpdate = true; //Set isGoodUpdate to true to indicate correct permissionChange
                         }
-                        catch (System.Exception ex)
+                        catch (Exception ex)
                         {
                             MessageBox.Show(ex.Message);
                         }
@@ -67,13 +68,14 @@ namespace LauncherTwo
                     String patchUrl = a.Substring("--UpdateGame=".Length);
                     var patchVersion = VersionCheck.GetLatestGameVersionName();
 
-                    var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
+                    var progress = new Progress<DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-                    RXPatchLib.RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
-                    System.Threading.Tasks.Task task = RXPatchLib.RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
+                    RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
+                    System.Threading.Tasks.Task task = RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
-                    var window = new Views.ApplyUpdateWindow(task, RXPatchLib.RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
+
+                    var window = new Views.ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();
 
                     VersionCheck.UpdateGameVersion();

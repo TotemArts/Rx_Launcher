@@ -233,7 +233,6 @@ namespace LauncherTwo
 
                 RxLogger.Logger.Instance.Write($"Starting game update | TargetDir: {targetDir} | AppDir: {applicationDir} | PatchPath: {patchPath},| PatchVersion: {patchVersion}");
                 Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
-
                 RxLogger.Logger.Instance.Write("Download complete, Showing ApplyUpdateWindow");
 
                 var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);

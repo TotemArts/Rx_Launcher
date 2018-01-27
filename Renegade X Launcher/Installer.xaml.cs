@@ -117,7 +117,7 @@ namespace LauncherTwo
                 {
                     bool downloadSuccess = false;
 
-                    var bestPatchServer = RXPatcher.Instance.UpdateServerHandler.SelectBestPatchServer();
+                    var bestPatchServer = RXPatcher.Instance.GetUpdateServerHandler().SelectBestPatchServer();
 
                     Uri RedistServer = bestPatchServer.Uri;
 

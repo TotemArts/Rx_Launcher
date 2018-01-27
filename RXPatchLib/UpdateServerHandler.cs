@@ -26,7 +26,7 @@ namespace RXPatchLib
     /// </summary>
     public class UpdateServerHandler
     {
-        private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
+        private readonly List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
         private UpdateServerEntry _lastBestServerEntry;
 
         public void AddUpdateServer(string Url, string FriendlyName)
