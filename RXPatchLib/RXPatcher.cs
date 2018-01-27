@@ -73,10 +73,9 @@ namespace RXPatchLib
             Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
 
-            var selector = new UpdateServerSelector();
-            await selector.SelectHosts(UpdateServerHandler.GetUpdateServers());
+            await UpdateServerSelector.SelectHosts(UpdateServerHandler.GetUpdateServers());
 
-            var bestHost = selector.Hosts.Dequeue();
+            var bestHost = UpdateServerSelector.Hosts.Dequeue();
 
             Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
             await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructionsHash);
