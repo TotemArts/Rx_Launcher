@@ -18,6 +18,7 @@ namespace RXPatchLib
         const string TempSubPath = "apply"; // Note that this directory will be automatically emptied after patching.
 
         //public UpdateServerSelector Selector = null;
+
         public UpdateServerEntry UpdateServer = null;
         public string WebPatchPath = null;
 
@@ -44,6 +45,7 @@ namespace RXPatchLib
 
         public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
         {
+
             return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
         }
 
@@ -100,6 +102,7 @@ namespace RXPatchLib
             // Lock Hosts queue and dequeue next host to BaseURL.
             return UpdateServer;
         }
+        
 
         private static string CreateBackupPath(string applicationDirPath)
         {

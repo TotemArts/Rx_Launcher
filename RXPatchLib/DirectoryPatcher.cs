@@ -293,7 +293,6 @@ namespace RXPatchLib
         public string GetTargetPath(string subPath) { return Path.Combine(_targetPath, subPath); }
         public string GetBackupPath(string subPath) { return Path.Combine(_backupPath, subPath); }
         public string GetTempPath(string subPath) { return Path.Combine(_tempPath, subPath); }
-
         private const int MaximumDeltaThreads = 4;
 
         public DirectoryPatcher(XdeltaPatcher filePatcher, string targetPath, string backupPath, string tempPath, IPatchSource patchSource)
@@ -418,6 +417,7 @@ namespace RXPatchLib
             // (on testing with using all cores, it maxed out my 24 core server, but it did patch in about 30 seconds!)
             RxLogger.Logger.Instance.Write(
                 $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > 4 ? 4 : Environment.ProcessorCount)} of them");
+
             for (var i = 0; i < (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount); i++)
             {
                 RxLogger.Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");

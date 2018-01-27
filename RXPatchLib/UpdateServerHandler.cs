@@ -35,6 +35,7 @@ namespace RXPatchLib
         public void AddUpdateServer(string url, string friendlyName)
         {
             _updateServers.Add(new UpdateServerEntry(url, friendlyName));
+
         }
 
         public List<UpdateServerEntry> GetUpdateServers()

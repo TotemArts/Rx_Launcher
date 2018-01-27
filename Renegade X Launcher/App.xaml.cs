@@ -7,7 +7,6 @@ using System.Windows;
 using RxLogger;
 using RXPatchLib;
 
-
 namespace LauncherTwo
 {
     /// <summary>
@@ -15,6 +14,8 @@ namespace LauncherTwo
     /// </summary>
     public partial class App : Application
     {
+        
+
         public void StartupApp(object sender, StartupEventArgs e)
         {
             //Determine if the permissionChange is succesfull after launcher update
@@ -74,6 +75,7 @@ namespace LauncherTwo
                     System.Threading.Tasks.Task task = RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
                     var window = new Views.ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
+
                     window.ShowDialog();
 
                     VersionCheck.UpdateGameVersion();

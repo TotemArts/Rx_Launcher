@@ -31,7 +31,6 @@ namespace RXPatchLib
         readonly string _downloadPath;
         readonly object _isDownloadingLock = new object();
         private byte _downloadsRunning;
-
         private const int MaxDownloadThreads = 12;
 
         public WebPatchSource(RxPatcher patcher, string downloadPath)
@@ -225,6 +224,20 @@ namespace RXPatchLib
 
                         // Reset progress and requeue download
                         await LoadNew(subPath, hash, cancellationToken, progressCallback);
+                    }
+                    catch (WebException)
+                    {
+                        // Try the next best host; throw an exception if there is none
+                        if (_patcher.PopHost() == null)
+                        {
+                            // Unlock download to leave in clean state.
+                            UnlockDownload();
+
+                            throw new NoReliableHostException();
+                        }
+
+                        // Proceed execution with next mirror
+                        goto new_host_selected;
                     }
                 }
             }
