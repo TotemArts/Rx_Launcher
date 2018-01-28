@@ -461,10 +461,12 @@ namespace LauncherTwo
                 this.Join_Server_Btn.Background.Opacity = 0.5;
                 this.Join_Server_Btn.Content = "Server Version Mismatch";
             }
-
-            System.Windows.Media.Animation.Storyboard sb = this.FindResource("JoinButtonGlow") as System.Windows.Media.Animation.Storyboard;
-            System.Windows.Media.Animation.Storyboard.SetTarget(sb, this.Join_Server_Btn);
-            sb.Begin();
+            
+            // Ax: This just doesnt work, i assume it was meant to make the Join Game button actually "glow", however it just makes it fade out and back in when a user picks a new server in the list
+            // Schmitz - i assume this was something you were working on?
+            //System.Windows.Media.Animation.Storyboard sb = this.FindResource("JoinButtonGlow") as System.Windows.Media.Animation.Storyboard;
+            //System.Windows.Media.Animation.Storyboard.SetTarget(sb, this.Join_Server_Btn);
+            //sb.Begin();
 
             ServerInfoGrid.UpdateLayout();
         }
