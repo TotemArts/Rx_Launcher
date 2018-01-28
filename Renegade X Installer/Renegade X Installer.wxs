@@ -8,14 +8,12 @@ For blamage or help: Ask for Schmitz.
 
   <!--Define the product information-->
 	<Product Id="*" 
-           Name="Renegade X"
+           Name="Renegade X Launcher (Beta)"
            Language="1033" 
-           Version="0.5.6.0"
+           Version="0.8.0.1"
            Manufacturer="Totem Arts" 
            UpgradeCode="{2473E6A8-A59F-434D-B871-E18AE833400C}">
-    
-    
-    
+
     <!--Define package information-->
     <Package InstallerVersion="200" 
              Compressed="yes" 
@@ -63,11 +61,36 @@ For blamage or help: Ask for Schmitz.
     <Icon Id="SetupIcon" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
     <Icon Id="Shortcut.ico" SourceFile="../Renegade X Launcher/Icon_Silver.ico"/>
     <Property Id="ARPPRODUCTICON" Value="SetupIcon" />
+
+    <!--
+    ENABLE THIS TO ENABLE THE BETA LAUNCHER MESSAGE
+	  <InstallUISequence>
+	    <Show Dialog="QuestionDlg"
+	          Before="ExecuteAction" />
+	  </InstallUISequence>
+    -->
   </Product>
-  
-  
+
   <!--Fragment that defines the folder structure of the installed product-->
   <Fragment>
+    <!--
+    ENABLE THIS TO ENABLE THE BETA LAUNCHER MESSAGE
+    <UI>
+      <Dialog Id="QuestionDlg" Width="260" Height="85" Title="[ProductName] Setup" NoMinimize="yes">
+        <Control Id="No" Type="PushButton" X="132" Y="57" Width="56" Height="17"
+                 Default="yes" Cancel="yes" Text="No">
+          <Publish Event="EndDialog" Value="Exit">1</Publish>
+        </Control>
+        <Control Id="Yes" Type="PushButton" X="72" Y="57" Width="56" Height="17" Text="Yes">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text" Type="Text" X="48" Y="15" Width="194" Height="30">
+          <Text>You are installing a beta version of the RenegadeX Installer, this might break things.
+Are you sure you want to continue?</Text>
+        </Control>
+      </Dialog>
+    </UI>-->
+
     <!--Defines the folders this installer can use. CAPITOL folders are default Windows paths. Id=Handler to use within this document; Name=the actual name of the folder when created-->
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="DesktopFolder" Name="Desktop"/>
@@ -92,7 +115,7 @@ For blamage or help: Ask for Schmitz.
     <!--Main component group with all essentional files-->
 		<ComponentGroup Id="ProductComponents" Directory="InstallLocationLauncher">
 			<!--The productcomponens contains all the main Launcher files-->
-			 <Component Id="ProductComponent" Guid="{D3FAB246-2A53-40A1-BCA4-4E1A087E6CD9}"> 
+			 <Component Id="ProductComponent" Guid="{14f49604-b3ef-4e23-b345-f2c0b7e37cc8}"> 
          <File Id="LauncherEXE" Name="Renegade X Launcher.exe" Source="../Renegade X Launcher/bin/Release/Renegade X Launcher.exe" DiskId='1' Vital="yes" >
            <Shortcut Id='LauncherStartmenu' Directory='DesktopFolder' Name='Renegade X Launcher' WorkingDirectory='InstallLocationLauncher' Advertise='yes' Icon='Shortcut.ico'/>
          </File>
@@ -103,8 +126,9 @@ For blamage or help: Ask for Schmitz.
          <File Id="SteamAPIDLL" Name="SteamAPI.dll" Source="../Renegade X Launcher/bin/Release/SteamAPI.dll" DiskId='1' Vital="yes"/>
          <File Id="XceedWpfDatagridDLL" Name="Xceed.Wpf.DataGrid.dll" Source="../Renegade X Launcher/bin/Release/Xceed.Wpf.DataGrid.dll" DiskId='1' Vital="yes"/>
          <File Id="XceedWpfToolkitDLL" Name="Xceed.Wpf.Toolkit.dll" Source="../Renegade X Launcher/bin/Release/Xceed.Wpf.Toolkit.dll" DiskId='1' Vital="yes"/>
-         <File Id="xdelta32EXE" Name="xdelta3-3.0.8.x86-32.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.0.8.x86-32.exe" DiskId='1' Vital="yes"/>
-         <File Id="xdelta64EXE" Name="xdelta3-3.0.8.x86-64.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.0.8.x86-64.exe" DiskId='1' Vital="yes"/>
+			   <File Id="RxLogger" Name="RxLogger.dll" Source="../Renegade X Launcher/bin/Release/RxLogger.dll" DiskId='1' Vital="yes"/>
+         <File Id="xdelta32EXE" Name="xdelta3-3.1.0-i686.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.1.0-i686.exe" DiskId='1' Vital="yes"/>
+         <File Id="xdelta64EXE" Name="xdelta3-3.1.0-x86_64.exe" Source="../Renegade X Launcher/bin/Release/xdelta3-3.1.0-x86_64.exe" DiskId='1' Vital="yes"/>
         
          <!--Create the default UDK folders the Launcher can use to install the game-->
          <CreateFolder Directory="InstallLocationEngine"/>

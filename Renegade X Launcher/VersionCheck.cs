@@ -36,8 +36,8 @@ namespace LauncherTwo
         {
             _launcherVersion = new Version
             {
-                Name = "0.77-dev",
-                Number = 077
+                Name = "0.8.0.1",
+                Number = 0801
             };
         }
 
@@ -149,7 +149,7 @@ namespace LauncherTwo
 
                 // Server URL's list & Friendly Names
                 foreach (var x in versionData["game"]["server_urls"].ToObject<dynamic>())
-                    RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["friendly_name"].ToString());
+                    RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
             }
             catch(Exception ex)
             {

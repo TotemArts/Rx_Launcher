@@ -20,6 +20,7 @@ namespace LauncherTwo
         {
             //Determine if the permissionChange is succesfull after launcher update
             bool isGoodUpdate = false;
+            bool isLogging = false;
 
             Logger.Instance.Write("Application starting up...");
 
@@ -28,6 +29,7 @@ namespace LauncherTwo
                 if (a.Equals("--log", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Instance.StartLogConsole();
+                    isLogging = true;
                 }
                 if (a.StartsWith("--patch-result="))
                 {
@@ -101,7 +103,7 @@ namespace LauncherTwo
             }
             */
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
-            if (e.Args.Length == 0 || isGoodUpdate)
+            if (e.Args.Length == 0 || isGoodUpdate || isLogging)
             {
                 if (InstanceHandler.IsAnotherInstanceRunning() && !isGoodUpdate)
                 {

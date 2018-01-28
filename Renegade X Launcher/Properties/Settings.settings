@@ -15,7 +15,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="VersionUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://static.renegade-x.com/launcher_data/version/beta.json</Value>
+      <Value Profile="(Default)">https://renegade-x.com/launcher_data/version/release.json</Value>
     </Setting>
     <Setting Name="Installed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

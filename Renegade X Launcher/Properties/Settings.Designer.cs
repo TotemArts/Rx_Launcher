@@ -73,7 +73,7 @@ namespace LauncherTwo.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://static.renegade-x.com/launcher_data/version/beta.json")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://renegade-x.com/launcher_data/version/release.json")]
         public string VersionUrl {
             get {
                 return ((string)(this["VersionUrl"]));
