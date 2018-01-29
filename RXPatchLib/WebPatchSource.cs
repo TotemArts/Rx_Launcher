@@ -149,17 +149,7 @@ namespace RXPatchLib
                         {
                             try
                             {
-                                var rnd = new Random();
-                                var xyz = _patcher.UpdateServerSelector.Hosts.ToArray();
-
-                                /*
-                                 * I'm sure this is not the best way of doing this, however it does select the best top n+4 servers from the queue to download from
-                                 * at random, this does mean soemtimes you might download from one mirror more than others, but it still does
-                                 * a pretty good job at equalisising downloads between servers
-                                 *
-                                 * Note: As the queue is dynamically changing during the initial download, we have to check the length of the queue and adjudst accordingly.
-                                 */
-                                var thisPatchServer = (xyz.Length == 1 ? xyz[0] : xyz[rnd.Next(0, (xyz.Length < 4 ? xyz.Length-1 : 4))]);
+                                var thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
                                 if (thisPatchServer == null)
                                     throw new Exception("Unable to find a suitable update server");
 
