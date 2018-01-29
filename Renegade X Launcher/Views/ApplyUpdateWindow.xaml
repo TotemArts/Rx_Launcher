@@ -1,4 +1,4 @@
-﻿<parent:RXWindow
+﻿<parent:RxWindow
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:LauncherTwo.Views"
     mc:Ignorable="d"
     x:Class="LauncherTwo.Views.ApplyUpdateWindow"
-    Style="{StaticResource {x:Type parent:RXWindow}}"
+    Style="{StaticResource {x:Type parent:RxWindow}}"
     Padding="12"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     d:DataContext="{d:DesignData /Views/SampleUpdateProgress.xaml}"
@@ -24,10 +24,9 @@
         <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="RestoreTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="CloseTitleBarButton" TargetType="UserControl"/>
-        
+
         <Color x:Key="RenXFontColor">#FFAEBAC1</Color>
 
-        
         <SolidColorBrush x:Key="RenXFontColorBrush" Color="{DynamicResource RenXFontColor}"/>
         <local:PhaseProgressPercentageConverter x:Key="PhaseProgressPercentageConverter"/>
         <local:PhaseProgressStringConverter x:Key="PhaseProgressStringConverter"/>
@@ -59,8 +58,8 @@
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="2" Content="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressStringConverter}}"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding LoadProgressWithSpeed, Converter={StaticResource PhaseProgressWithSpeedStringConverter}}"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}"/>
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="0"  Content="Source"  Background="Transparent" BorderThickness="0" />
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="{Binding ServerMessage, Mode=OneWay}"  Background="Transparent" BorderThickness="0" Padding="0,5,5,5"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="0"  Content="Sources"  Background="Transparent" BorderThickness="0" />
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressStringConverter}}" Background="Transparent" BorderThickness="0" Padding="0,5,5,5"/>
             </Grid>
         </Grid>
         
@@ -73,4 +72,4 @@
             </StackPanel>
         </Grid>
     </StackPanel>
-</parent:RXWindow>
+</parent:RxWindow>

@@ -41,23 +41,23 @@ namespace LauncherTwo
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public string IPEndpoint { get; set; }
+        public string IpEndpoint { get; set; }
         public bool SkipIntroMovies { get; set; }
 
         public override string GetProcessArguments ()
         {
-            string Arguments = "";
-            if (IPEndpoint != null)
+            string arguments = "";
+            if (IpEndpoint != null)
             {
-                Arguments += IPEndpoint;
+                arguments += IpEndpoint;
                 if (Password != null)
                 {
-                    Arguments += "?PASSWORD=" + Password;
+                    arguments += "?PASSWORD=" + Password;
                 }
             }
             if (SkipIntroMovies)
             {
-                Arguments += " -nomoviestartup"; 
+                arguments += " -nomoviestartup"; 
             }
 
             //Pinpoint location of quote error
@@ -65,9 +65,9 @@ namespace LauncherTwo
             //End quote error
 
             //Fix for quote error
-            Arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username + "";
+            arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username + "";
             //End Fix
-            return Arguments;
+            return arguments;
         }
 
     }
@@ -75,22 +75,22 @@ namespace LauncherTwo
     public class EngineInstance
     {
         public EngineInstanceStartupParameters StartupParameters { get; protected set; }
-        public String IPEndpoint = "";
+        public String IpEndpoint = "";
         public Task Task { get; protected set; }
 
-        public static EngineInstance Start(EngineInstanceStartupParameters StartupParameters)
+        public static EngineInstance Start(EngineInstanceStartupParameters startupParameters)
         {
             var instance = new EngineInstance();
 
             try
             {
-                var ipHack = (GameInstanceStartupParameters)StartupParameters;
-                instance.IPEndpoint = ipHack.IPEndpoint;
+                var ipHack = (GameInstanceStartupParameters)startupParameters;
+                instance.IpEndpoint = ipHack.IpEndpoint;
                 ipHack = null;
             }
             catch { };
 
-            instance.StartupParameters = StartupParameters;
+            instance.StartupParameters = startupParameters;
             instance.Task = instance.StartAsync();
             return instance;
         }

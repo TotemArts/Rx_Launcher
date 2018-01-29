@@ -10,77 +10,106 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
+    /// <summary>
+    /// Overwrites for the WebClient to specify our own timeout when the downloader attempts to grab files
+    /// </summary>
+    [System.ComponentModel.DesignerCategory("Code")]
+    class MyWebClient : WebClient
+    {
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var w = base.GetWebRequest(address);
+            w.Timeout = 10 * 1000;
+            return w;
+        }
+    }
+
     class WebPatchSource : IPatchSource, IDisposable
     {
-        Dictionary<string, Task> LoadTasks = new Dictionary<string, Task>();
-        RXPatcher Patcher;
-        string DownloadPath;
-        bool IsDownloading = false;
-        object IsDownloadingLock = new object();
+        readonly Dictionary<string, Task> _loadTasks = new Dictionary<string, Task>();
+        readonly RxPatcher _patcher;
+        readonly string _downloadPath;
+        readonly object _isDownloadingLock = new object();
+        private byte _downloadsRunning;
+        private const int MaxDownloadThreads = 12;
 
-        public WebPatchSource(RXPatcher patcher, string downloadPath)
+        public WebPatchSource(RxPatcher patcher, string downloadPath)
         {
-            Patcher = patcher;
-            DownloadPath = downloadPath;
+            _patcher = patcher;
+            _downloadPath = downloadPath;
         }
 
         public void Dispose()
         {
-            Debug.Assert(Task.WhenAll(LoadTasks.Values).IsCompleted);
+            Debug.Assert(Task.WhenAll(_loadTasks.Values).IsCompleted);
         }
 
         public string GetSystemPath(string subPath)
         {
-            return Path.Combine(DownloadPath, subPath);
+            return Path.Combine(_downloadPath, subPath);
         }
 
-        public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             Task task;
-            if (!LoadTasks.TryGetValue(subPath, out task))
+            if (!_loadTasks.TryGetValue(subPath, out task))
             {
                 task = LoadNew(subPath, hash, cancellationToken, progressCallback);
-                LoadTasks[subPath] = task;
+                _loadTasks[subPath] = task;
             }
             return task;
         }
 
+        /// <summary>
+        /// Locks a download thread so that it may not attempt to download again
+        /// This controls concurrent downloading
+        /// </summary>
+        /// <returns>The return value can be ignored</returns>
         private async Task LockDownload()
         {
             while (true)
             {
-                lock (IsDownloadingLock)
+                lock (_isDownloadingLock)
                 {
-                    if (!IsDownloading)
+                    // This is where the threading of concurrent downloads happens, currently hardcoded to 12 but easily changed.
+                    if (_downloadsRunning < MaxDownloadThreads)
                     {
-                        IsDownloading = true;
+                        _downloadsRunning++;
+                        Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | ACCEPTING DOWNLOAD");
                         break;
                     }
                 }
 
-                await Task.Delay(100);
+                await Task.Delay(1000);
             }
         }
 
+        /// <summary>
+        /// Unlocks a concurrent download thread to allow another one to start
+        /// </summary>
         private void UnlockDownload()
         {
-            lock (IsDownloadingLock)
-                IsDownloading = false;
+            lock (_isDownloadingLock)
+            {
+                _downloadsRunning--;
+                Debug.Print($"{Thread.CurrentThread.ManagedThreadId} | DLRUN: {_downloadsRunning} | DOWNLOAD COMPLETE");
+            }
         }
 
-        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
             string filePath = GetSystemPath(subPath);
+            var guid = Guid.NewGuid();
 
             // Check if the file exists
             if (File.Exists(filePath))
             {
                 // If the file exists and is correct, return without redownloading.
-                if (hash != null && await SHA256.GetFileHashAsync(filePath) == hash)
+                if (hash != null && await Sha256.GetFileHashAsync(filePath) == hash)
                 {
                     // Update progress (probably unncessary)
-                    long FileSize = new FileInfo(filePath).Length;
-                    progressCallback(FileSize, FileSize);
+                    long fileSize = new FileInfo(filePath).Length;
+                    progressCallback(fileSize, fileSize, _downloadsRunning);
 
                     return;
                 }
@@ -95,36 +124,67 @@ namespace RXPatchLib
             // Since I can't await within a lock...
             await LockDownload();
 
-            using (var webClient = new WebClient())
+            using (var webClient = new MyWebClient())
             {
-                webClient.Proxy = null;
+                webClient.Proxy = null; // Were not using a proxy server, let's ensure that.
 
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
-                    progressCallback(args.BytesReceived, args.TotalBytesToReceive);
+                    // Notify the RenX Updater window of a downloads progress
+                    progressCallback(args.BytesReceived, args.TotalBytesToReceive, _downloadsRunning);
+
+                    // Notify our debug window of a downloads progress
+                    AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
                 };
 
+                // goto labels are the devil, you should be ashamed of using this, whoever you are. :P
                 new_host_selected:
 
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     RetryStrategy retryStrategy = new RetryStrategy();
-
                     try
                     {
                         await retryStrategy.Run(async () =>
                         {
                             try
                             {
+                                var rnd = new Random();
+                                var xyz = _patcher.UpdateServerSelector.Hosts.ToArray();
+
+                                /*
+                                 * I'm sure this is not the best way of doing this, however it does select the best top n+4 servers from the queue to download from
+                                 * at random, this does mean soemtimes you might download from one mirror more than others, but it still does
+                                 * a pretty good job at equalisising downloads between servers
+                                 *
+                                 * Note: As the queue is dynamically changing during the initial download, we have to check the length of the queue and adjudst accordingly.
+                                 */
+                                var thisPatchServer = xyz[rnd.Next(0, (xyz.Length < 4 ? xyz.Length-1 : 4))];
+                                if (thisPatchServer == null)
+                                    throw new Exception("Unable to find a suitable update server");
+
+                                // Add a new download to the debugging window
+                                AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
+
+                                // Mark this patch server as currently used (is active)
+                                thisPatchServer.IsUsed = true;
+
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {Patcher.UpdateServer.Uri.AbsoluteUri}/{Patcher.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(new Uri($"{Patcher.UpdateServer.Uri.AbsoluteUri}/{Patcher.WebPatchPath}/{subPath}"), filePath);
+                                RxLogger.Logger.Instance.Write($"Starting file transfer: {_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
+                                await webClient.DownloadFileTaskAsync(new Uri($"{_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
+
+                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
+
+                                thisPatchServer.IsUsed = false;
 
                                 // File finished downoading successfully; allow next download to start and check hash
                                 UnlockDownload();
 
-                                if (hash != null && await SHA256.GetFileHashAsync(filePath) != hash)
+                                // Check our hash, if it's not the same we re-queue
+                                // todo: add a retry count to the file instruction, this is needed because if the servers file is actually broken you'll be in an infiniate download loop
+                                if (hash != null && await Sha256.GetFileHashAsync(filePath) != hash)
                                     throw new HashMistmatchException(); // Hash mismatch; throw exception
 
                                 return null;
@@ -143,7 +203,7 @@ namespace RXPatchLib
                     catch (TooManyRetriesException)
                     {
                         // Try the next best host; throw an exception if there is none
-                        if (Patcher.PopHost() == null)
+                        if (_patcher.PopHost() == null)
                         {
                             // Unlock download to leave in clean state.
                             UnlockDownload();
@@ -159,34 +219,28 @@ namespace RXPatchLib
                         RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
                         // Try the next best host; throw an exception if there is none
-                        if (Patcher.PopHost() == null)
+                        if (_patcher.PopHost() == null)
                             throw new NoReliableHostException();
 
                         // Reset progress and requeue download
                         await LoadNew(subPath, hash, cancellationToken, progressCallback);
                     }
+                    catch (WebException)
+                    {
+                        // Try the next best host; throw an exception if there is none
+                        if (_patcher.PopHost() == null)
+                        {
+                            // Unlock download to leave in clean state.
+                            UnlockDownload();
+
+                            throw new NoReliableHostException();
+                        }
+
+                        // Proceed execution with next mirror
+                        goto new_host_selected;
+                    }
                 }
             }
-
-            /* TODO
-            if (UseProxy)
-            {
-                request.Proxy = new WebProxy(ProxyServer + ":" + ProxyPort.ToString());
-                if (ProxyUsername.Length > 0)
-                    request.Proxy.Credentials = new NetworkCredential(ProxyUsername, ProxyPassword);
-            }
-
-            WebResponse response = request.GetResponse();
-            //result.MimeType = res.ContentType;
-            //result.LastModified = response.LastModified;
-            if (!resuming)//(Size == 0)
-            {
-                //resuming = false;
-                Size = (int)response.ContentLength;
-                SizeInKB = (int)Size / 1024;
-            }
-            acceptRanges = String.Compare(response.Headers["Accept-Ranges"], "bytes", true) == 0;
-             * */
         }
     }
 }

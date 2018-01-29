@@ -8,7 +8,6 @@ using RxLogger;
 
 namespace RXPatchLib
 {
-
     /// <summary>
     /// Contains a server entry that eventually sits inside a List array
     /// </summary>
@@ -19,9 +18,9 @@ namespace RXPatchLib
         public bool IsUsed;
         public bool HasErrored;
 
-        public UpdateServerEntry(string Url, string name)
+        public UpdateServerEntry(string url, string name)
         {
-            Uri = new Uri(Url);
+            Uri = new Uri(url);
             Name = name;
         }
     }
@@ -32,11 +31,11 @@ namespace RXPatchLib
     public class UpdateServerHandler
     {
         private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
-        private UpdateServerEntry _lastBestServerEntry;
 
-        public void AddUpdateServer(string Url, string FriendlyName)
+        public void AddUpdateServer(string url, string friendlyName)
         {
-            _updateServers.Add(new UpdateServerEntry(Url, FriendlyName));
+            _updateServers.Add(new UpdateServerEntry(url, friendlyName));
+
         }
 
         public List<UpdateServerEntry> GetUpdateServers()
@@ -50,11 +49,18 @@ namespace RXPatchLib
         /// <returns>An UpdateServerEntry of the host found, or Null if no more hosts exist</returns>
         public UpdateServerEntry SelectBestPatchServer()
         {
-            if (_lastBestServerEntry != null)
-                return _lastBestServerEntry;
+            lock (_updateServers)
+            {
+                var thisServerEntry =
+                    _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+                if (thisServerEntry != null)
+                {
+                    thisServerEntry.IsUsed = true; // Mark is as used so it's not used again
+                    return thisServerEntry;
+                }
 
-            _lastBestServerEntry = _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
-            return _lastBestServerEntry;
+                return null;
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
 using RxLogger;
+using RXPatchLib;
 
 namespace LauncherTwo
 {
@@ -19,6 +20,7 @@ namespace LauncherTwo
         {
             //Determine if the permissionChange is succesfull after launcher update
             bool isGoodUpdate = false;
+            bool isLogging = false;
 
             Logger.Instance.Write("Application starting up...");
 
@@ -27,6 +29,7 @@ namespace LauncherTwo
                 if (a.Equals("--log", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Instance.StartLogConsole();
+                    isLogging = true;
                 }
                 if (a.StartsWith("--patch-result="))
                 {
@@ -43,7 +46,7 @@ namespace LauncherTwo
                             SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());
                             isGoodUpdate = true; //Set isGoodUpdate to true to indicate correct permissionChange
                         }
-                        catch (System.Exception ex)
+                        catch (Exception ex)
                         {
                             MessageBox.Show(ex.Message);
                         }
@@ -67,13 +70,14 @@ namespace LauncherTwo
                     String patchUrl = a.Substring("--UpdateGame=".Length);
                     var patchVersion = VersionCheck.GetLatestGameVersionName();
 
-                    var progress = new System.Progress<RXPatchLib.DirectoryPatcherProgressReport>();
+                    var progress = new Progress<DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-                    RXPatchLib.RXPatcher.Instance.AddNewUpdateServer(patchUrl, "");
-                    System.Threading.Tasks.Task task = RXPatchLib.RXPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RXPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
+                    RxPatcher.Instance.AddNewUpdateServer(patchUrl, "");
+                    System.Threading.Tasks.Task task = RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
-                    var window = new Views.ApplyUpdateWindow(task, RXPatchLib.RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
+                    var window = new Views.ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
+
                     window.ShowDialog();
 
                     VersionCheck.UpdateGameVersion();
@@ -99,7 +103,7 @@ namespace LauncherTwo
             }
             */
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
-            if (e.Args.Length == 0 || isGoodUpdate)
+            if (e.Args.Length == 0 || isGoodUpdate || isLogging)
             {
                 if (InstanceHandler.IsAnotherInstanceRunning() && !isGoodUpdate)
                 {

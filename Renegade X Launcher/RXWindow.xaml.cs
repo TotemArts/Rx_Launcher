@@ -8,7 +8,7 @@ using System.Windows.Interop;
 
 namespace LauncherTwo
 {
-    public partial class RXWindow : ModernWindow
+    public partial class RxWindow : ModernWindow
     {
         public static readonly RoutedCommand ShowSystemMenuUnderMouseCommand = new RoutedCommand();
         public static readonly RoutedCommand ShowSystemMenuUnderIconCommand = new RoutedCommand();
@@ -18,7 +18,7 @@ namespace LauncherTwo
         [DllImport("user32.dll")]
         private static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
-        public RXWindow()
+        public RxWindow()
         {
             CommandBindings.Add(new CommandBinding(ShowSystemMenuUnderMouseCommand, (element, args) =>
             {
@@ -33,12 +33,12 @@ namespace LauncherTwo
             }));
             CommandBindings.Add(new CommandBinding(DragMoveCommand, (element, args) =>
             {
-                var WM_SYSCOMMAND = 0x0112;
-                var WM_LBUTTONUP = 0x0202;
-                var SC_MOUSEMOVE = 0xf012;
+                var wmSyscommand = 0x0112;
+                var wmLbuttonup = 0x0202;
+                var scMousemove = 0xf012;
                 var handle = new WindowInteropHelper(this).Handle;
-                SendMessage(handle, WM_SYSCOMMAND, (IntPtr)SC_MOUSEMOVE, IntPtr.Zero);
-                SendMessage(handle, WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
+                SendMessage(handle, wmSyscommand, (IntPtr)scMousemove, IntPtr.Zero);
+                SendMessage(handle, wmLbuttonup, IntPtr.Zero, IntPtr.Zero);
             }));
             CommandBindings.Add(new CommandBinding(ToggleMaximizedCommand, (element, args) =>
             {

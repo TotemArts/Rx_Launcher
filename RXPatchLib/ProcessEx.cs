@@ -28,13 +28,13 @@ namespace RXPatchLib
             startInfo.CreateNoWindow = true;
 
             TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
-            using (Process Process = new Process())
+            using (Process process = new Process())
             {
-                Process.EnableRaisingEvents = true;
+                process.EnableRaisingEvents = true;
                 string x = Directory.GetCurrentDirectory();
-                Process.Exited += (sender, e) => { tcs.SetResult(Process.ExitCode); };
-                Process.StartInfo = startInfo;
-                Process.Start();
+                process.Exited += (sender, e) => { tcs.SetResult(process.ExitCode); };
+                process.StartInfo = startInfo;
+                process.Start();
                 return await tcs.Task;
             }
         }

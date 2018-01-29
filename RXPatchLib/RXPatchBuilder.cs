@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-    public class RXPatchBuilder
+    public class RxPatchBuilder
     {
         public async Task CreatePatchAsync(PatchInfo patchInfo)
         {

@@ -32,10 +32,10 @@ namespace RxLogger
 
         public enum ErrorLevel
         {
-            ERR_SUCCESS,
-            ERR_INFO,
-            ERR_WARNING,
-            ERR_ERROR
+            ErrSuccess,
+            ErrInfo,
+            ErrWarning,
+            ErrError
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace RxLogger
         /// <param name="callingMethod">This should be ignored as the compiler sets this parameter at run time</param>
         /// <param name="callingFilePath">This should be ignored as the compiler sets this parameter at run time</param>
         /// <param name="callingFileLineNumber">This should be ignored as the compiler sets this parameter at run time</param>
-        public void Write(string message, ErrorLevel errorLevel = ErrorLevel.ERR_INFO,
+        public void Write(string message, ErrorLevel errorLevel = ErrorLevel.ErrInfo,
             [CallerMemberName] string callingMethod = "",
             [CallerFilePath] string callingFilePath = "",
             [CallerLineNumber] int callingFileLineNumber = 0)
@@ -105,23 +105,23 @@ namespace RxLogger
                 {
                     switch (errorLevel)
                     {
-                        case ErrorLevel.ERR_ERROR:
+                        case ErrorLevel.ErrError:
                             Console.ForegroundColor = ConsoleColor.Red;
                             break;
 
-                        case ErrorLevel.ERR_INFO:
-                        case ErrorLevel.ERR_SUCCESS:
+                        case ErrorLevel.ErrInfo:
+                        case ErrorLevel.ErrSuccess:
                             Console.ForegroundColor = ConsoleColor.White;
                             break;
 
-                        case ErrorLevel.ERR_WARNING:
+                        case ErrorLevel.ErrWarning:
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             break;
                     }
 
                     // ReSharper disable once LocalizableElement
                     Console.WriteLine(
-                        $"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)}] - {message}");
+                        $"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] - {message}");
                 }
             }
         }

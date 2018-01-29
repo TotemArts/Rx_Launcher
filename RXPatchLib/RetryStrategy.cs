@@ -16,14 +16,14 @@ namespace RXPatchLib
             public Exception Exception;
         }
 
-        ITimeProvider TimeProvider;
-        TimeSpan TestIntervalLength = new TimeSpan(0, 0, 60);
-        int MaxExceptionsInInterval = 2;
-        TimeSpan DelayAfterException = new TimeSpan(0, 0, 2);
+        readonly ITimeProvider _timeProvider;
+        readonly TimeSpan _testIntervalLength = new TimeSpan(0, 0, 60);
+        readonly int _maxExceptionsInInterval = 2;
+        readonly TimeSpan _delayAfterException = new TimeSpan(0, 0, 2);
 
         public RetryStrategy(ITimeProvider timeProvider = null)
         {
-            TimeProvider = timeProvider ?? SystemTimeProvider.StaticInstance;
+            _timeProvider = timeProvider ?? SystemTimeProvider.StaticInstance;
         }
 
         public async Task Run(Func<Task<Exception>> function)
@@ -39,8 +39,8 @@ namespace RXPatchLib
                     break;
                 }
 
-                var now = TimeProvider.Now;
-                var intervalBegin = now.Subtract(TestIntervalLength);
+                var now = _timeProvider.Now;
+                var intervalBegin = now.Subtract(_testIntervalLength);
 
                 entries.Add(new Entry
                 {
@@ -52,12 +52,12 @@ namespace RXPatchLib
                 Debug.Assert(firstEntryInIntervalIndex != -1);
 
                 int exceptionsInInterval = entries.Count - firstEntryInIntervalIndex;
-                if (exceptionsInInterval > MaxExceptionsInInterval)
+                if (exceptionsInInterval > _maxExceptionsInInterval)
                 {
                     throw new TooManyRetriesException(entries.Select(_ => _.Exception));
                 }
 
-                await TimeProvider.Delay(DelayAfterException);
+                await _timeProvider.Delay(_delayAfterException);
             }
         }
     }

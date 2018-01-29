@@ -15,16 +15,16 @@ namespace LauncherTwo.Views
     public class Settings : INotifyPropertyChanged
     {
         #region SkipIntroMovies Setting
-        private bool _SkipIntroMovies;
+        private bool _skipIntroMovies;
         public bool SkipIntroMovies
         {
             get
             {
-                return _SkipIntroMovies;
+                return _skipIntroMovies;
             }
             set
             {
-                _SkipIntroMovies = value;
+                _skipIntroMovies = value;
                 NotifyPropertyChanged("SkipIntroMovies");
             }
         }
@@ -42,11 +42,11 @@ namespace LauncherTwo.Views
     }
 
 
-    public partial class SettingsWindow : RXWindow
+    public partial class SettingsWindow : RxWindow
     {
         public Settings Settings { get; set; }
 
-        const String RESET_MESSAGE = "Are you sure you want to reset Renegade X?\nThis will revert all settings to their default.";
+        const String ResetMessage = "Are you sure you want to reset Renegade X?\nThis will revert all settings to their default.";
 
         public SettingsWindow()
         {
@@ -77,7 +77,7 @@ namespace LauncherTwo.Views
 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult rsltMessageBox = MessageBox.Show(RESET_MESSAGE, "Reset", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult rsltMessageBox = MessageBox.Show(ResetMessage, "Reset", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (rsltMessageBox == MessageBoxResult.Yes)
             {
                 String configFolder = System.IO.Path.Combine(GameInstallation.GetRootPath(), "UDKGame\\Config");
@@ -97,9 +97,9 @@ namespace LauncherTwo.Views
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-            Task task = RXPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+            Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
-            var window = new ApplyUpdateWindow(task, RXPatcher.Instance, progress, patchVersion, cancellationTokenSource, type);
+            var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, type);
             window.Owner = this;
             window.ShowDialog();
 

@@ -14,13 +14,13 @@ namespace LauncherTwo.Steam
         public static SteamAPISession.LoginStatus Status { get; protected set; }
         public static SteamAPISession.User User { get; protected set; }
 
-        private static string username;
-        private static string password; 
+        private static string _username;
+        private static string _password; 
 
         public static void Login(string aUsername, string aPassword)
         {
-            username = aUsername;
-            password = aPassword;
+            _username = aUsername;
+            _password = aPassword;
 
             Status = Session.Authenticate(aUsername, aPassword);
 
@@ -39,7 +39,7 @@ namespace LauncherTwo.Steam
 
         public static void UnlockSteamGuard(string aGaurdPassword)
         {
-            Status = Session.Authenticate(username, password, aGaurdPassword); 
+            Status = Session.Authenticate(_username, _password, aGaurdPassword); 
         }
     }
 }

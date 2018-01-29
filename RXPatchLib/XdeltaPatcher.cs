@@ -8,25 +8,25 @@ namespace RXPatchLib
 {
     public class XdeltaPatcher
     {
-        public long _SourceBufferSize = 512 * 1024 * 1024;
+        public long SourceBufferSize = 512 * 1024 * 1024;
         public long SourceWindowSize
         {
-            get { return _SourceBufferSize; }
-            set { if (value < 1) throw new InvalidOperationException(); _SourceBufferSize = value; }
+            get { return SourceBufferSize; }
+            set { if (value < 1) throw new InvalidOperationException(); SourceBufferSize = value; }
         }
 
-        private XdeltaPatchSystem PatchSystem;
+        private readonly XdeltaPatchSystem _patchSystem;
 
         public XdeltaPatcher(XdeltaPatchSystem patchSystem)
         {
-            PatchSystem = patchSystem;
+            _patchSystem = patchSystem;
         }
 
         public async Task ApplyPatchAsync(string oldPath, string patchedPath, string patchPath)
         {
             try
             {
-                await PatchSystem.RunCommandAsync(
+                await _patchSystem.RunCommandAsync(
                     "-d",
                     "-B" + SourceWindowSize.ToString(),
                     "-f",
@@ -44,7 +44,7 @@ namespace RXPatchLib
         {
             try
             {
-                await PatchSystem.RunCommandAsync(
+                await _patchSystem.RunCommandAsync(
                     "-d",
                     "-B" + SourceWindowSize.ToString(),
                     "-f",

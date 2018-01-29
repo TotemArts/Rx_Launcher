@@ -18,8 +18,8 @@ namespace RXPatchLibTest
             CollectionAssert.IsSubsetOf(expectedFiles.ToArray(), actualFiles.ToArray());
             foreach (var file in expectedFiles)
             {
-                var expectedFileContents = await SHA256.GetFileHashAsync(Path.Combine(expectedPath, file));
-                var actualFileContents = await SHA256.GetFileHashAsync(Path.Combine(actualPath, file));
+                var expectedFileContents = await Sha256.GetFileHashAsync(Path.Combine(expectedPath, file));
+                var actualFileContents = await Sha256.GetFileHashAsync(Path.Combine(actualPath, file));
                 Assert.AreEqual(expectedFileContents, actualFileContents, "file " + file + " is different");
             }
         }

@@ -20,51 +20,51 @@ namespace LauncherTwo
 
         }
 
-        public BannerInfo(string WebsiteLink, ImageSource Source )
+        public BannerInfo(string websiteLink, ImageSource source )
         {
-            m_WebsiteLink = WebsiteLink;
-            m_BannerImageSource = Source; 
+            MWebsiteLink = websiteLink;
+            MBannerImageSource = source; 
         }
 
-        public string m_WebsiteLink;
-        public ImageSource m_BannerImageSource;
+        public string MWebsiteLink;
+        public ImageSource MBannerImageSource;
     }
     class BannerTools
     {
-        private static Dictionary<string, BannerInfo> Banners = new Dictionary<string, BannerInfo>()
+        private static readonly Dictionary<string, BannerInfo> _banners = new Dictionary<string, BannerInfo>()
         {
             { "Default", new BannerInfo("https://renegade-x.com/", new BitmapImage(new Uri("Resources/defaultBanner.png", UriKind.Relative))) }
         };
 
-        public static ImageSource GetBanner(string IPAddress)
+        public static ImageSource GetBanner(string ipAddress)
         {
-            if( Banners.ContainsKey(IPAddress))
+            if( _banners.ContainsKey(ipAddress))
             {
-                return Banners[IPAddress].m_BannerImageSource;
+                return _banners[ipAddress].MBannerImageSource;
             }
             else
             {
-                return Banners["Default"].m_BannerImageSource;
+                return _banners["Default"].MBannerImageSource;
             }
         }
 
-        public static void LaunchBannerLink(string IPAddress)
+        public static void LaunchBannerLink(string ipAddress)
         {
-            System.Diagnostics.Process.Start(GetBannerLink(IPAddress));
+            System.Diagnostics.Process.Start(GetBannerLink(ipAddress));
         }
 
-        public static string GetBannerLink(string IPAddress)
+        public static string GetBannerLink(string ipAddress)
         {
-            string Link;
-            if (IPAddress != null && Banners.ContainsKey(IPAddress))
+            string link;
+            if (ipAddress != null && _banners.ContainsKey(ipAddress))
             {
-                Link = Banners[IPAddress].m_WebsiteLink;
+                link = _banners[ipAddress].MWebsiteLink;
             }
             else
             {
-                Link = Banners["Default"].m_WebsiteLink;
+                link = _banners["Default"].MWebsiteLink;
             }
-            return Link;
+            return link;
         }
 
         public static void Setup()
@@ -79,23 +79,23 @@ namespace LauncherTwo
             try
             {
                 //Grab the string from the RenX Website.
-                string jsonText = new WebClient().DownloadString(RenXWebLinks.RENX_BANNERS_JSON_URL);
+                string jsonText = new WebClient().DownloadString(RenXWebLinks.RenxBannersJsonUrl);
 
                 //Turn it into a JSon object that we can parse.
                 var results = JsonConvert.DeserializeObject<dynamic>(jsonText);
 
-                foreach(var Data in results)
+                foreach(var data in results)
                 {
                     BannerInfo info = new BannerInfo
                     {
-                        m_WebsiteLink = Data["Link"],
+                        MWebsiteLink = data["Link"],
                     };
 
-                    string bannerURL = Data["Banner"];
-                    info.m_BannerImageSource = DownloadImage(bannerURL);
+                    string bannerUrl = data["Banner"];
+                    info.MBannerImageSource = DownloadImage(bannerUrl);
 
-                    string ipString = Data["IP"] ?? "-1";
-                    string[] ips = ipString.Split(RenXWebLinks.RENX_SERVER_SETTING_SPACE_SYMBOL);
+                    string ipString = data["IP"] ?? "-1";
+                    string[] ips = ipString.Split(RenXWebLinks.RenxServerSettingSpaceSymbol);
 
                     foreach( string ip in ips)
                     {
@@ -104,7 +104,7 @@ namespace LauncherTwo
                          *  Reason: Game server providers use the same server IP Address for multiple instances of the same game, this fixes banners for these server types.
                          */
 
-                        Banners.Add(ip, info); 
+                        _banners.Add(ip, info); 
                     }
                 }
             }

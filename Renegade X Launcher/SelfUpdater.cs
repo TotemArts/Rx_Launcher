@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace LauncherTwo
 {
-    enum eUpdateState
+    enum EUpdateState
     {
         NotStarted = 0,
         Downloading,
@@ -23,10 +23,10 @@ namespace LauncherTwo
     }
     public static class SelfUpdater
     {
-        static eUpdateState UpdateState = eUpdateState.NotStarted;
-        static Views.UpdateDownloadWindow UpdaterWindow = null;
-        static WebClient Client;
-        static string PatchHash;
+        static EUpdateState _updateState = EUpdateState.NotStarted;
+        static Views.UpdateDownloadWindow _updaterWindow = null;
+        static WebClient _client;
+        static string _patchHash;
 
         static string GetTempDirectory()
         {
@@ -48,22 +48,22 @@ namespace LauncherTwo
             return GetTempDirectory() + @"launcher_update.zip";
         }
 
-        static eUpdateState GetUpdateState()
+        static EUpdateState GetUpdateState()
         {
-            return UpdateState;
+            return _updateState;
         }
 
         public static void CancelUpdate()
         {
-            UpdateState = eUpdateState.Cancelled;
+            _updateState = EUpdateState.Cancelled;
             // TODO: Cancel whichever state is currently happening.
         }
 
         public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow, string url, string hash)
         {
-            UpdaterWindow = aUpdaterWindow;
-            PatchHash = hash;
-            if (UpdateState != eUpdateState.Downloading && UpdateState != eUpdateState.Extracting && UpdateState != eUpdateState.ReadyToInstall)
+            _updaterWindow = aUpdaterWindow;
+            _patchHash = hash;
+            if (_updateState != EUpdateState.Downloading && _updateState != EUpdateState.Extracting && _updateState != EUpdateState.ReadyToInstall)
             {
                 StartDownload(url);
             }
@@ -73,24 +73,24 @@ namespace LauncherTwo
         {
             try
             {
-                UpdateState = eUpdateState.Downloading;
-                UpdaterWindow.StatusLabel.Content = "Starting Download...";
+                _updateState = EUpdateState.Downloading;
+                _updaterWindow.StatusLabel.Content = "Starting Download...";
 
                 if (File.Exists(GetSavePath()))
                     File.Delete(GetSavePath());
                 if (!Directory.Exists(GetTempDirectory()))
                     Directory.CreateDirectory(GetTempDirectory());
 
-                Client = new WebClient();
-                Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
-                Client.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(DownloadCompletedCallback);
+                _client = new WebClient();
+                _client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
+                _client.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(DownloadCompletedCallback);
 
                 Uri uri = new Uri(url);
-                Client.DownloadFileAsync(uri, GetSavePath());
+                _client.DownloadFileAsync(uri, GetSavePath());
             }
             catch (Exception e)
             {
-                UpdaterWindow.StatusLabel.Content = "Error Downloading: " + e.Message;
+                _updaterWindow.StatusLabel.Content = "Error Downloading: " + e.Message;
             }
         }
 
@@ -101,29 +101,29 @@ namespace LauncherTwo
                 if (Directory.Exists(GetExtractDirectory()))
                     Directory.Delete(GetExtractDirectory(), true);
 
-                UpdateState = eUpdateState.Extracting;
-                UpdaterWindow.StatusLabel.Content = "Extracting...";
+                _updateState = EUpdateState.Extracting;
+                _updaterWindow.StatusLabel.Content = "Extracting...";
                 ZipFile.ExtractToDirectory(GetSavePath(), GetExtractDirectory());
                 ReadyToInstall();
             }
             catch (Exception e)
             {
-                UpdaterWindow.StatusLabel.Content = "Error Extracting: " + e.Message;
+                _updaterWindow.StatusLabel.Content = "Error Extracting: " + e.Message;
             }
         }
 
         static void ReadyToInstall()
         {
-            UpdateState = eUpdateState.ReadyToInstall;
-            UpdaterWindow.UpdateFinished = true;
-            UpdaterWindow.StatusLabel.Content = "Ready to install. Press close to install and restart.";
+            _updateState = EUpdateState.ReadyToInstall;
+            _updaterWindow.UpdateFinished = true;
+            _updaterWindow.StatusLabel.Content = "Ready to install. Press close to install and restart.";
         }
 
         public static void ExecuteInstall()
         {
             try
             {
-                if (UpdateState == eUpdateState.ReadyToInstall)
+                if (_updateState == EUpdateState.ReadyToInstall)
                 {
                     string installLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     string executableName = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -180,7 +180,7 @@ namespace LauncherTwo
             }
             catch (Exception e)
             {
-                UpdaterWindow.StatusLabel.Content = "Error Installing: " + e.Message;
+                _updaterWindow.StatusLabel.Content = "Error Installing: " + e.Message;
             }
         }
 
@@ -188,24 +188,24 @@ namespace LauncherTwo
         {
             if (e.Cancelled)
             {
-                UpdateState = eUpdateState.Error;
-                UpdaterWindow.StatusLabel.Content = "Download was interrupted";
+                _updateState = EUpdateState.Error;
+                _updaterWindow.StatusLabel.Content = "Download was interrupted";
             }
             else if (e.Error != null)
             {
-                UpdateState = eUpdateState.Error;
-                UpdaterWindow.StatusLabel.Content = e.Error.Message;
+                _updateState = EUpdateState.Error;
+                _updaterWindow.StatusLabel.Content = e.Error.Message;
             }
             else
             {
-                UpdaterWindow.StatusLabel.Content = "Download Finished; verifying...";
+                _updaterWindow.StatusLabel.Content = "Download Finished; verifying...";
 
                 // Generate SHA256 hash of the download
-                Task<string> hash_task = RXPatchLib.SHA256.GetFileHashAsync(GetSavePath());
-                hash_task.Wait();
+                Task<string> hashTask = RXPatchLib.Sha256.GetFileHashAsync(GetSavePath());
+                hashTask.Wait();
 
                 // Verify the hash of the download
-                if (hash_task.Result == PatchHash || PatchHash == "")
+                if (hashTask.Result == _patchHash || _patchHash == "")
                 {
                     // Download valid; begin extraction
                     StartExtract();
@@ -213,8 +213,8 @@ namespace LauncherTwo
                 else
                 {
                     // Hash mismatch; set an error
-                    UpdateState = eUpdateState.Error;
-                    UpdaterWindow.StatusLabel.Content = "Hash mismatch";
+                    _updateState = EUpdateState.Error;
+                    _updaterWindow.StatusLabel.Content = "Hash mismatch";
                 }
             }
         }
@@ -222,15 +222,15 @@ namespace LauncherTwo
         private static void DownloadProgressCallback(object sender, DownloadProgressChangedEventArgs e)
         {
             //UpdaterWindow.StatusLabel.Content = (string)e.UserState + "    downloaded " + e.BytesReceived + " of " + e.TotalBytesToReceive + " bytes. " + e.ProgressPercentage + "% complete...";
-            UpdaterWindow.StatusLabel.Content = "Downloading...";
+            _updaterWindow.StatusLabel.Content = "Downloading...";
 
-            double DownloadedInMB = (double)(e.BytesReceived / 1024) / 1024;
-            DownloadedInMB = Math.Round(DownloadedInMB, 2);
+            double downloadedInMb = (double)(e.BytesReceived / 1024) / 1024;
+            downloadedInMb = Math.Round(downloadedInMb, 2);
 
             if (e.TotalBytesToReceive > 0.0f)
-                UpdaterWindow.StatusLabel.Content += " " + (e.ProgressPercentage) + "%";
+                _updaterWindow.StatusLabel.Content += " " + (e.ProgressPercentage) + "%";
             else
-                UpdaterWindow.StatusLabel.Content += " " + DownloadedInMB.ToString() + "mb";
+                _updaterWindow.StatusLabel.Content += " " + downloadedInMb.ToString() + "mb";
         }
 
     }

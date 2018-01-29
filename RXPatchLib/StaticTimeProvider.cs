@@ -8,22 +8,22 @@ namespace RXPatchLib
 {
     class StaticTimeProvider : ITimeProvider
     {
-        DateTime _Now;
+        DateTime _now;
         public DateTime Now
         {
             get
             {
-                return _Now;
+                return _now;
             }
             set
             {
-                _Now = value;
+                _now = value;
             }
         }
 
         public StaticTimeProvider(DateTime now)
         {
-            _Now = now;
+            _now = now;
         }
 
         public Task Delay(TimeSpan timespan)

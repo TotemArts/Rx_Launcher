@@ -7,21 +7,21 @@ namespace RXPatchLib
 {
     public class FileSystemPatchSource : IPatchSource
     {
-        string RootPath;
+        readonly string _rootPath;
 
         public FileSystemPatchSource(string rootPath)
         {
-            RootPath = rootPath;
+            _rootPath = rootPath;
         }
 
         public string GetSystemPath(string subPath)
         {
-            return Path.Combine(RootPath, subPath);
+            return Path.Combine(_rootPath, subPath);
         }
 
-        public async Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long> progressCallback)
+        public async Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
-            if (hash != null && await SHA256.GetFileHashAsync(GetSystemPath(subPath)) != hash)
+            if (hash != null && await Sha256.GetFileHashAsync(GetSystemPath(subPath)) != hash)
                 throw new PatchSourceLoadException(subPath, hash);
         }
     }
