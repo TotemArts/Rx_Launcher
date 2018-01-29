@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -205,10 +206,17 @@ namespace RXPatchLib
         {
             string targetPath = _directoryPatcher.GetTargetPath(_subPath);
 
-            Logger.Instance.Write($"ModifiedTimeReplaceAction - {targetPath}");
+            Logger.Instance.Write($"ModifiedTimeReplaceAction - {targetPath} - {_lastWriteTime.ToString(CultureInfo.InvariantCulture)}");
 
             // Update LastWriteTime
-            new FileInfo(targetPath).LastWriteTimeUtc = _lastWriteTime;
+            try
+            {
+                new FileInfo(targetPath).LastWriteTimeUtc = _lastWriteTime;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Write($"ModifiedTimeReplaceAction encountered an error\r\n{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
+            }
 
             return TaskExtensions.CompletedTask;
         }
@@ -250,7 +258,6 @@ namespace RXPatchLib
                 _tasks.Add(task);
 
                 var guid = Guid.NewGuid();
-                Logger.Instance.Write($"{guid} | Executing Task {task} | _tasks count: {_tasks.Count}");
                 try
                 {
                     await task;
@@ -262,8 +269,6 @@ namespace RXPatchLib
                     // (I'm not saying that it's right, i just dont know how to fix it right now.)
                     Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
                 }
-
-                Logger.Instance.Write($"{guid} | Task Finished");
 
                 // Update progress
                 progressItem.Finish();
@@ -327,10 +332,15 @@ namespace RXPatchLib
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
+            // This will ensure that all instruction hashes are at the BOTTOM of the order list.
+            // These must be last as these are actions against complete files
+            instructions = instructions.OrderBy(x => x.OldHash != "").ToList();
+
             // Process each instruction in instructions.json
             foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
             {
                 var instruction = pair.Instruction;
+
                 cancellationToken.ThrowIfCancellationRequested();
                 string targetFilePath = Path.Combine(_targetPath, instruction.Path);
 
