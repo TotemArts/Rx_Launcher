@@ -308,7 +308,7 @@ namespace LauncherTwo.Views
                 catch (Exception exception)
                 {
                     StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], exception.Message);
-                    RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}");
+                    RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}\r\n{exception.StackTrace}");
                 }
                 HasFinished = true;
             });
