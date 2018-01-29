@@ -135,14 +135,14 @@ namespace LauncherTwo.Views
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
                 double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
-                return string.Format("{0} / ~{1} {2} ({3} {4}/s - {5:##.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
+                return string.Format("{0} / ~{1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
             }
             else
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
                 double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
-                return string.Format("{0} / {1} {2} ({3} {4}/s - {5:##.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
+                return string.Format("{0} / {1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
             }
         }
 

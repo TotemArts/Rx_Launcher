@@ -43,6 +43,8 @@ namespace RXPatchLib
                 var selectedServer = CurrentHostsList.OrderBy(x => x.ConnectionCount).First();
                 selectedServer.ConnectionCount++;
 
+                RxLogger.Logger.Instance.Write($"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections agaist it");
+
                 return selectedServer.UpdateServer;
             }
         }
