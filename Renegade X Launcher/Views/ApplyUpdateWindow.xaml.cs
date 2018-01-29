@@ -73,19 +73,6 @@ namespace LauncherTwo.Views
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
                 return $"{perc:0.##}%";
             }
-            else if ( progress.DownloadThreads == 0 )
-            {
-                // If downloadThreads are zero, then we must be not in the downloading stage
-                // this will ensure we update the progress string correctly
-                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return $"{perc:0.##}%";
-            }
-            else if ( progress.DownloadThreads > 0 )
-            {
-                // DownloadThreads is above zero, we are in download phase, update the progress string accordingly
-                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return $"Downloading using {progress.DownloadThreads} threads ({perc:0.##}%)";
-            }
             else
             {
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
@@ -147,13 +134,15 @@ namespace LauncherTwo.Views
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
-                return string.Format("{0} / ~{1} {2} ({3} {4}/s)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit);
+                double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
+                return string.Format("{0} / ~{1} {2} ({3} {4}/s - {5:##.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
             }
             else
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
-                return string.Format("{0} / {1} {2} ({3} {4}/s)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit);
+                double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
+                return string.Format("{0} / {1} {2} ({3} {4}/s - {5:##.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
             }
         }
 
@@ -267,6 +256,7 @@ namespace LauncherTwo.Views
         /// Initializes the updatewindow
         /// </summary>
         /// <param name="patchTask">The update task</param>
+        /// <param name="patcher"></param>
         /// <param name="progress"></param>
         /// <param name="targetVersionString">The version to update to</param>
         /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
@@ -341,7 +331,6 @@ namespace LauncherTwo.Views
         {
             _cancellationTokenSource.Cancel();
             this.StatusMessage = "Operation cancelled by User";
-            Application.Current.Shutdown();
         }
 
         private void NotifyPropertyChanged(string propertyName)

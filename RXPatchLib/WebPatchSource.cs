@@ -194,6 +194,7 @@ namespace RXPatchLib
                                 RxLogger.Logger.Instance.Write(
                                     $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
                                 cancellationToken.ThrowIfCancellationRequested();
+                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                                 return e;
                             }
                         });
@@ -202,6 +203,9 @@ namespace RXPatchLib
                     }
                     catch (TooManyRetriesException)
                     {
+
+                        AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
+
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
                         {
@@ -216,6 +220,7 @@ namespace RXPatchLib
                     }
                     catch (HashMistmatchException)
                     {
+                        AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
                         // Try the next best host; throw an exception if there is none
@@ -227,6 +232,7 @@ namespace RXPatchLib
                     }
                     catch (WebException)
                     {
+                        AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
                         {
