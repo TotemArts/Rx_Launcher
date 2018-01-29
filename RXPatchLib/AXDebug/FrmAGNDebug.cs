@@ -19,8 +19,11 @@ namespace RXPatchLib.AXDebug
             if ( InvokeRequired )
                 Invoke(new MethodInvoker(() => AddDownload(guid, filepath, serverUri)));
 
-            string[] clm = {guid.ToString(), filepath, serverUri, "Download Pending", "0"};
-            lstDownloads.Items.Add(new ListViewItem(clm) { Name = guid.ToString() });
+            lock (lstDownloads)
+            {
+                string[] clm = {guid.ToString(), filepath, serverUri, "Download Pending", "0"};
+                lstDownloads.Items.Add(new ListViewItem(clm) {Name = guid.ToString()});
+            }
         }
 
         public void RemoveDownload(Guid guid)
@@ -28,9 +31,12 @@ namespace RXPatchLib.AXDebug
             if (InvokeRequired)
                 Invoke(new MethodInvoker(() => RemoveDownload(guid)));
 
-            var clm = FindListViewItemByName(guid.ToString());
-            if ( clm != null )
-                lstDownloads.Items.Remove(clm);
+            lock (lstDownloads)
+            {
+                var clm = FindListViewItemByName(guid.ToString());
+                if (clm != null)
+                    lstDownloads.Items.Remove(clm);
+            }
         }
 
         public void UpdateDownload(Guid guid, long progress, long fileSize)
@@ -38,17 +44,37 @@ namespace RXPatchLib.AXDebug
             if (InvokeRequired)
                 Invoke(new MethodInvoker(() => UpdateDownload(guid, progress, fileSize)));
 
-            var clm = FindListViewItemByName(guid.ToString());
-            if (clm != null)
+            lock (lstDownloads)
             {
-                clm.SubItems[4].Text = $@"{GetHumanReadableFileSize(progress)}/{GetHumanReadableFileSize(fileSize)}";
-                clm.SubItems[3].Text = "Downloading";
+                var clm = FindListViewItemByName(guid.ToString());
+                if (clm != null)
+                {
+                    clm.SubItems[4].Text =
+                        $@"{GetHumanReadableFileSize(progress)}/{GetHumanReadableFileSize(fileSize)}";
+                    clm.SubItems[3].Text = "Downloading";
+                }
             }
         }
 
         private ListViewItem FindListViewItemByName(string name)
         {
-            return lstDownloads.Items.Find(name, true).DefaultIfEmpty(null).FirstOrDefault();
+            if (InvokeRequired)
+                Invoke(new MethodInvoker(() => FindListViewItemByName(name)));
+
+            lock (lstDownloads)
+            {
+                try
+                {
+                    var retDownload = lstDownloads.Items.Find(name, true).DefaultIfEmpty(null).FirstOrDefault();
+                    return retDownload;
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                return null;
+            }
         }
 
         private string GetHumanReadableFileSize(long input)

@@ -445,20 +445,16 @@ namespace RXPatchLib
                             thisAction.IsActive = true;
                         }
 
-                        Logger.Instance.Write($"Starting action with file size of {thisAction.PatchSize}");
+                        Logger.Instance.Write($"Starting action with file size of  {thisAction.PatchSize}");
                         try
                         {
-                            AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, thisAction.PatchSize.ToString(), thisAction.IsActive.ToString());
                             await thisAction.Execute();
-                            AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         }
                         catch (Exception ex)
                         {
                             Logger.Instance.Write($"Error while attempting to apply a patch, error:\r\n{ex.Message}\r\n{ex.StackTrace}");
-
                             // Throw a new exception to let the gui know.
                             throw new Exception($"Unable to apply patch, we ran into an error\r\n{ex.Message}");
-                            AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         }
                         
                         // Complete this action
