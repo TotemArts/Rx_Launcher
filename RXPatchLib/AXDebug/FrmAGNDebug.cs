@@ -16,13 +16,18 @@ namespace RXPatchLib.AXDebug
          */
         public void AddDownload(Guid guid, string filepath, string serverUri)
         {
-            string[] clm = {guid.ToString(), filepath, serverUri, "Download Pending", "0"};
+            if ( InvokeRequired )
+                Invoke(new MethodInvoker(() => AddDownload(guid, filepath, serverUri)));
 
+            string[] clm = {guid.ToString(), filepath, serverUri, "Download Pending", "0"};
             lstDownloads.Items.Add(new ListViewItem(clm) { Name = guid.ToString() });
         }
 
         public void RemoveDownload(Guid guid)
         {
+            if (InvokeRequired)
+                Invoke(new MethodInvoker(() => RemoveDownload(guid)));
+
             var clm = FindListViewItemByName(guid.ToString());
             if ( clm != null )
                 lstDownloads.Items.Remove(clm);
@@ -30,6 +35,9 @@ namespace RXPatchLib.AXDebug
 
         public void UpdateDownload(Guid guid, long progress, long fileSize)
         {
+            if (InvokeRequired)
+                Invoke(new MethodInvoker(() => UpdateDownload(guid, progress, fileSize)));
+
             var clm = FindListViewItemByName(guid.ToString());
             if (clm != null)
             {

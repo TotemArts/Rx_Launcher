@@ -390,6 +390,7 @@ namespace RXPatchLib
         {
             List<IFilePatchAction> tmpActions = actions.ToList(); // Create a copy of our list
             List<BackgroundWorker> bgWorkers = new List<BackgroundWorker>();
+            var guid = Guid.NewGuid();
 
             // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
@@ -425,24 +426,16 @@ namespace RXPatchLib
                         // Lock our tmpActions variable so we have unique access to it now
                         lock (tmpActions)
                         {
-                            if (tmpActions.Any(k => !k.IsComplete && !k.IsActive && k.PatchSize > 0))
-                            {
+                            if (tmpActions.Any(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize > 0))
                                 // If an action is not complete, not active and is above zero patch size
-                                thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(xx => !xx.IsComplete && !xx.IsActive && xx.PatchSize > 0);
-                            }
+                                thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize > 0);
                             else
-                            {
                                 // We have no actions that are above a patch size of zero, do we have any that are zero that still need doing?
                                 if (tmpActions.Any(l => !l.IsComplete && !l.IsActive && l.PatchSize == 0))
-                                {
-                                    thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(xx => !xx.IsComplete && !xx.IsActive && xx.PatchSize == 0);
-                                }
+                                    thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize == 0);
                                 else
-                                {
                                     // We're done, break out of our loop to close this thread
                                     break;
-                                }
-                            }
 
                             // Grab an action that is not complete, and not active and has a file size
                             
@@ -455,7 +448,9 @@ namespace RXPatchLib
                         Logger.Instance.Write($"Starting action with file size of {thisAction.PatchSize}");
                         try
                         {
+                            AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, thisAction.PatchSize.ToString(), thisAction.IsActive.ToString());
                             await thisAction.Execute();
+                            AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         }
                         catch (Exception ex)
                         {
@@ -463,26 +458,27 @@ namespace RXPatchLib
 
                             // Throw a new exception to let the gui know.
                             throw new Exception($"Unable to apply patch, we ran into an error\r\n{ex.Message}");
-                        }
-
-                        // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
-                        // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
-                        // We have to check for zero, to ensure that the asyncronus method of performing this action
-                        // does not attempt to move/rename/etc a file before it has been actually downloaded.
-                        if (thisAction.PatchSize == 0)
-                        {
-                            secondPhaseProgress.AdvanceItem(1);
-                            progressCallback(secondPhaseProgress);
-                        }
-                        else
-                        {
-                            progress.AdvanceItem(thisAction.PatchSize);
-                            progressCallback(progress);
+                            AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         }
                         
                         // Complete this action
                         lock (tmpActions)
                         {
+                            // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
+                            // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
+                            // We have to check for zero, to ensure that the asyncronus method of performing this action
+                            // does not attempt to move/rename/etc a file before it has been actually downloaded.
+                            if (thisAction.PatchSize == 0)
+                            {
+                                secondPhaseProgress.AdvanceItem(1);
+                                progressCallback(secondPhaseProgress);
+                            }
+                            else
+                            {
+                                progress.AdvanceItem(thisAction.PatchSize);
+                                progressCallback(progress);
+                            }
+
                             thisAction.IsComplete = true;
                             thisAction.IsActive = false;
                         }
