@@ -36,8 +36,8 @@ namespace LauncherTwo
         {
             _launcherVersion = new Version
             {
-                Name = "0.8",
-                Number = 08
+                Name = "0.00",
+                Number = 0
             };
         }
 
@@ -148,7 +148,7 @@ namespace LauncherTwo
                 GamePatchPath = versionData["game"]["patch_path"];
 
                 // Server URL's list & Friendly Names
-                foreach (var x in versionData["game"]["server_urls"].ToObject<dynamic>())
+                foreach (var x in versionData["game"]["mirrors"].ToObject<dynamic>())
                     RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
             }
             catch(Exception ex)
