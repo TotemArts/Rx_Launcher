@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using FirstFloor.ModernUI.Windows.Controls;
 
 namespace LauncherTwo.Views
 {
@@ -73,19 +75,6 @@ namespace LauncherTwo.Views
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
                 return $"{perc:0.##}%";
             }
-            else if ( progress.DownloadThreads == 0 )
-            {
-                // If downloadThreads are zero, then we must be not in the downloading stage
-                // this will ensure we update the progress string correctly
-                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return $"{perc:0.##}%";
-            }
-            else if ( progress.DownloadThreads > 0 )
-            {
-                // DownloadThreads is above zero, we are in download phase, update the progress string accordingly
-                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
-                return $"Downloading using {progress.DownloadThreads} threads ({perc:0.##}%)";
-            }
             else
             {
                 double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
@@ -147,13 +136,15 @@ namespace LauncherTwo.Views
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
-                return string.Format("{0} / ~{1} {2} ({3} {4}/s)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit);
+                double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
+                return string.Format("{0} / ~{1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
             }
             else
             {
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
                 var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
-                return string.Format("{0} / {1} {2} ({3} {4}/s)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit);
+                double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
+                return string.Format("{0} / {1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
             }
         }
 
@@ -267,6 +258,7 @@ namespace LauncherTwo.Views
         /// Initializes the updatewindow
         /// </summary>
         /// <param name="patchTask">The update task</param>
+        /// <param name="patcher"></param>
         /// <param name="progress"></param>
         /// <param name="targetVersionString">The version to update to</param>
         /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
@@ -305,6 +297,8 @@ namespace LauncherTwo.Views
             {
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
+                    if ( _cancellationTokenSource.IsCancellationRequested )
+                        throw new OperationCanceledException();
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;
@@ -318,10 +312,10 @@ namespace LauncherTwo.Views
                 catch (Exception exception)
                 {
                     StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], exception.Message);
-                    RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}");
+                    RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}\r\n{exception.StackTrace}");
                 }
                 HasFinished = true;
-            });
+            }, _cancellationTokenSource.Token);
         }
 
         public void This_Closing(object sender, CancelEventArgs e)
@@ -339,9 +333,17 @@ namespace LauncherTwo.Views
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            _cancellationTokenSource.Cancel();
-            this.StatusMessage = "Operation cancelled by User";
-            Application.Current.Shutdown();
+            ModernDialog areYouSureDialog = new ModernDialog();
+            areYouSureDialog.Title = "Stop Download - Renegade X";
+            areYouSureDialog.Content = "Are you sure you want to stop this download?\r\nYou can come back to it later.";
+            areYouSureDialog.Buttons = new Button[] { areYouSureDialog.YesButton, areYouSureDialog.NoButton };
+            areYouSureDialog.ShowDialog();
+
+            if (areYouSureDialog.DialogResult.Value == true)
+            {
+                _cancellationTokenSource.Cancel();
+                this.StatusMessage = "Operation cancelled by User";
+            }
         }
 
         private void NotifyPropertyChanged(string propertyName)

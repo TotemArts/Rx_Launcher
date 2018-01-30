@@ -71,17 +71,34 @@ namespace LauncherTwo
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-            Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+            Task task = null;
 
-            //Create the update window
-            var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
-            window.Owner = this;
-            //Show the dialog and wait for completion
-            window.ShowDialog();
+            try
+            {
+                task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress,
+                    cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
-            RxLogger.Logger.Instance.Write($"Install complete, task state isCompleted = {task.IsCompleted}");
-            
-            if (task.IsCompleted == true)
+                //Create the update window
+                var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion,
+                    cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
+                window.Owner = this;
+                //Show the dialog and wait for completion
+                window.Show();
+
+                while (!task.IsCompleted)
+                {
+                    await Task.Delay(1000);
+                    if ( cancellationTokenSource.IsCancellationRequested )
+                        task.Dispose();
+                }
+
+                RxLogger.Logger.Instance.Write($"Install complete, task state isCompleted = {task.IsCompleted}");
+            }
+            catch (Exception)
+            {
+            }
+
+            if (task?.IsCompleted == true && task?.Status != TaskStatus.Canceled)
             {
                 VersionCheck.UpdateGameVersion();
                 //Create the UE3 redist dialog
@@ -176,9 +193,11 @@ namespace LauncherTwo
                     notInstalledDialog.ShowDialog();
                     //Shutdown launcher
                     Application.Current.Shutdown();
-
                 }
-
+            }
+            else
+            {
+                Application.Current.Shutdown();
             }
         }
     }

@@ -58,6 +58,7 @@ namespace LauncherTwo
                     Installer x = new Installer();
                     x.Show();
                     x.FirstInstall();
+                    return;
                 }
                 else if(a.StartsWith("--UpdateGame="))//Manually opdate the game to a given URL.
                 {
@@ -81,6 +82,7 @@ namespace LauncherTwo
                     window.ShowDialog();
 
                     VersionCheck.UpdateGameVersion();
+                    return;
                 }
             }
 

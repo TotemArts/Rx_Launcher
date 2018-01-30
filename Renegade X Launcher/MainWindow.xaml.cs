@@ -29,8 +29,7 @@ namespace LauncherTwo
         /// </summary>
         private Boolean _defaultMoviePlays = false;
 
-        public const int ServerRefreshRate = 60; // 60 sec
-        public const int ServerAutoPingRate = 60; // unused
+        public const int ServerRefreshRate = 0; // 60 sec
         public static readonly int MaxPlayerCount = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer _refreshTimer;
@@ -86,17 +85,10 @@ namespace LauncherTwo
             return value ? _chkBoxOnImg : _chkBoxOffImg;
         }
 
-
-        
-
-
         #region -= Filters =-
         private int _filterMaxPlayers = MaxPlayerCount; // Default to max
         private int _filterMinPlayers = 0;
         #endregion -= Filters =-
-
-
-        
 
         public MainWindow()
         {
@@ -106,17 +98,19 @@ namespace LauncherTwo
             {
                 StartCheckingVersions();
 
-                _refreshTimer = new DispatcherTimer();
-                _refreshTimer.Interval = new TimeSpan(0, 0, ServerRefreshRate);
-                _refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
-                _refreshTimer.Start();
+                if (ServerRefreshRate > 0)
+                {
+                    _refreshTimer = new DispatcherTimer();
+                    _refreshTimer.Interval = new TimeSpan(0, 0, ServerRefreshRate);
+                    _refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
+                    _refreshTimer.Start();
+                }
                 StartRefreshingServers();
 
                 if (VersionCheck.GetGameVersionName() == "Unknown")
                 {
                     Properties.Settings.Default.Installed = false;
                     Properties.Settings.Default.Save();
-
 
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game
@@ -218,6 +212,10 @@ namespace LauncherTwo
             }
             else
             {
+                //Get the previous vid that plays and store it. Nullify the playing vid so no handle is open
+                Uri previousVid = sv_MapPreviewVid.Source;
+                sv_MapPreviewVid.Source = null;
+
                 // Close any other instances of the RenX-Launcher
                 if (InstanceHandler.IsAnotherInstanceRunning())
                     InstanceHandler.KillDuplicateInstance();
@@ -241,6 +239,13 @@ namespace LauncherTwo
 
                 VersionCheck.UpdateGameVersion();
                 wasUpdated = true;
+
+                //Resume playback of vid
+                sv_MapPreviewVid.Source = previousVid;
+                sv_MapPreviewVid.Play();
+
+                // Refresh server list
+                StartRefreshingServers();
             }
         }
 

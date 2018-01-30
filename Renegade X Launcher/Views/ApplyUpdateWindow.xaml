@@ -18,7 +18,7 @@
     MinWidth="0"
     MaxWidth="600"
     ResizeMode="NoResize"
-    Closing="This_Closing">
+    Closing="This_Closing" Width="560">
     <Window.Resources>
         <Style x:Key="MinimizeTitleBarButton" TargetType="UserControl"/>
         <Style x:Key="MaximizeTitleBarButton" TargetType="UserControl"/>
@@ -47,7 +47,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="350"/>
                 </Grid.ColumnDefinitions>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="0" Content="Validating"/>
                 <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="0" Content="Downloading"/>
@@ -55,18 +55,16 @@
                 <ProgressBar Grid.Row="0" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
                 <ProgressBar Grid.Row="1" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Load, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
                 <ProgressBar Grid.Row="2" Grid.Column="1" Height="15" IsIndeterminate="{Binding ProgressReport.Apply, Converter={StaticResource PhaseIsIndeterminateConverter}}" Value="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressPercentageConverter}}"/>
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="2" Content="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressStringConverter}}"/>
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding LoadProgressWithSpeed, Converter={StaticResource PhaseProgressWithSpeedStringConverter}}"/>
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}"/>
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="0"  Content="Sources"  Background="Transparent" BorderThickness="0" />
-                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="{Binding ProgressReport.Load, Converter={StaticResource PhaseProgressStringConverter}}" Background="Transparent" BorderThickness="0" Padding="0,5,5,5"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="0" Grid.Column="2" Content="{Binding ProgressReport.Analyze, Converter={StaticResource PhaseProgressStringConverter}}" Margin="0,0,87,0"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="1" Grid.Column="2" Content="{Binding LoadProgressWithSpeed, Converter={StaticResource PhaseProgressWithSpeedStringConverter}}" Margin="0,0,87,0"/>
+                <Label Foreground="{DynamicResource RenXFontColorBrush}" Grid.Row="2" Grid.Column="2" Content="{Binding ProgressReport.Apply, Converter={StaticResource PhaseProgressStringConverter}}" Margin="0,0,87,0"/>
             </Grid>
         </Grid>
         
         <Grid>
             <FrameworkElement Height="10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Foreground="{DynamicResource RenXFontColorBrush}"  Margin="0,0,20,0" Width="70" Click="Cancel_Click" IsCancel="True" Content="Cancel" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>
+                <Button Foreground="{DynamicResource RenXFontColorBrush}"  Margin="0,0,20,0" Width="101" Click="Cancel_Click" IsCancel="True" Content="Stop Download" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>
                 <!--<Button Foreground="{DynamicResource RenXFontColorBrush}" Width="70" Click="Pause_Click" IsCancel="True" Content="Pause" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}" IsEnabled="{Binding IsCancellationPossible}"/>-->
                 <Button Foreground="{DynamicResource RenXFontColorBrush}" Margin="20,0,0,0"  Width="70" Click="Close_Click" IsDefault="True" Content="Close" Visibility="{Binding HasFinished, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>

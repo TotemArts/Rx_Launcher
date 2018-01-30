@@ -9,12 +9,45 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
+
+    public class UpdateServerSelectorObject
+    {
+        public UpdateServerEntry UpdateServer; // stores the update server object for the server in question
+        public int ConnectionCount; //Stores the amount of times this server was used, it's used for selecting the next best server
+
+        public UpdateServerSelectorObject(UpdateServerEntry updateServerEntry)
+        {
+            UpdateServer = updateServerEntry;
+        }
+    }
+
     public class UpdateServerSelector
     {
         CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private const string TestFile = "10kb_file";
         public Queue<UpdateServerEntry> Hosts;
+        private readonly List<UpdateServerSelectorObject> CurrentHostsList = new List<UpdateServerSelectorObject>();
+
+        /// <summary>
+        /// Gets the next UpdateServerEntry that has the least amount of connections to it
+        /// </summary>
+        /// <returns></returns>
+        public UpdateServerEntry GetNextAvailableServerEntry()
+        {
+            if (CurrentHostsList.Count == 0)
+                return null;
+
+            lock (CurrentHostsList)
+            {
+                var selectedServer = CurrentHostsList.OrderBy(x => x.ConnectionCount).First();
+                selectedServer.ConnectionCount++;
+
+                RxLogger.Logger.Instance.Write($"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections agaist it");
+
+                return selectedServer.UpdateServer;
+            }
+        }
 
         public async Task<bool> QueryHost(UpdateServerEntry hostObject)
         {
@@ -39,7 +72,13 @@ namespace RXPatchLib
             if (response == System.Net.HttpStatusCode.OK)
             {
                 lock (Hosts)
+                {
                     Hosts.Enqueue(hostObject);
+
+                    // Only add the top 4 hosts into this list
+                    if (CurrentHostsList.Count < 4)
+                            CurrentHostsList.Add(new UpdateServerSelectorObject(hostObject));
+                }   
 
                 RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue");
 

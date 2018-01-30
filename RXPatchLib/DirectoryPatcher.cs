@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -49,7 +50,7 @@ namespace RXPatchLib
             string targetPath = _directoryPatcher.GetTargetPath(_subPath);
             string backupPath = _directoryPatcher.GetBackupPath(_subPath);
 
-            RxLogger.Logger.Instance.Write($"RemoveAction - {targetPath} - {backupPath}");
+            Logger.Instance.Write($"RemoveAction - {targetPath} - {backupPath}");
 
             // Deletes or moves the file to backupPath, if it exists
             if (File.Exists(targetPath))
@@ -103,7 +104,7 @@ namespace RXPatchLib
             string targetPath = _directoryPatcher.GetTargetPath(_subPath);
             string patchPath = _directoryPatcher.PatchSource.GetSystemPath(_patchSubPath);
 
-            RxLogger.Logger.Instance.Write($"DeltaPatchAction - {tempPath} - {targetPath} - {patchPath}");
+            Logger.Instance.Write($"DeltaPatchAction - {tempPath} - {targetPath} - {patchPath}");
 
             // Ensure the temp directory exists, and generate the new file based on the old file and the delta
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
@@ -149,7 +150,7 @@ namespace RXPatchLib
             string targetPath = _directoryPatcher.GetTargetPath(_subPath);
             string backupPath = _directoryPatcher.GetBackupPath(_subPath);
 
-            RxLogger.Logger.Instance.Write($"FullReplaceAction - {tempPath} - {newPath} - {targetPath} - {backupPath}");
+            Logger.Instance.Write($"FullReplaceAction - {tempPath} - {newPath} - {targetPath} - {backupPath}");
 
             // Ensure the temp directory exists, and decompress the file
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
@@ -205,10 +206,17 @@ namespace RXPatchLib
         {
             string targetPath = _directoryPatcher.GetTargetPath(_subPath);
 
-            RxLogger.Logger.Instance.Write($"ModifiedTimeReplaceAction - {targetPath}");
+            Logger.Instance.Write($"ModifiedTimeReplaceAction - {targetPath} - {_lastWriteTime.ToString(CultureInfo.InvariantCulture)}");
 
             // Update LastWriteTime
-            new FileInfo(targetPath).LastWriteTimeUtc = _lastWriteTime;
+            try
+            {
+                new FileInfo(targetPath).LastWriteTimeUtc = _lastWriteTime;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Write($"ModifiedTimeReplaceAction encountered an error\r\n{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
+            }
 
             return TaskExtensions.CompletedTask;
         }
@@ -250,7 +258,6 @@ namespace RXPatchLib
                 _tasks.Add(task);
 
                 var guid = Guid.NewGuid();
-                RxLogger.Logger.Instance.Write($"{guid} | Executing Task {task} | _tasks count: {_tasks.Count}");
                 try
                 {
                     await task;
@@ -260,11 +267,8 @@ namespace RXPatchLib
                     // The RenX client seems to crash around here when the cancel button is pressed
                     // while it does crash, it does however achieve our goal of stopping the download
                     // (I'm not saying that it's right, i just dont know how to fix it right now.)
-                    RxLogger.Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
+                    Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
                 }
-                _cancellationToken.ThrowIfCancellationRequested();
-
-                RxLogger.Logger.Instance.Write($"{guid} | Task Finished");
 
                 // Update progress
                 progressItem.Finish();
@@ -304,18 +308,6 @@ namespace RXPatchLib
             PatchSource = patchSource;
         }
 
-        private class InstructionModel
-        {
-            public FilePatchInstruction Instruction;
-            public long Size;
-
-            public InstructionModel(FilePatchInstruction x, long y)
-            {
-                Instruction = x;
-                Size = y;
-            }
-        }
-
         internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructions_hash)
         {
             // Download instructions
@@ -340,10 +332,15 @@ namespace RXPatchLib
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
+            // This will ensure that all instruction hashes are at the BOTTOM of the order list.
+            // These must be last as these are actions against complete files
+            instructions = instructions.OrderBy(x => x.OldHash != "").ToList();
+
             // Process each instruction in instructions.json
             foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
             {
                 var instruction = pair.Instruction;
+
                 cancellationToken.ThrowIfCancellationRequested();
                 string targetFilePath = Path.Combine(_targetPath, instruction.Path);
 
@@ -399,10 +396,11 @@ namespace RXPatchLib
             }
         }
 
-        private static async Task Apply(List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
+        private static async Task Apply(CancellationToken cancellationToken, List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
             List<IFilePatchAction> tmpActions = actions.ToList(); // Create a copy of our list
             List<BackgroundWorker> bgWorkers = new List<BackgroundWorker>();
+            var guid = Guid.NewGuid();
 
             // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
@@ -415,22 +413,22 @@ namespace RXPatchLib
 
             // Create our workers, but clamp the value to 4, we dont want to cook peoples PC's
             // (on testing with using all cores, it maxed out my 24 core server, but it did patch in about 30 seconds!)
-            RxLogger.Logger.Instance.Write(
-                $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > 4 ? 4 : Environment.ProcessorCount)} of them");
+            Logger.Instance.Write(
+                $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount)} of them");
 
             for (var i = 0; i < (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount); i++)
             {
-                RxLogger.Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
-                bgWorkers.Add(new BackgroundWorker());
+                Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
+                bgWorkers.Add(new BackgroundWorker() {WorkerSupportsCancellation = true});
             }
 
-            foreach (var x in bgWorkers)
+            foreach (var backgroundWorker in bgWorkers)
             {
-                RxLogger.Logger.Instance.Write($"Assigning DoWork methods to bgworker");
-                x.DoWork += async (sender, args) =>
+                Logger.Instance.Write($"Assigning DoWork methods to bgworker");
+                backgroundWorker.DoWork += async (sender, args) =>
                 {
                     // While there are still some in the array to use.
-                    while (tmpActions.Any(checker => !checker.IsComplete) && !x.CancellationPending)
+                    while (tmpActions.Any(checker => !checker.IsComplete) && !backgroundWorker.CancellationPending && !backgroundWorker.CancellationPending)
                     {
                         // Execute action
                         IFilePatchAction thisAction;
@@ -438,24 +436,16 @@ namespace RXPatchLib
                         // Lock our tmpActions variable so we have unique access to it now
                         lock (tmpActions)
                         {
-                            if (tmpActions.Any(k => !k.IsComplete && !k.IsActive && k.PatchSize > 0))
-                            {
+                            if (tmpActions.Any(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize > 0))
                                 // If an action is not complete, not active and is above zero patch size
-                                thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(xx => !xx.IsComplete && !xx.IsActive && xx.PatchSize > 0);
-                            }
+                                thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize > 0);
                             else
-                            {
                                 // We have no actions that are above a patch size of zero, do we have any that are zero that still need doing?
                                 if (tmpActions.Any(l => !l.IsComplete && !l.IsActive && l.PatchSize == 0))
-                                {
-                                    thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(xx => !xx.IsComplete && !xx.IsActive && xx.PatchSize == 0);
-                                }
+                                    thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize == 0);
                                 else
-                                {
                                     // We're done, break out of our loop to close this thread
                                     break;
-                                }
-                            }
 
                             // Grab an action that is not complete, and not active and has a file size
                             
@@ -465,41 +455,59 @@ namespace RXPatchLib
                             thisAction.IsActive = true;
                         }
 
-                        RxLogger.Logger.Instance.Write($"Starting action with file size of {thisAction.PatchSize}");
-                        await thisAction.Execute();
-
-                        // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
-                        // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
-                        // We have to check for zero, to ensure that the asyncronus method of performing this action
-                        // does not attempt to move/rename/etc a file before it has been actually downloaded.
-                        if (thisAction.PatchSize == 0)
+                        Logger.Instance.Write($"Starting action with file size of  {thisAction.PatchSize}");
+                        try
                         {
-                            secondPhaseProgress.AdvanceItem(1);
-                            progressCallback(secondPhaseProgress);
+                            await thisAction.Execute();
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            progress.AdvanceItem(thisAction.PatchSize);
-                            progressCallback(progress);
+                            Logger.Instance.Write($"Error while attempting to apply a patch, error:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                            // Throw a new exception to let the gui know.
+                            throw new Exception($"Unable to apply patch, we ran into an error\r\n{ex.Message}");
                         }
                         
                         // Complete this action
                         lock (tmpActions)
                         {
+                            // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
+                            // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
+                            // We have to check for zero, to ensure that the asyncronus method of performing this action
+                            // does not attempt to move/rename/etc a file before it has been actually downloaded.
+                            if (thisAction.PatchSize == 0)
+                            {
+                                secondPhaseProgress.AdvanceItem(1);
+                                progressCallback(secondPhaseProgress);
+                            }
+                            else
+                            {
+                                progress.AdvanceItem(thisAction.PatchSize);
+                                progressCallback(progress);
+                            }
+
                             thisAction.IsComplete = true;
                             thisAction.IsActive = false;
                         }
                     }
 
-                    RxLogger.Logger.Instance.Write("Background worker terminated");
+                    Logger.Instance.Write("Background worker terminated");
                 };
 
-                x.RunWorkerAsync();
+                backgroundWorker.RunWorkerAsync();
             }
 
-            while (tmpActions.Any(x => !x.IsComplete))
+            while (tmpActions.Any(action => !action.IsComplete))
             {
                 await Task.Delay(1000);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    foreach (var bgWorker in bgWorkers)
+                    {
+                        bgWorker.CancelAsync();
+                    }
+
+                    break;
+                }
             }
 
             // Dispose of all of our workers
@@ -533,7 +541,7 @@ namespace RXPatchLib
             await loadPhase.AwaitAllTasksAndFinish();
 
             // Apply the new files
-            await Apply(actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
+            await Apply(cancellationToken, actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
         }
     }
 }
