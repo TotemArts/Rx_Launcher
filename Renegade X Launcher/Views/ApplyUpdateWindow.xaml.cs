@@ -336,7 +336,7 @@ namespace LauncherTwo.Views
             ModernDialog areYouSureDialog = new ModernDialog();
             areYouSureDialog.Title = "Stop Download - Renegade X";
             areYouSureDialog.Content = "Are you sure you want to stop this download?\r\nYou can come back to it later.";
-            areYouSureDialog.Buttons = new Button[] { areYouSureDialog.OkButton, areYouSureDialog.CancelButton };
+            areYouSureDialog.Buttons = new Button[] { areYouSureDialog.YesButton, areYouSureDialog.NoButton };
             areYouSureDialog.ShowDialog();
 
             if (areYouSureDialog.DialogResult.Value == true)
