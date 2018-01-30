@@ -134,12 +134,15 @@ namespace LauncherTwo
                         "cd /D \"" + Path.GetTempPath() + "\"",
 
                         // Wait for the launcher to close.
-                        ":wait_for_close",
-                        "tasklist /FI \"PID eq " + pidString + "\" /FO csv /NH | find \"\"\"" + pidString + "\"\"\" > nul",
-                        "if not errorlevel 1 (",
-                        "    timeout /t 1 > nul",
-                        "    goto :wait_for_close",
-                        ")",
+                        //":wait_for_close",
+                        //"tasklist /FI \"PID eq " + pidString + "\" /FO csv /NH | find \"\"\"" + pidString + "\"\"\" > nul",
+                        //"if not errorlevel 1 (",
+                        //"    timeout /t 1 > nul",
+                        //"    goto :wait_for_close",
+                        //")",
+
+                        // Kill the process
+                        "taskkill /PID " + pidString + " /F",
 
                         // Clean up possible left behind files from previous installation attempt. (If it fails, abort update.)
                         "set patch_result=1",
