@@ -396,7 +396,7 @@ namespace RXPatchLib
             }
         }
 
-        private static async Task Apply(List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
+        private static async Task Apply(CancellationToken cancellationToken, List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
             List<IFilePatchAction> tmpActions = actions.ToList(); // Create a copy of our list
             List<BackgroundWorker> bgWorkers = new List<BackgroundWorker>();
@@ -419,7 +419,7 @@ namespace RXPatchLib
             for (var i = 0; i < (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount); i++)
             {
                 Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
-                bgWorkers.Add(new BackgroundWorker());
+                bgWorkers.Add(new BackgroundWorker() {WorkerSupportsCancellation = true});
             }
 
             foreach (var backgroundWorker in bgWorkers)
@@ -428,7 +428,7 @@ namespace RXPatchLib
                 backgroundWorker.DoWork += async (sender, args) =>
                 {
                     // While there are still some in the array to use.
-                    while (tmpActions.Any(checker => !checker.IsComplete) && !backgroundWorker.CancellationPending)
+                    while (tmpActions.Any(checker => !checker.IsComplete) && !backgroundWorker.CancellationPending && !backgroundWorker.CancellationPending)
                     {
                         // Execute action
                         IFilePatchAction thisAction;
@@ -499,6 +499,15 @@ namespace RXPatchLib
             while (tmpActions.Any(action => !action.IsComplete))
             {
                 await Task.Delay(1000);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    foreach (var bgWorker in bgWorkers)
+                    {
+                        bgWorker.CancelAsync();
+                    }
+
+                    break;
+                }
             }
 
             // Dispose of all of our workers
@@ -532,7 +541,7 @@ namespace RXPatchLib
             await loadPhase.AwaitAllTasksAndFinish();
 
             // Apply the new files
-            await Apply(actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
+            await Apply(cancellationToken, actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
         }
     }
 }

@@ -41,7 +41,7 @@ namespace RXPatchLib
 
         public void Dispose()
         {
-            Debug.Assert(Task.WhenAll(_loadTasks.Values).IsCompleted);
+            //Debug.Assert(Task.WhenAll(_loadTasks.Values).IsCompleted);
         }
 
         public string GetSystemPath(string subPath)
@@ -136,6 +136,13 @@ namespace RXPatchLib
                     // Notify our debug window of a downloads progress
                     AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
                 };
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    RxLogger.Logger.Instance.Write($"Web client for {subPath} starting to shutdown due to Cancellation Requested");
+                    webClient.Dispose();
+                    return;
+                }
 
                 // goto labels are the devil, you should be ashamed of using this, whoever you are. :P
                 new_host_selected:

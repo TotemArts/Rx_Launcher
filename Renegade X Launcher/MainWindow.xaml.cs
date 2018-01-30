@@ -86,17 +86,10 @@ namespace LauncherTwo
             return value ? _chkBoxOnImg : _chkBoxOffImg;
         }
 
-
-        
-
-
         #region -= Filters =-
         private int _filterMaxPlayers = MaxPlayerCount; // Default to max
         private int _filterMinPlayers = 0;
         #endregion -= Filters =-
-
-
-        
 
         public MainWindow()
         {
@@ -116,7 +109,6 @@ namespace LauncherTwo
                 {
                     Properties.Settings.Default.Installed = false;
                     Properties.Settings.Default.Save();
-
 
                     #region PrimaryStartupInstallation
                     //Show the dialog that asks to install the game

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using FirstFloor.ModernUI.Windows.Controls;
 
 namespace LauncherTwo.Views
 {
@@ -295,6 +297,8 @@ namespace LauncherTwo.Views
             {
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
+                    if ( _cancellationTokenSource.IsCancellationRequested )
+                        throw new OperationCanceledException();
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;
@@ -311,7 +315,7 @@ namespace LauncherTwo.Views
                     RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}\r\n{exception.StackTrace}");
                 }
                 HasFinished = true;
-            });
+            }, _cancellationTokenSource.Token);
         }
 
         public void This_Closing(object sender, CancelEventArgs e)
@@ -329,8 +333,17 @@ namespace LauncherTwo.Views
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            _cancellationTokenSource.Cancel();
-            this.StatusMessage = "Operation cancelled by User";
+            ModernDialog areYouSureDialog = new ModernDialog();
+            areYouSureDialog.Title = "Stop Download - Renegade X";
+            areYouSureDialog.Content = "Are you sure you want to stop this download?\r\nYou can come back to it later.";
+            areYouSureDialog.Buttons = new Button[] { areYouSureDialog.OkButton, areYouSureDialog.CancelButton };
+            areYouSureDialog.ShowDialog();
+
+            if (areYouSureDialog.DialogResult.Value == true)
+            {
+                _cancellationTokenSource.Cancel();
+                this.StatusMessage = "Operation cancelled by User";
+            }
         }
 
         private void NotifyPropertyChanged(string propertyName)
