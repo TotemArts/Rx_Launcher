@@ -198,10 +198,6 @@ namespace LauncherTwo
 
         void ShowGameUpdateWindow(out bool wasUpdated)
         {
-            //Get the previous vid that plays and store it. Nullify the playing vid so no handle is open
-            Uri previousVid = sv_MapPreviewVid.Source;
-            sv_MapPreviewVid.Source = null;
-
             RxLogger.Logger.Instance.Write("Showing game update window");
             UpdateAvailableWindow theWindow = new UpdateAvailableWindow();
             theWindow.LatestVersionText.Content = VersionCheck.GetLatestGameVersionName();
@@ -216,6 +212,10 @@ namespace LauncherTwo
             }
             else
             {
+                //Get the previous vid that plays and store it. Nullify the playing vid so no handle is open
+                Uri previousVid = sv_MapPreviewVid.Source;
+                sv_MapPreviewVid.Source = null;
+
                 // Close any other instances of the RenX-Launcher
                 if (InstanceHandler.IsAnotherInstanceRunning())
                     InstanceHandler.KillDuplicateInstance();
@@ -239,11 +239,14 @@ namespace LauncherTwo
 
                 VersionCheck.UpdateGameVersion();
                 wasUpdated = true;
-            }
 
-            //Resume playback of vid
-            sv_MapPreviewVid.Source = previousVid;
-            sv_MapPreviewVid.Play();
+                //Resume playback of vid
+                sv_MapPreviewVid.Source = previousVid;
+                sv_MapPreviewVid.Play();
+
+                // Refresh server list
+                StartRefreshingServers();
+            }
         }
 
         void DownloadLauncherUpdate(out bool updateInstallPending)
