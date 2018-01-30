@@ -198,7 +198,7 @@ namespace RXPatchLib
                                 if (errorResponse.StatusCode >= (HttpStatusCode) 400 && errorResponse.StatusCode < (HttpStatusCode) 500)
                                 {
                                     // 400 class errors will never resolve; do not retry
-                                    throw new TooManyRetriesException();
+                                    throw new TooManyRetriesException(new List<Exception>(){ e });
                                 }
 
                                 return e;
