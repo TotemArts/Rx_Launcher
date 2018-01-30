@@ -141,7 +141,7 @@ namespace LauncherTwo
                         //"    goto :wait_for_close",
                         //")",
 
-                        // Kill the process
+                        // Kill the process, why did we wait for it in the first place? - this is easier and less error prone
                         "taskkill /PID " + pidString + " /F",
 
                         // Clean up possible left behind files from previous installation attempt. (If it fails, abort update.)

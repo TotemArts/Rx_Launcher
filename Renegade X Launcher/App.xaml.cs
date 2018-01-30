@@ -19,7 +19,7 @@ namespace LauncherTwo
         public void StartupApp(object sender, StartupEventArgs e)
         {
             //Determine if the permissionChange is succesfull after launcher update
-            bool isGoodUpdate = false;
+            bool didTryUpdate = false;
             bool isLogging = false;
 
             Logger.Instance.Write("Application starting up...");
@@ -33,6 +33,7 @@ namespace LauncherTwo
                 }
                 if (a.StartsWith("--patch-result="))
                 {
+                    didTryUpdate = true;
                     string code = a.Substring("--patch-result=".Length);
                     Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
                     //If the code !=0 -> there is something wrong with the patching of the launcher
@@ -44,7 +45,7 @@ namespace LauncherTwo
                     {
                         try {
                             SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());
-                            isGoodUpdate = true; //Set isGoodUpdate to true to indicate correct permissionChange
+                             //Set isGoodUpdate to true to indicate correct permissionChange
                         }
                         catch (Exception ex)
                         {
@@ -105,9 +106,9 @@ namespace LauncherTwo
             }
             */
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
-            if (e.Args.Length == 0 || isGoodUpdate || isLogging)
+            if (e.Args.Length == 0 || didTryUpdate || isLogging)
             {
-                if (InstanceHandler.IsAnotherInstanceRunning() && !isGoodUpdate)
+                if (InstanceHandler.IsAnotherInstanceRunning() && !didTryUpdate)
                 {
                     MessageBox.Show("Error:\nUnable to start Renegade-X Launcher: Another instance is already running!",
                         "Renegade-X Launcher", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
