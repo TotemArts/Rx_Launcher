@@ -150,15 +150,16 @@ namespace RXPatchLib
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     RetryStrategy retryStrategy = new RetryStrategy();
+                    UpdateServerEntry thisPatchServer = null;
                     try
                     {
                         await retryStrategy.Run(async () =>
                         {
                             try
                             {
-                                var thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
+                                thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
                                 if (thisPatchServer == null)
-                                    throw new Exception("Unable to find a suitable update server");
+                                    throw new NoReliableHostException();
 
                                 // Add a new download to the debugging window
                                 AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
@@ -192,6 +193,14 @@ namespace RXPatchLib
                                     $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
                                 cancellationToken.ThrowIfCancellationRequested();
                                 AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
+
+                                HttpWebResponse errorResponse = e.Response as HttpWebResponse;
+                                if (errorResponse.StatusCode >= (HttpStatusCode) 400 && errorResponse.StatusCode < (HttpStatusCode) 500)
+                                {
+                                    // 400 class errors will never resolve; do not retry
+                                    throw new TooManyRetriesException();
+                                }
+
                                 return e;
                             }
                         });
@@ -200,8 +209,11 @@ namespace RXPatchLib
                     }
                     catch (TooManyRetriesException)
                     {
-
                         AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
+
+                        // Mark current mirror failed
+                        if (thisPatchServer != null)
+                            thisPatchServer.HasErrored = true;
 
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
@@ -220,27 +232,16 @@ namespace RXPatchLib
                         AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
+                        // Mark current mirror failed
+                        if (thisPatchServer != null)
+                            thisPatchServer.HasErrored = true;
+
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
                             throw new NoReliableHostException();
 
                         // Reset progress and requeue download
                         await LoadNew(subPath, hash, cancellationToken, progressCallback);
-                    }
-                    catch (WebException)
-                    {
-                        AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
-                        // Try the next best host; throw an exception if there is none
-                        if (_patcher.PopHost() == null)
-                        {
-                            // Unlock download to leave in clean state.
-                            UnlockDownload();
-
-                            throw new NoReliableHostException();
-                        }
-
-                        // Proceed execution with next mirror
-                        goto new_host_selected;
                     }
                 }
             }
