@@ -168,8 +168,8 @@ namespace RXPatchLib
                                 thisPatchServer.IsUsed = true;
 
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(new Uri($"{_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+                                RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
+                                await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
 
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
 
@@ -193,6 +193,8 @@ namespace RXPatchLib
                                     $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
                                 cancellationToken.ThrowIfCancellationRequested();
                                 AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
+
+                                if (thisPatchServer != null) thisPatchServer.HasErrored = true;
 
                                 HttpWebResponse errorResponse = e.Response as HttpWebResponse;
                                 if (errorResponse.StatusCode >= (HttpStatusCode) 400 && errorResponse.StatusCode < (HttpStatusCode) 500)
