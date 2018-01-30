@@ -10,6 +10,17 @@ namespace RXPatchLib
 {
     public class Sha256
     {
+        public static string GetFileHash(string path)
+        {
+            if (!File.Exists(path))
+                return null;
+
+            using (var stream = File.OpenRead(path))
+            {
+                return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(stream)).Replace("-", string.Empty);
+            }
+        }
+
         public static async Task<string> GetFileHashAsync(string path)
         {
             if (!File.Exists(path))

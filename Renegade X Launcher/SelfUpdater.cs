@@ -200,12 +200,8 @@ namespace LauncherTwo
             {
                 _updaterWindow.StatusLabel.Content = "Download Finished; verifying...";
 
-                // Generate SHA256 hash of the download
-                Task<string> hashTask = RXPatchLib.Sha256.GetFileHashAsync(GetSavePath());
-                hashTask.Wait();
-
                 // Verify the hash of the download
-                if (hashTask.Result == _patchHash || _patchHash == "")
+                if (_patchHash == "" || _patchHash == RXPatchLib.Sha256.GetFileHash(GetSavePath()))
                 {
                     // Download valid; begin extraction
                     StartExtract();
