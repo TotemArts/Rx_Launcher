@@ -60,13 +60,7 @@ namespace LauncherTwo
                 arguments += " -nomoviestartup"; 
             }
 
-            //Pinpoint location of quote error
-            //Arguments += " -ini:UDKGame:DefaultPlayer.Name=\"" + Username + "\"";
-            //End quote error
-
-            //Fix for quote error
-            arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username + "";
-            //End Fix
+            arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username.Replace(' ', '\u00A0');
             return arguments;
         }
 
