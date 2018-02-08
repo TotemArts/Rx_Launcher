@@ -92,7 +92,6 @@ namespace SelfUpdateExecutor
         static void Error(string message)
         {
             Console.Error.WriteLine(message);
-            System.Threading.Thread.Sleep(1500);
         }
 
         /**
