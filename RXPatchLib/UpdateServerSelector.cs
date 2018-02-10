@@ -51,9 +51,9 @@ namespace RXPatchLib
 
                 // Take the top 4 servers
                 var selectedServers = CurrentHostsList.Take(ServerRecordsToTake).ToList();
-                if (selectedServers != null && selectedServers.Count > 0)
+                if (selectedServers.Count > 0)
                 {
-                    // Order them by connection count, take the first one or return null if there isnt
+                    // Order them by connection count, take the first one or return null if there isnt any left
                     var selectedServer = selectedServers.OrderBy(x => x.ConnectionCount).DefaultIfEmpty(null).FirstOrDefault();
 
                     // If we didnt get null, ++ connection count and return it, otherwise return null
