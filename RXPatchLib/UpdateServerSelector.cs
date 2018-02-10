@@ -35,14 +35,13 @@ namespace RXPatchLib
         /// <returns></returns>
         public UpdateServerEntry GetNextAvailableServerEntry()
         {
-            var erroredServerCount = 0;
             var ServerRecordsToTake = 4;
-
-            if (CurrentHostsList.Count == 0)
-                return null;
 
             lock (CurrentHostsList)
             {
+                if (CurrentHostsList.Count == 0)
+                    return null;
+
                 // Remove any server that has errored
                 CurrentHostsList.RemoveAll(server => server.UpdateServer.HasErrored);
 
@@ -104,7 +103,7 @@ namespace RXPatchLib
 
                     // We can keep track of the list via this, including connection count
                     CurrentHostsList.Add(new UpdateServerSelectorObject(hostObject));
-                }   
+                }
 
                 RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue");
 

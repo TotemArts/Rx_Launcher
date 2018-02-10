@@ -45,7 +45,6 @@ namespace LauncherTwo
                     {
                         try {
                             SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());
-                             //Set isGoodUpdate to true to indicate correct permissionChange
                         }
                         catch (Exception ex)
                         {
@@ -106,6 +105,7 @@ namespace LauncherTwo
             }
             */
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
+            // didTryUpdate - If we tried an update, we have args, so we need to check this as well to make the main window load.
             if (e.Args.Length == 0 || didTryUpdate || isLogging)
             {
                 if (InstanceHandler.IsAnotherInstanceRunning() && !didTryUpdate)
