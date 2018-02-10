@@ -37,11 +37,11 @@ namespace LauncherTwo
                     string code = a.Substring("--patch-result=".Length);
                     Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
                     //If the code !=0 -> there is something wrong with the patching of the launcher
-                    if (code != "0")
+                    if (code != "0" && code != "Success")
                     {
                         MessageBox.Show(string.Format("Failed to update the launcher (code {0}).\n\nPlease close any applications related to Renegade-X and try again.", code), "Patch failed", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    else//Otherwise -> change folderpermissions and afterwards launch the launcher
+                    else // Otherwise -> change folderpermissions and afterwards launch the launcher
                     {
                         try {
                             SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());

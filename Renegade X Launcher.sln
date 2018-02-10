@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebAPI", "SteamWebAPI-master\SteamWebAPI.csproj", "{D846D108-D95B-4488-BA01-E487DA220C17}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Renegade X Installer", "Renegade X Installer\Renegade X Installer.wixproj", "{1081A06F-6D2C-46A8-8EEC-E30C54E29093}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxLogger", "RxLogger\RxLogger.csproj", "{407A95B5-B682-4785-9813-49B5FB614C8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfUpdateExecutor", "SelfUpdateExecutor\SelfUpdateExecutor.csproj", "{07AA9339-2F27-466D-A69A-FCB4E5B04F92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,14 @@ Global
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Release|x86.ActiveCfg = Release|Any CPU
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Release|x86.Build.0 = Release|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|x86.Build.0 = Debug|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|x86.ActiveCfg = Release|Any CPU
+		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
