@@ -3,6 +3,9 @@ Remove-Item "bin" -Recurse -ErrorAction Ignore
 Remove-Item "RXPatch-bin" -Recurse -ErrorAction Ignore
 ROBOCOPY "Renegade X Launcher/bin/Release" "bin" *.dll *.exe *.config /S /XF *.vshost*
 
+# Copy self updater to /bin
+ROBOCOPY "SelfUpdateExecutor/bin/Release" "bin" *.dll *.exe /S /XF *.vshost*
+
 # Copy patcher binaries to /RXPatch-bin
 ROBOCOPY "RXPatch/bin/Release" "RXPatch-bin" *.dll *.exe *.config /S /XF *.vshost*
 
