@@ -156,9 +156,9 @@ namespace RXPatchLib
                         await retryStrategy.Run(async () =>
                         {
                             try
-                            {                                
+                            {
                                 if (thisPatchServer == null)
-                                    throw new Exception("Unable to find a suitable update server");
+                                    throw new NoReliableHostException();
 
                                 // Add a new download to the debugging window
                                 AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
