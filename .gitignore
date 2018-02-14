@@ -4,6 +4,7 @@
 /RXPatch-bin
 /launcher*.zip
 /launcher-hash.txt
+/*.msi
 
 # /RXPatch/
 /RXPatch/bin
