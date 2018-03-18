@@ -100,6 +100,10 @@ namespace RXPatchLib
         {
             string filePath = GetSystemPath(subPath);
             var guid = Guid.NewGuid();
+            var thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
+
+            if (thisPatchServer == null)
+                throw new NoReliableHostException();
 
             // Check if the file exists
             if (File.Exists(filePath))
@@ -143,24 +147,19 @@ namespace RXPatchLib
                     webClient.Dispose();
                     return;
                 }
-
+                
                 // goto labels are the devil, you should be ashamed of using this, whoever you are. :P
                 new_host_selected:
 
                 using (cancellationToken.Register(() => webClient.CancelAsync()))
                 {
                     RetryStrategy retryStrategy = new RetryStrategy();
-                    UpdateServerEntry thisPatchServer = null;
                     try
                     {
                         await retryStrategy.Run(async () =>
                         {
                             try
                             {
-                                thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
-                                if (thisPatchServer == null)
-                                    throw new NoReliableHostException();
-
                                 // Add a new download to the debugging window
                                 AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
 
@@ -193,14 +192,6 @@ namespace RXPatchLib
                                     $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
                                 cancellationToken.ThrowIfCancellationRequested();
                                 AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
-
-                                HttpWebResponse errorResponse = e.Response as HttpWebResponse;
-                                if (errorResponse.StatusCode >= (HttpStatusCode) 400 && errorResponse.StatusCode < (HttpStatusCode) 500)
-                                {
-                                    // 400 class errors will never resolve; do not retry
-                                    throw new TooManyRetriesException(new List<Exception>(){ e });
-                                }
-
                                 return e;
                             }
                         });
@@ -209,11 +200,8 @@ namespace RXPatchLib
                     }
                     catch (TooManyRetriesException)
                     {
+                        if (thisPatchServer != null) thisPatchServer.HasErrored = true;
                         AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
-
-                        // Mark current mirror failed
-                        if (thisPatchServer != null)
-                            thisPatchServer.HasErrored = true;
 
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
@@ -231,10 +219,6 @@ namespace RXPatchLib
                     {
                         AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
-
-                        // Mark current mirror failed
-                        if (thisPatchServer != null)
-                            thisPatchServer.HasErrored = true;
 
                         // Try the next best host; throw an exception if there is none
                         if (_patcher.PopHost() == null)
