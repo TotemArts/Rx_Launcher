@@ -28,6 +28,7 @@ namespace RXPatchLib
         private const string TestFile = "10kb_file";
         public Queue<UpdateServerEntry> Hosts;
         private readonly List<UpdateServerSelectorObject> CurrentHostsList = new List<UpdateServerSelectorObject>();
+        private const int ServerRecordsToTake = 4;
 
         /// <summary>
         /// Gets the next UpdateServerEntry that has the least amount of connections to it
@@ -35,8 +36,6 @@ namespace RXPatchLib
         /// <returns></returns>
         public UpdateServerEntry GetNextAvailableServerEntry()
         {
-            var ServerRecordsToTake = 4;
-
             lock (CurrentHostsList)
             {
                 if (CurrentHostsList.Count == 0)
