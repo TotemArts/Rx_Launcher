@@ -126,8 +126,6 @@ namespace RXPatchLib
 
             using (var webClient = new MyWebClient())
             {
-                webClient.Proxy = null; // Were not using a proxy server, let's ensure that.
-
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
                     // Notify the RenX Updater window of a downloads progress
@@ -168,8 +166,8 @@ namespace RXPatchLib
                                 thisPatchServer.IsUsed = true;
 
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(new Uri($"{_patcher.UpdateServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+                                RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
+                                await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
 
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
 

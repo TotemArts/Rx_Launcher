@@ -28,6 +28,7 @@ namespace RXPatchLib
         private const string TestFile = "10kb_file";
         public Queue<UpdateServerEntry> Hosts;
         private readonly List<UpdateServerSelectorObject> CurrentHostsList = new List<UpdateServerSelectorObject>();
+        private const int ServerRecordsToTake = 4;
 
         /// <summary>
         /// Gets the next UpdateServerEntry that has the least amount of connections to it
@@ -35,18 +36,42 @@ namespace RXPatchLib
         /// <returns></returns>
         public UpdateServerEntry GetNextAvailableServerEntry()
         {
-            if (CurrentHostsList.Count == 0)
-                return null;
-
             lock (CurrentHostsList)
             {
-                var selectedServer = CurrentHostsList.OrderBy(x => x.ConnectionCount).First();
-                selectedServer.ConnectionCount++;
+                if (CurrentHostsList.Count == 0)
+                    return null;
 
-                RxLogger.Logger.Instance.Write($"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections agaist it");
+                // Remove any server that has errored
+                CurrentHostsList.RemoveAll(server => server.UpdateServer.HasErrored);
 
-                return selectedServer.UpdateServer;
+                // If we have ran out of hosts, then return null.
+                if (CurrentHostsList.Count == 0)
+                    return null;
+
+                // Take the top 4 servers
+                var selectedServers = CurrentHostsList.Take(ServerRecordsToTake).ToList();
+                if (selectedServers.Count > 0)
+                {
+                    // Order them by connection count and take the top one off the pile
+                    var selectedServer = selectedServers.OrderBy(x => x.ConnectionCount).DefaultIfEmpty(null).FirstOrDefault();
+
+                    // If we didnt get null, ++ connection count and return it, otherwise return null
+                    if (selectedServer != null)
+                    {
+                        selectedServer.ConnectionCount++;
+
+                        RxLogger.Logger.Instance.Write(
+                            $"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections against it");
+
+                        return selectedServer.UpdateServer;
+                    }
+
+                    // Server selection failed, return null
+                    return null;
+                }
             }
+
+            return null;
         }
 
         public async Task<bool> QueryHost(UpdateServerEntry hostObject)
@@ -75,10 +100,9 @@ namespace RXPatchLib
                 {
                     Hosts.Enqueue(hostObject);
 
-                    // Only add the top 4 hosts into this list
-                    if (CurrentHostsList.Count < 4)
-                            CurrentHostsList.Add(new UpdateServerSelectorObject(hostObject));
-                }   
+                    // We can keep track of the list via this, including connection count
+                    CurrentHostsList.Add(new UpdateServerSelectorObject(hostObject));
+                }
 
                 RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue");
 
