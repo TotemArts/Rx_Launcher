@@ -6,16 +6,18 @@
 
 # Configuration variables
 # $launcher_data_destination = user@host:dir/
+# $version_data_destination = user@host:dir/
 
 # Setup some vars
 revision=$(git rev-parse --short HEAD)
-launcher=launcher-$revision.zip
-installer=Renegade_X_Installer-$revision.msi
+bin=bin/
+launcher=${bin}launcher-$revision.zip
+installer=${bin}Renegade_X_Installer-$revision.msi
+json=${bin}version/*.json
+args='-av --update'
 
 # Connect and transfer over the launcher and installer
-echo destination: $launcher_data_destination
-sftp $launcher_data_destination << EOF
-put $launcher
-put $installer
-bye
-EOF
+rsync $args $launcher $installer $launcher_data_destination
+
+# Connect and transfer over the version files
+rsync $args $json $version_data_destination

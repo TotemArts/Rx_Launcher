@@ -1,10 +1,6 @@
 
 # /
-/bin
-/RXPatch-bin
-/launcher*.zip
-/launcher-hash.txt
-/*.msi
+/packaging/bin
 
 # /RXPatch/
 /RXPatch/bin
