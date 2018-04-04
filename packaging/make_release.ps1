@@ -62,6 +62,7 @@ $Json.launcher.patch_url = ReplaceFilename $Json.launcher.patch_url $package_zip
 $Json.launcher.patch_hash = ( Get-FileHash -Algorithm SHA256 $package_zip ).Hash
 
 # Generate standard version files
+New-Item -ItemType Directory -Path ($bin + "version/")
 GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/release.json"
 GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/beta.json"
 GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/server.json"
