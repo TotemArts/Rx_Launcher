@@ -1,5 +1,10 @@
+Param(
+	[string]$SourceBranch="master",
+	[switch]$DryRun
+)
+
 # Constants
-$develop_branch = "master"
+$initial_branch = (git symbolic-ref --short -q HEAD)
 $version_file = "..\Renegade X Launcher\VersionCheck.cs"
 $bin = "bin/"
 
@@ -18,16 +23,23 @@ function UpdateJsonVersion([string]$JsonContent) {
 	return $Json
 }
 
-function ReplaceFilename([string]$Url, [string]$Filename) {
+function GetFilenameFromPath([string]$Path) {
 	# Replace text after the last '/' with filename
-	$UrlPaths = $Url.Split("/");
+	return $Path.Split("/")[-1]
+}
+
+function ReplaceFilename([string]$Url, [string]$Path) {
+	$Filename = GetFilenameFromPath $Path
+
+	# Replace text after the last '/' with filename
+	$UrlPaths = $Url.Split("/")
 	$UrlPaths[$UrlPaths.Length - 1] = $Filename
-	return [string]::Join("/", $UrlPaths);
+	return [string]::Join("/", $UrlPaths)
 }
 
 function GenerateJSON($Json, [string]$Url) {
 	# Get Filename from URL
-	$Filename = $Url.Split("/")[-1];
+	$Filename = GetFilenameFromPath $Url
 
 	# Fetch JSON at Url and update launcher information
 	$TargetJson = ((Invoke-WebRequest -URI $Url).Content | ConvertFrom-Json)
@@ -37,8 +49,8 @@ function GenerateJSON($Json, [string]$Url) {
 	$TargetJson | ConvertTo-Json -Depth 10 | Set-Content ($bin + "version/" + $Filename)
 }
 
-# Checkout master
-git checkout $develop_branch
+# Checkout source branch
+git checkout $SourceBranch
 
 # Get new version
 $Json = UpdateJsonVersion (Invoke-WebRequest -URI "https://static.renegade-x.com/launcher_data/version/release.json").Content
@@ -50,14 +62,18 @@ $Json = UpdateJsonVersion (Invoke-WebRequest -URI "https://static.renegade-x.com
 $release_branch = "release/" + $Json.launcher.version_name
 git checkout -b $release_branch
 git commit -m ("Set version for release ``" + $Json.launcher.version_name + "``") $version_file
-git push origin $release_branch
+
+# Push branch to origin
+if (!$DryRun) {
+	git push origin $release_branch
+}
 
 # Package launcher (package.ps1)
 .\package.ps1
 
 # Update remaining version data
 $revision = (git rev-parse --short HEAD)
-$package_zip = ($bin + "launcher-" + $revision + ".zip");
+$package_zip = ($bin + "launcher-" + $revision + ".zip")
 $Json.launcher.patch_url = ReplaceFilename $Json.launcher.patch_url $package_zip
 $Json.launcher.patch_hash = ( Get-FileHash -Algorithm SHA256 $package_zip ).Hash
 
@@ -71,8 +87,11 @@ GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/server.j
 $Json.launcher.version_number = 76
 GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/legacy.json"
 
-# Checkout master
-git checkout $develop_branch
+# Dry-Run cleanup
+if ($DryRun) {
+	# Checkout master
+	git checkout $initial_branch
 
-# Cleanup
-git branch -D $release_branch
+	# Cleanup
+	git branch -D $release_branch
+}
