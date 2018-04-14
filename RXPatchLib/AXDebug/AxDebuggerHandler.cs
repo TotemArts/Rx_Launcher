@@ -17,14 +17,18 @@ namespace RXPatchLib.AXDebug
 
         // Form Container
         private readonly FrmAgnDebug _frmAgnDebug = new FrmAgnDebug();
+        private readonly bool _isFormLoaded;
 
         /// <summary>
         /// This will only show the download debug form if --log is in the startup parameter of the application
         /// </summary>
         public AxDebuggerHandler()
         {
-            if ( Environment.GetCommandLineArgs().Any(x => x.Equals("--log", StringComparison.OrdinalIgnoreCase)) )
+            if (Environment.GetCommandLineArgs().Any(x => x.Equals("--log", StringComparison.OrdinalIgnoreCase)))
+            {
                 _frmAgnDebug.Show();
+                _isFormLoaded = true;
+            }
         }
 
         /// <summary>
@@ -35,7 +39,7 @@ namespace RXPatchLib.AXDebug
         /// <param name="serverUri">The server URL that it's downloading from</param>
         public void AddDownload(Guid guid, string filepath, string serverUri)
         {
-            _frmAgnDebug.AddDownload(guid, filepath, serverUri);
+            if ( _isFormLoaded) _frmAgnDebug.AddDownload(guid, filepath, serverUri);
         }
 
         /// <summary>
@@ -44,7 +48,7 @@ namespace RXPatchLib.AXDebug
         /// <param name="guid">The GUID you passed in during AddDownload</param>
         public void RemoveDownload(Guid guid)
         {
-            _frmAgnDebug.RemoveDownload(guid);
+            if (_isFormLoaded) _frmAgnDebug.RemoveDownload(guid);
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace RXPatchLib.AXDebug
         /// <param name="fileSize">The current total file size from the WebClient OnDownloadProgressed event</param>
         public void UpdateDownload(Guid guid, long progress, long fileSize)
         {
-            _frmAgnDebug.UpdateDownload(guid, progress, fileSize);
+            if (_isFormLoaded) _frmAgnDebug.UpdateDownload(guid, progress, fileSize);
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace RXPatchLib.AXDebug
         /// </summary>
         public void Dispose()
         {
-            _frmAgnDebug.Close();
+            if (_isFormLoaded) _frmAgnDebug.Close();
         }
     }
 }
