@@ -109,7 +109,10 @@ namespace RXPatchLib
                 {
                     // Update progress (probably unncessary)
                     long fileSize = new FileInfo(filePath).Length;
-                    progressCallback(fileSize, fileSize, _downloadsRunning);
+                    lock (_isDownloadingLock)
+                    {
+                        progressCallback(fileSize, fileSize, _downloadsRunning);
+                    }
 
                     return;
                 }
@@ -129,7 +132,10 @@ namespace RXPatchLib
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
                     // Notify the RenX Updater window of a downloads progress
-                    progressCallback(args.BytesReceived, args.TotalBytesToReceive, _downloadsRunning);
+                    lock (_isDownloadingLock)
+                    {
+                        progressCallback(args.BytesReceived, args.TotalBytesToReceive, _downloadsRunning);
+                    }
 
                     // Notify our debug window of a downloads progress
                     AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
@@ -160,14 +166,18 @@ namespace RXPatchLib
                                     throw new NoReliableHostException();
 
                                 // Add a new download to the debugging window
-                                AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath, thisPatchServer.Uri.AbsoluteUri);
+                                AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath,
+                                    thisPatchServer.Uri.AbsoluteUri);
 
                                 // Mark this patch server as currently used (is active)
                                 thisPatchServer.IsUsed = true;
 
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+                                RxLogger.Logger.Instance.Write(
+                                    $"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
+                                await webClient.DownloadFileTaskAsync(
+                                    new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"),
+                                    filePath);
 
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
 
@@ -193,10 +203,11 @@ namespace RXPatchLib
                                 AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
 
                                 HttpWebResponse errorResponse = e.Response as HttpWebResponse;
-                                if (errorResponse.StatusCode >= (HttpStatusCode) 400 && errorResponse.StatusCode < (HttpStatusCode) 500)
+                                if (errorResponse != null && (errorResponse.StatusCode >= (HttpStatusCode) 400 &&
+                                                                errorResponse.StatusCode < (HttpStatusCode) 500))
                                 {
                                     // 400 class errors will never resolve; do not retry
-                                    throw new TooManyRetriesException(new List<Exception>(){ e });
+                                    throw new TooManyRetriesException(new List<Exception> {e});
                                 }
 
                                 return e;
