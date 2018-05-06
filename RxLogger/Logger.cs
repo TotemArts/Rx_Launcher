@@ -46,13 +46,14 @@ namespace RxLogger
             try
             {
                 var filePath = $"{Environment.GetEnvironmentVariable("APPDATA")}\\Renegade-X Launcher";
-                var fileName = $"{DateTime.Now:dd-mm-yyyy - HH-mm-ss}-Application.log";
+                var fileName = $"{DateTime.Now:dd-MM-yyyy_HH-mm-ss}_Application.log";
                 _fullPath = $"{filePath}\\{fileName}";
 
                 if (!System.IO.Directory.Exists(filePath))
                     System.IO.Directory.CreateDirectory(filePath);
-
+   
                 InitLog();
+                CleanUp(filePath);
             }
             catch (Exception ex)
             {
@@ -100,7 +101,7 @@ namespace RxLogger
             {
                 // ReSharper disable once LocalizableElement
                 System.IO.File.AppendAllText(_fullPath,
-                    $"[{DateTime.Now:dd-mm-yyyy - HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] | {errorLevel.ToString()} - {message}\r\n");
+                    $"[{DateTime.Now:dd-MM-yyyy_HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] | {errorLevel.ToString()} - {message}\r\n");
                 if (_hasConsole)
                 {
                     switch (errorLevel)
@@ -123,6 +124,56 @@ namespace RxLogger
                     Console.WriteLine(
                         $"[{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] - {message}");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Cleans up the log folder by removing older logfiles.
+        /// </summary>
+        /// <param name="path">The path to cleanup</param>
+        /// <param name="amountToKeep">Amount of logfiles to keep. Default is 6</param>
+        private void CleanUp(string path, int amountToKeep = 6)
+        {
+            Write("Starting logfile cleanup.");
+            try
+            {
+                //Grab all the files in the directory as FileInfo objects
+                System.IO.FileInfo[] files = new System.IO.DirectoryInfo(path).GetFiles();
+
+                //Delete potential bogus files by a simple extension check (Maybe a bit redundant?)
+                var bogusFiles = from file in files where !file.Extension.Equals(".log") select file;
+
+                if (bogusFiles.Any())
+                {
+                    foreach (System.IO.FileInfo bogusFile in bogusFiles)
+                    {
+                        bogusFile.Delete();
+                        Write($"Deleted bogus logfile: {bogusFile.Name}.");
+                    }
+                    //Re-Read directory now bogusFiles are gone
+                    files = new System.IO.DirectoryInfo(path).GetFiles();
+                }
+
+                //Reverse them so we have the newest at [0]
+                Array.Reverse(files);
+                if (files.GetLength(0) > amountToKeep)
+                {
+                    //Delete files > amountToKeep
+                    int fileCounter = 0;
+                    for (int i = amountToKeep; i < files.GetLength(0); i++, fileCounter++)
+                    {
+                        files[i].Delete();
+                        Write($"Deleted logfile: {files[i].Name}");
+                    }
+                    Write($"Logfile cleanup done. Removed {fileCounter} files.");
+                }
+                else
+                    Write($"Logfile cleanup done. No logfiles removed.");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
     }
