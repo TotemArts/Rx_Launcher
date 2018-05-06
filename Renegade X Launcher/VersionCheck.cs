@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,8 +38,8 @@ namespace LauncherTwo
         {
             _launcherVersion = new Version
             {
-                Name = "0.00",
-                Number = 00
+                Name = "0.82",
+                Number = 82
             };
         }
 
