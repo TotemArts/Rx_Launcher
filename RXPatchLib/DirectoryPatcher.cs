@@ -268,6 +268,7 @@ namespace RXPatchLib
                     // while it does crash, it does however achieve our goal of stopping the download
                     // (I'm not saying that it's right, i just dont know how to fix it right now.)
                     Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
+                    throw;
                 }
 
                 // Update progress

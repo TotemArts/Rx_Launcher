@@ -71,32 +71,24 @@ namespace LauncherTwo
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-            Task task = null;
-
-            try
-            {
-                task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress,
+            Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress,
                     cancellationTokenSource.Token, VersionCheck.InstructionsHash);
 
-                //Create the update window
-                var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion,
-                    cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
-                window.Owner = this;
-                //Show the dialog and wait for completion
-                window.Show();
+            //Create the update window
+            var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion,
+                cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
+            window.Owner = this;
+            //Show the dialog and wait for completion
+            window.Show();
 
-                while (!task.IsCompleted)
-                {
-                    await Task.Delay(1000);
-                    if ( cancellationTokenSource.IsCancellationRequested )
-                        task.Dispose();
-                }
-
-                RxLogger.Logger.Instance.Write($"Install complete, task state isCompleted = {task.IsCompleted}");
-            }
-            catch (Exception)
+            while (!task.IsCompleted)
             {
+                await Task.Delay(1000);
+                if (cancellationTokenSource.IsCancellationRequested)
+                    task.Dispose();
             }
+
+            RxLogger.Logger.Instance.Write($"Install complete, task state isCompleted = {task.IsCompleted}");
 
             if (task?.IsCompleted == true && task?.Status != TaskStatus.Canceled)
             {

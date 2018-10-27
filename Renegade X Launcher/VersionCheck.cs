@@ -29,10 +29,10 @@ namespace LauncherTwo
 
         public static string InstructionsHash;
         public static string GamePatchPath = null;
-        //public static string[] GamePatchUrls = null;
         public static UpdateServerModel[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
         public static string LauncherPatchHash = null;
+        public static string BannersUrl = null;
 
         static VersionCheck()
         {
@@ -166,6 +166,7 @@ namespace LauncherTwo
 
                 LauncherPatchUrl = versionData["launcher"]["patch_url"];
                 LauncherPatchHash = versionData["launcher"]["patch_hash"];
+                BannersUrl = versionData["launcher"]["banners_url"];
             }
             catch (Exception ex)
             {
@@ -215,7 +216,8 @@ namespace LauncherTwo
 
         public static bool IsLauncherOutOfDate()
         {
-            return _latestLauncherVersion.Number > _launcherVersion.Number;
+            return _launcherVersion.Number != 0 // Suppress for development builds
+                && _latestLauncherVersion.Number > _launcherVersion.Number;
         }
 
         public static bool IsGameOutOfDate()

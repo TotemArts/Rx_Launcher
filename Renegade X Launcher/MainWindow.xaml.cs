@@ -137,8 +137,6 @@ namespace LauncherTwo
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
             SD_GameVersion.Content = VersionCheck.GetGameVersionName();
-
-            BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
             //due to the mediaelement being set to manual control, we need to start the previewvid in the constructor
@@ -147,8 +145,7 @@ namespace LauncherTwo
 
         private async Task CheckVersionsAsync()
         {
-            Task updateTask = VersionCheck.UpdateLatestVersions();
-            await updateTask;
+            await VersionCheck.UpdateLatestVersions();
 
             if (!VersionCheck.IsLauncherOutOfDate())
             {
@@ -163,6 +160,11 @@ namespace LauncherTwo
                 if (updateInstallPending)
                 {
                     Close();
+                }
+                else
+                {
+                    // Get banners; consider moving this later
+                    BannerTools.Setup();
                 }
                 return;
             }
@@ -187,6 +189,9 @@ namespace LauncherTwo
                 }
                 SD_GameVersion.Content = VersionCheck.GetGameVersionName();
             }
+
+            // Get banners; consider moving this later
+            BannerTools.Setup();
         }
 
         private void StartCheckingVersions()

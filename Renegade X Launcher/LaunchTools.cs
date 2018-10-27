@@ -13,7 +13,7 @@ namespace LauncherTwo
     {
         public string GetProcessPath ()
         {
-            return GameInstallation.GetRootPath() + "Binaries\\Win32\\UDK.exe";
+            return GameInstallation.GetRootPath() + "Binaries\\UDKLift.exe";
         }
 
         public abstract string GetProcessArguments ();

@@ -69,17 +69,20 @@ namespace LauncherTwo
 
         public static void Setup()
         {
-
             ParseBanners();
-
         }
 
         private static void ParseBanners()
         {
+            if (VersionCheck.BannersUrl == null)
+            {
+                Debug.Print("Error: BannersUrl is null in ParseBanners");
+            }
+
             try
             {
                 //Grab the string from the RenX Website.
-                string jsonText = new WebClient().DownloadString(RenXWebLinks.RenxBannersJsonUrl);
+                string jsonText = new WebClient().DownloadString(VersionCheck.BannersUrl);
 
                 //Turn it into a JSon object that we can parse.
                 var results = JsonConvert.DeserializeObject<dynamic>(jsonText);

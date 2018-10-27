@@ -165,23 +165,13 @@ namespace RXPatchLib
                                 if (thisPatchServer == null)
                                     throw new NoReliableHostException();
 
-                                // Add a new download to the debugging window
-                                AXDebug.AxDebuggerHandler.Instance.AddDownload(guid, subPath,
-                                    thisPatchServer.Uri.AbsoluteUri);
-
                                 // Mark this patch server as currently used (is active)
                                 thisPatchServer.IsUsed = true;
 
                                 // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write(
-                                    $"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(
-                                    new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"),
-                                    filePath);
-
+                                RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
+                                await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
                                 RxLogger.Logger.Instance.Write("  > File Transfer Complete");
-
-                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
 
                                 thisPatchServer.IsUsed = false;
 
@@ -200,11 +190,10 @@ namespace RXPatchLib
                                 RxLogger.Logger.Instance.Write(
                                     $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
                                 cancellationToken.ThrowIfCancellationRequested();
-                                AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
 
                                 HttpWebResponse errorResponse = e.Response as HttpWebResponse;
-                                if (errorResponse != null && (errorResponse.StatusCode >= (HttpStatusCode) 400 &&
-                                                                errorResponse.StatusCode < (HttpStatusCode) 500))
+                                if (errorResponse != null && errorResponse.StatusCode >= (HttpStatusCode) 400
+                                    && errorResponse.StatusCode < (HttpStatusCode) 500)
                                 {
                                     // 400 class errors will never resolve; do not retry
                                     throw new TooManyRetriesException(new List<Exception> {e});
@@ -216,9 +205,13 @@ namespace RXPatchLib
 
                         // Download successfully completed
                     }
-                    catch (TooManyRetriesException)
+                    catch (TooManyRetriesException tooManyRetriesException)
                     {
-                        AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
+                        RxLogger.Logger.Instance.Write("Too many retries; caught exceptions: ");
+                        foreach (Exception ex in tooManyRetriesException.Exceptions)
+                        {
+                            RxLogger.Logger.Instance.Write(ex.Message + "\r\n" + ex.StackTrace);
+                        }
 
                         // Mark current mirror failed
                         if (thisPatchServer != null)
@@ -238,7 +231,6 @@ namespace RXPatchLib
                     }
                     catch (HashMistmatchException)
                     {
-                        AXDebug.AxDebuggerHandler.Instance.RemoveDownload(guid);
                         RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
                         // Mark current mirror failed

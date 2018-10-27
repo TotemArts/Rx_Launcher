@@ -22,17 +22,18 @@ namespace LauncherTwo
             bool didTryUpdate = false;
             bool isLogging = false;
 
-            Logger.Instance.Write("Application starting up...");
+            Logger.Instance.Write("Application starting up; checking command line options...");
 
             foreach (string a in e.Args)
             {
+                Logger.Instance.Write("Parsing option: " + a);
                 if (a.Equals("--log", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Instance.StartLogConsole();
                     isLogging = true;
                 }
                 if (a.StartsWith("--patch-result="))
-                {
+                {                   
                     didTryUpdate = true;
                     string code = a.Substring("--patch-result=".Length);
                     Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
@@ -84,26 +85,20 @@ namespace LauncherTwo
                     VersionCheck.UpdateGameVersion();
                     return;
                 }
+                Logger.Instance.Write("Parsed option: " + a);
             }
+
+            Logger.Instance.Write("Done checking command line options");
 
             if (LauncherTwo.Properties.Settings.Default.UpgradeRequired)
             {
+                Logger.Instance.Write("Upgrading properties...");
                 LauncherTwo.Properties.Settings.Default.Upgrade();
                 LauncherTwo.Properties.Settings.Default.UpgradeRequired = false;
                 LauncherTwo.Properties.Settings.Default.Save();
+                Logger.Instance.Write("Properties upgraded");
             }
 
-            /* Commented out untill I found a better way to intergrate it in the installation
-            if (!GameInstallation.IsRootPathPlausible())
-            {
-                var result = MessageBox.Show("The game path seems to be incorrect. Please ensure that the launcher is placed in the correct location. If you proceed, files in the following location might be affected:\n\n" + GameInstallation.GetRootPath() + "\n\nAre you sure want to proceed?", "Invalid game path", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
-                if (result != MessageBoxResult.Yes)
-                {
-                    Shutdown();
-                    return;
-                }
-            }
-            */
             //If no args are present, or a permissionChange update was executed -> normally start the launcher
             // didTryUpdate - If we tried an update, we have args, so we need to check this as well to make the main window load.
             if (e.Args.Length == 0 || didTryUpdate || isLogging)
@@ -118,12 +113,8 @@ namespace LauncherTwo
                 Logger.Instance.Write("Initial application startup complete, Creating new MainWindow");
                 new MainWindow().Show();
             }
-            /*else
-            {
-                Application.Current.Shutdown();
-            }*/
 
-            
+            Logger.Instance.Write("Exiting StartupApp...");
         }
 
         /// <summary>
