@@ -46,7 +46,7 @@ namespace RXPatch
             RxPatcher.Instance.AddNewUpdateServer(remainingArguments[0], "");
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, new CancellationToken(), null) // intentionally skipping instructions.json verification
+                (progress) => RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, new CancellationTokenSource(), null) // intentionally skipping instructions.json verification
             );
 
             return 0;

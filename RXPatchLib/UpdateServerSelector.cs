@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Net.NetworkInformation;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +21,7 @@ namespace RXPatchLib
 
     public class UpdateServerSelector
     {
-        CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private const string TestFile = "10kb_file";
         public Queue<UpdateServerEntry> Hosts;
@@ -77,15 +75,16 @@ namespace RXPatchLib
         public async Task<bool> QueryHost(UpdateServerEntry hostObject)
         {
             RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}");
-
-            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
             request.Method = "GET";
+            request.Timeout = 10000; // max wait time = 10 sec
 
             //Default to "not found"
-            System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
+            HttpStatusCode responseCode = HttpStatusCode.NotFound;
             try
             {
-                response = ((System.Net.HttpWebResponse)await request.GetResponseAsync()).StatusCode;
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                responseCode = response.StatusCode;
             }
             catch
             {
@@ -94,7 +93,7 @@ namespace RXPatchLib
             }
 
             // Push host to queue if valid
-            if (response == System.Net.HttpStatusCode.OK)
+            if (responseCode == HttpStatusCode.OK)
             {
                 lock (Hosts)
                 {
@@ -131,8 +130,10 @@ namespace RXPatchLib
                 tasks.Remove(task);
 
                 // Good mirror found; return result
-                if (task.Result)
+                // Leave other tasks to finish on their own
+                if (task.Result) {
                     return;
+                }
             }
 
             // No host found; throw exception

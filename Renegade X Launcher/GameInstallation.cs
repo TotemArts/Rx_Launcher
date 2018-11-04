@@ -1,5 +1,5 @@
-﻿
-using System.IO;
+﻿using System.IO;
+
 namespace LauncherTwo
 {
     static class GameInstallation
@@ -13,7 +13,7 @@ namespace LauncherTwo
             }
             else
             {
-                launcherPath = System.IO.Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../..");
+                launcherPath = Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location + "/../..");
                 //launcherPath =  "C:\\Games\\Renegade X\\";
                 //launcherPath = "C:\\Program Files (x86)\\Renegade X"; //For testing
                 //launcherPath = "D:\\Program Files (x86)\\Renegade X"; //For Testing

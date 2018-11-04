@@ -465,7 +465,7 @@ namespace LauncherTwo
             {
                 pingTasks.Add(PingAsync(serverInfo));
             }
-            await Task.WhenAll(pingTasks.ToArray());
+            await Task.WhenAll(pingTasks);
         }
 
         static async Task PingAsync(ServerInfo serverInfo)
@@ -495,9 +495,8 @@ namespace LauncherTwo
             //Otherwise, assume CountryCode and name is missing
             if (ipAddress != "Missing")
             {
-                string[] countryCode;
                 //First check the cache if we already have the current ip, this reduces the call to the api
-                CountryCodeCache.TryGetValue(ipAddress, out countryCode);
+                CountryCodeCache.TryGetValue(ipAddress, out string[] countryCode);
                 //If the CountryCode was not found in the cache (null), grab it from the api
                 //Else, use the CountryCode from the cache
                 if (countryCode == null)

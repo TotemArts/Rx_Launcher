@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -281,11 +280,8 @@ namespace LauncherTwo.Views
 
             this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", statusTitle[0]);
 
-            if (patcher.UpdateServer == null)
-                this.ServerMessage = "pending";
-            else
-                this.ServerMessage = patcher.UpdateServer.Name;
-
+            ServerMessage = patcher.UpdateServer?.Name ?? "pending";
+            
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", statusTitle[1]);
 
@@ -293,15 +289,28 @@ namespace LauncherTwo.Views
             progress.ProgressChanged += (o, report) => lastReport = report;
 
             // Here we start the actual patching process, the whole thing from verification to applying.
-            Task backgroundTask = Task.Factory.StartNew(async () =>
+            Task.Run(async () =>
             {
+                bool didSucceed = true;
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
-                    if ( _cancellationTokenSource.IsCancellationRequested )
-                        throw new OperationCanceledException();
+                    if ( _cancellationTokenSource.IsCancellationRequested ) {
+                        //throw new OperationCanceledException();
+                        didSucceed = false;
+                        ProgressReport = lastReport;
+                        break;
+                    }
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;
+
+                // Handle use-case: user cancelled
+                if (!didSucceed) {
+                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], "User cancelled operation.");
+                    RxLogger.Logger.Instance.Write(StatusMessage, RxLogger.Logger.ErrorLevel.ErrInfo);
+                    HasFinished = true;
+                    return;
+                }
 
                 try
                 {
@@ -333,9 +342,11 @@ namespace LauncherTwo.Views
 
         public void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            ModernDialog areYouSureDialog = new ModernDialog();
-            areYouSureDialog.Title = "Stop Download - Renegade X";
-            areYouSureDialog.Content = "Are you sure you want to stop this download?\r\nYou can come back to it later.";
+            ModernDialog areYouSureDialog = new ModernDialog
+            {
+                Title = "Stop Download - Renegade X",
+                Content = "Are you sure you want to stop this download?\r\nYou can come back to it later."
+            };
             areYouSureDialog.Buttons = new Button[] { areYouSureDialog.YesButton, areYouSureDialog.NoButton };
             areYouSureDialog.ShowDialog();
 
@@ -348,10 +359,7 @@ namespace LauncherTwo.Views
 
         private void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>

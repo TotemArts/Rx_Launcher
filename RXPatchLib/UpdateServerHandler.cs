@@ -52,7 +52,7 @@ namespace RXPatchLib
             lock (_updateServers)
             {
                 var thisServerEntry =
-                    _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => !x.HasErrored && !x.IsUsed);
+                    _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => x != null && !x.HasErrored && !x.IsUsed);
                 if (thisServerEntry != null)
                 {
                     thisServerEntry.IsUsed = true; // Mark is as used so it's not used again

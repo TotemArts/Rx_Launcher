@@ -47,10 +47,7 @@ namespace LauncherTwo
 
         private void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -92,6 +89,7 @@ namespace LauncherTwo
 
         public MainWindow()
         {
+            RxLogger.Logger.Instance.Write("Initializing MainWindow...");
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
             SourceInitialized += (s, a) =>
@@ -235,7 +233,7 @@ namespace LauncherTwo
                 var cancellationTokenSource = new CancellationTokenSource();
 
                 RxLogger.Logger.Instance.Write($"Starting game update | TargetDir: {targetDir} | AppDir: {applicationDir} | PatchPath: {patchPath},| PatchVersion: {patchVersion}");
-                Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+                Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource, VersionCheck.InstructionsHash);
 
                 RxLogger.Logger.Instance.Write("Download complete, Showing ApplyUpdateWindow");
                 var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
@@ -684,26 +682,32 @@ namespace LauncherTwo
         private void InitFirstInstall()
         {
             //Show the dialog that asks to install the game
-            ModernDialog firstInstallDialog = new ModernDialog();
-            firstInstallDialog.Title = "Installation";
-            firstInstallDialog.Content = MessageInstall;
+            ModernDialog firstInstallDialog = new ModernDialog
+            {
+                Title = "Installation",
+                Content = MessageInstall
+            };
             firstInstallDialog.Buttons = new Button[] { firstInstallDialog.YesButton, firstInstallDialog.NoButton };
             firstInstallDialog.ShowDialog();
             //Check if the user wants to install
             if (firstInstallDialog.DialogResult.Value == true)
             {
                 Uri path = new System.Uri(Assembly.GetExecutingAssembly().CodeBase);
-                ProcessStartInfo startInfo = new ProcessStartInfo(path.AbsoluteUri, "--firstInstall");
-                startInfo.Verb = "runas";
+                ProcessStartInfo startInfo = new ProcessStartInfo(path.AbsoluteUri, "--firstInstall")
+                {
+                    Verb = "runas"
+                };
                 System.Diagnostics.Process.Start(startInfo);
                 Application.Current.Shutdown();
             }
             else
             {
                 //Show dialog that the game is not playable untill installation is completed
-                ModernDialog notInstalledDialog = new ModernDialog();
-                notInstalledDialog.Title = "Installation";
-                notInstalledDialog.Content = MessageNotInstalled;
+                ModernDialog notInstalledDialog = new ModernDialog
+                {
+                    Title = "Installation",
+                    Content = MessageNotInstalled
+                };
                 notInstalledDialog.Buttons = new Button[] { notInstalledDialog.OkButton };
                 notInstalledDialog.ShowDialog();
             }

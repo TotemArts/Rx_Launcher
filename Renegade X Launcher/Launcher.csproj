@@ -115,14 +115,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BannerTools.cs" />
+    <Compile Include="Tools\BannerTools.cs" />
     <Compile Include="BitmapToImageSourceConverter.cs" />
     <Compile Include="GameInstallation.cs" />
     <Compile Include="Installer.xaml.cs">
       <DependentUpon>Installer.xaml</DependentUpon>
     </Compile>
     <Compile Include="InstanceHandler.cs" />
-    <Compile Include="LaunchTools.cs" />
+    <Compile Include="Tools\LaunchTools.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -135,8 +135,15 @@
     </Compile>
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
+    <Compile Include="StartupInterpreter\Interpreters\FirstInstallExp.cs" />
+    <Compile Include="StartupInterpreter\Interpreters\IStartupExpression.cs" />
+    <Compile Include="StartupInterpreter\Interpreters\LogExp.cs" />
+    <Compile Include="StartupInterpreter\Interpreters\PatchResultExp.cs" />
+    <Compile Include="StartupInterpreter\Interpreters\UpdateGameExp.cs" />
+    <Compile Include="StartupInterpreter\StartupContext.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="TaskExtensions.cs" />
+    <Compile Include="Tools\Utils.cs" />
     <Compile Include="TrulyObservableCollection.cs" />
     <Compile Include="UpdateServerModel.cs" />
     <Compile Include="URI.cs" />
@@ -301,9 +308,7 @@
       <Name>SteamWebAPI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tools\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Icon.ico" />
     <Resource Include="Icon_Silver.ico" />

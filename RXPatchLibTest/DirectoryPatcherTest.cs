@@ -83,7 +83,7 @@ namespace RXPatchLibTest
 
             try
             {
-                await _directoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationToken(), await Sha256.GetFileHashAsync(instructionsFilename));
+                await _directoryPatcher.ApplyPatchAsync(TestProgressHandlerFactory.Create(), new CancellationTokenSource(), await Sha256.GetFileHashAsync(instructionsFilename));
             }
             finally
             {

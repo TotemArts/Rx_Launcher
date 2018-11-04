@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Net;
 using System.Windows;
 using Newtonsoft.Json;
-using RxLogger;
 using RXPatchLib;
 
 
@@ -83,6 +82,10 @@ namespace LauncherTwo
                 string versionName = null;
                 int? versionNumber = null;
                 string filename = GameInstallation.GetRootPath() + iniPath;
+
+                if (!File.Exists(filename))
+                    throw new Exception("Default config not found.");
+
                 foreach (var line in File.ReadAllLines(filename))
                 {
                     if (line.StartsWith(versionPrefix))
@@ -99,8 +102,7 @@ namespace LauncherTwo
                     }
                 }
 
-                if (versionName == "Open Beta 2" ||
-                    versionName == "Open Beta 3")
+                if (versionName.ToLower().Contains("beta"))
                 {
                     versionNumber = 0;
                 }
@@ -129,15 +131,20 @@ namespace LauncherTwo
             string versionJson = "";
             dynamic versionData = null;
 
-            try
+            using (WebClient client = new WebClient())
             {
-                versionJson = await new WebClient().DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
-            }
-            catch (WebException ex)
-            {
-                MessageBox.Show("An error occurred while downloading version information, you can still play the game in single player but multiplayer might be unavailable.",
-                    "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Error while downloading launcher startup configuration, you can still play the game in single player but multiplayer might be unavailable.", Logger.ErrorLevel.ErrError);
+                try
+                {
+
+                    versionJson = await client.DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
+
+                }
+                catch (WebException)
+                {
+                    MessageBox.Show("An error occurred while downloading version information, you can still play the game in single player but multiplayer might be unavailable.",
+                        "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
+                    RxLogger.Logger.Instance.Write($"Error while downloading launcher startup configuration, you can still play the game in single player but multiplayer might be unavailable.", RxLogger.Logger.ErrorLevel.ErrError);
+                }
             }
 
             // If we dont have any versionJson, we cannot contiune anyway!
@@ -148,11 +155,11 @@ namespace LauncherTwo
             try
             {
                 versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
-            } catch (Exception ex)
+            } catch (Exception)
             {
                 MessageBox.Show("Unable to load the RenegadeX Launcher, unable to parse JSON Version Information",
                     "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Unable to load the RenegadeX Launcher, unable to parse JSON Version Information", Logger.ErrorLevel.ErrError);
+                RxLogger.Logger.Instance.Write($"Unable to load the RenegadeX Launcher, unable to parse JSON Version Information", RxLogger.Logger.ErrorLevel.ErrError);
             }
 
             // Launcher parsing
@@ -168,11 +175,11 @@ namespace LauncherTwo
                 LauncherPatchHash = versionData["launcher"]["patch_hash"];
                 BannersUrl = versionData["launcher"]["banners_url"];
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("An error occurred while loading the launcher version information.\r\nIt's recommended that you download the launcher again from www.renegade-x.com/download",
                     "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Error loading the launcher version information.\r\nIt's recommended that you download the launcher again from www.renegade-x.com", Logger.ErrorLevel.ErrError);
+                RxLogger.Logger.Instance.Write($"Error loading the launcher version information.\r\nIt's recommended that you download the launcher again from www.renegade-x.com", RxLogger.Logger.ErrorLevel.ErrError);
             }
 
             // Game parsing
@@ -192,7 +199,7 @@ namespace LauncherTwo
                     foreach (var x in versionData["game"]["mirrors"].ToObject<dynamic>())
                         RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // If the launcher is out of date, we dont care that the game is wrong
                     if (!IsLauncherOutOfDate())
@@ -203,14 +210,14 @@ namespace LauncherTwo
                     }
 
                     // Log this event to the file still however.
-                    RxLogger.Logger.Instance.Write($"Error while parsing the Content Delivery Network JSON, you will not be able to update the game.\r\nPlease report this issue to a developer over at www.renegade-x.com", Logger.ErrorLevel.ErrError);
+                    RxLogger.Logger.Instance.Write($"Error while parsing the Content Delivery Network JSON, you will not be able to update the game.\r\nPlease report this issue to a developer over at www.renegade-x.com", RxLogger.Logger.ErrorLevel.ErrError);
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 MessageBox.Show("An error occurred while loading the game version information.\r\nPlease report this issue to a developer over at www.renegade-x.com",
                     "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Error loading the game version information.\r\nPlease report this issue to a developer over at www.renegade-x.com", Logger.ErrorLevel.ErrError);
+                RxLogger.Logger.Instance.Write($"Error loading the game version information.\r\nPlease report this issue to a developer over at www.renegade-x.com", RxLogger.Logger.ErrorLevel.ErrError);
             }
         }
 

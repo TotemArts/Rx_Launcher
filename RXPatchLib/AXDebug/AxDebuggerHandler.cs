@@ -8,7 +8,7 @@ namespace RXPatchLib.AXDebug
     ///     This class handles the instanced version of the Concurrent Downloading Debug window (FrmAGNDebug)
     ///     This must be instanced, otherwise a new form would load for every download that starts, and that would suck
     /// </summary>
-    class AxDebuggerHandler
+    internal class AxDebuggerHandler
     {
 
         // Instance Handler

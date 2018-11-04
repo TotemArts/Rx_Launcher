@@ -97,7 +97,7 @@ namespace LauncherTwo.Views
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-            Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+            Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource, VersionCheck.InstructionsHash);
 
             var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, type);
             window.Owner = this;

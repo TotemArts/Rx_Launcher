@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.IO;
@@ -17,7 +14,10 @@ namespace RXPatchLib
 
             using (var stream = File.OpenRead(path))
             {
-                return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(stream)).Replace("-", string.Empty);
+                using (var provider = new SHA256CryptoServiceProvider())
+                {
+                    return BitConverter.ToString(provider.ComputeHash(stream)).Replace("-", string.Empty);
+                }
             }
         }
 
@@ -30,14 +30,20 @@ namespace RXPatchLib
             {
                 using (var stream = File.OpenRead(path))
                 {
-                    return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(stream)).Replace("-", string.Empty);
+                    using (var provider = new SHA256CryptoServiceProvider())
+                    {
+                        return BitConverter.ToString(provider.ComputeHash(stream)).Replace("-", string.Empty);
+                    }
                 }
             });
         }
 
         public static string Get(byte[] data)
         {
-            return BitConverter.ToString(new SHA256CryptoServiceProvider().ComputeHash(data)).Replace("-", string.Empty);
+            using (var provider = new SHA256CryptoServiceProvider())
+            {
+                return BitConverter.ToString(provider.ComputeHash(data)).Replace("-", string.Empty);
+            }
         }
     }
 }

@@ -9,8 +9,6 @@ using FirstFloor.ModernUI.Windows.Controls;
 using RXPatchLib;
 using System.IO;
 using System.Diagnostics;
-using System.Security.AccessControl;
-using System.Linq;
 
 namespace LauncherTwo
 {
@@ -32,22 +30,23 @@ namespace LauncherTwo
         public async Task<bool> DownloadRedist(string source, string target, CancellationToken cancelToken, Action<long, long> progressCallback)
         {
             // Initialize directory and WebClient
-            System.IO.Directory.CreateDirectory(GameInstallation.GetRootPath() + "Launcher\\Redist");
-            System.Net.WebClient redistRequest = new WebClient();
-
-            // Report progress
-            redistRequest.DownloadProgressChanged += (o, args) =>
+            Directory.CreateDirectory(GameInstallation.GetRootPath() + "Launcher\\Redist");
+            using (WebClient redistRequest = new WebClient())
             {
-                // Listen for cancellation
-                if (cancelToken.IsCancellationRequested)
-                    redistRequest.CancelAsync();
+                // Report progress
+                redistRequest.DownloadProgressChanged += (o, args) =>
+                {
+                    // Listen for cancellation
+                    if (cancelToken.IsCancellationRequested)
+                        redistRequest.CancelAsync();
 
-                // Update progress
-                progressCallback(args.BytesReceived, args.TotalBytesToReceive);
-            };
+                    // Update progress
+                    progressCallback(args.BytesReceived, args.TotalBytesToReceive);
+                };
 
-            // Download file
-            await redistRequest.DownloadFileTaskAsync(new Uri(source), target);
+                // Download file
+                await redistRequest.DownloadFileTaskAsync(new Uri(source), target);
+            }
 
             // Verify (UE3Redist isn't expected to ever change, so we're just dumping the hash here).
             return (await RXPatchLib.Sha256.GetFileHashAsync(target) == "A1A49F3C2E6830BAE084259650DFADF3AD97A30F59391930639D59220CC0B01F");
@@ -63,42 +62,58 @@ namespace LauncherTwo
 
             //Get the current root path and prepare the installation
             var targetDir = GameInstallation.GetRootPath();
-            var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
+            var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
             var patchPath = VersionCheck.GamePatchPath;
             var patchVersion = VersionCheck.GetLatestGameVersionName();
 
             //Create an empty var containing the progress report from the patcher
             var progress = new Progress<DirectoryPatcherProgressReport>();
-            var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+            var cancellationTokenSource = new CancellationTokenSource();
 
             Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress,
-                    cancellationTokenSource.Token, VersionCheck.InstructionsHash);
+                    cancellationTokenSource, VersionCheck.InstructionsHash);
 
             //Create the update window
             var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion,
-                cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install);
-            window.Owner = this;
+                cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Install)
+            { Owner = this };
             //Show the dialog and wait for completion
             window.Show();
 
-            while (!task.IsCompleted)
+            bool didSucceed = true;
+
+            try
             {
-                await Task.Delay(1000);
-                if (cancellationTokenSource.IsCancellationRequested)
-                    task.Dispose();
+                while (!task.IsCompleted)
+                {
+                    await Task.Delay(1000);
+
+                    if (cancellationTokenSource.IsCancellationRequested) {
+                        didSucceed = false;
+                        break;
+                    }
+                }
+            } catch (OperationCanceledException) { // user cancelled operation
+                didSucceed = false;
+                //Application.Current.Shutdown(); // Wrong way (threads still running)
+            } finally {
+                window.Close(); // Close ApplyUpdateWindow
+                task.Wait(); // Wait for all threads to be done
+                task.Dispose();
             }
-
-            RxLogger.Logger.Instance.Write($"Install complete, task state isCompleted = {task.IsCompleted}");
-
-            if (task?.IsCompleted == true && task?.Status != TaskStatus.Canceled)
+            
+            RxLogger.Logger.Instance.Write($"Install finished, task state isCompleted = {task.IsCompleted}");
+            
+            if (didSucceed)
             {
                 VersionCheck.UpdateGameVersion();
                 //Create the UE3 redist dialog
-
                 RxLogger.Logger.Instance.Write("Creating the UE3 Redist package dialog");
-                ModernDialog ueRedistDialog = new ModernDialog();
-                ueRedistDialog.Title = "UE3 Redistributable";
-                ueRedistDialog.Content = MessageRedistInstall;
+                ModernDialog ueRedistDialog = new ModernDialog
+                {
+                    Title = "UE3 Redistributable",
+                    Content = MessageRedistInstall
+                };
                 ueRedistDialog.Buttons = new Button[] { ueRedistDialog.OkButton, ueRedistDialog.CancelButton };
                 ueRedistDialog.ShowDialog();
 

@@ -49,12 +49,11 @@ namespace RXPatchLib
             return Path.Combine(_downloadPath, subPath);
         }
 
-        public Task Load(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
+        public Task Load(string subPath, string hash, CancellationTokenSource cancellationTokenSource, Action<long, long, byte> progressCallback)
         {
-            Task task;
-            if (!_loadTasks.TryGetValue(subPath, out task))
+            if (!_loadTasks.TryGetValue(subPath, out Task task))
             {
-                task = LoadNew(subPath, hash, cancellationToken, progressCallback);
+                task = LoadNew(subPath, hash, cancellationTokenSource, progressCallback);
                 _loadTasks[subPath] = task;
             }
             return task;
@@ -96,8 +95,13 @@ namespace RXPatchLib
             }
         }
 
-        public async Task LoadNew(string subPath, string hash, CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
+        public async Task LoadNew(string subPath, string hash, CancellationTokenSource cancellationTokenSource, Action<long, long, byte> progressCallback)
         {
+            if (cancellationTokenSource.IsCancellationRequested)
+            {
+                return;
+            }
+
             string filePath = GetSystemPath(subPath);
             var guid = Guid.NewGuid();
 
@@ -127,7 +131,7 @@ namespace RXPatchLib
             // Since I can't await within a lock...
             await LockDownload();
 
-            using (var webClient = new MyWebClient())
+            using (MyWebClient webClient = new MyWebClient())
             {
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
@@ -140,109 +144,131 @@ namespace RXPatchLib
                     // Notify our debug window of a downloads progress
                     AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
                 };
-
-                if (cancellationToken.IsCancellationRequested)
+                if (cancellationTokenSource.IsCancellationRequested)
                 {
                     RxLogger.Logger.Instance.Write($"Web client for {subPath} starting to shutdown due to Cancellation Requested");
-                    webClient.Dispose();
                     return;
                 }
 
-                // goto labels are the devil, you should be ashamed of using this, whoever you are. :P
-                new_host_selected:
-
-                using (cancellationToken.Register(() => webClient.CancelAsync()))
+                bool nextMirror = true;
+                while (nextMirror)
                 {
-                    RetryStrategy retryStrategy = new RetryStrategy();
-                    UpdateServerEntry thisPatchServer = null;
-                    try
+                    nextMirror = false; //in any case: stop loop
+                    using (cancellationTokenSource.Token.Register(() => webClient.CancelAsync()))
                     {
-                        await retryStrategy.Run(async () =>
+                        RetryStrategy retryStrategy = new RetryStrategy();
+                        UpdateServerEntry thisPatchServer = null;
+                        try
                         {
-                            try
+                            await retryStrategy.Run(async () =>
                             {
-                                thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
-                                if (thisPatchServer == null)
-                                    throw new NoReliableHostException();
+                                try
+                                {
+                                    thisPatchServer = _patcher.UpdateServerSelector.GetNextAvailableServerEntry();
+                                    if (thisPatchServer == null)
+                                        throw new NoReliableHostException();
 
-                                // Mark this patch server as currently used (is active)
-                                thisPatchServer.IsUsed = true;
+                                    // Mark this patch server as currently used (is active)
+                                    thisPatchServer.IsUsed = true;
 
-                                // Download file and wait until finished
-                                RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
-                                await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
-                                RxLogger.Logger.Instance.Write("  > File Transfer Complete");
+                                    // Download file and wait until finished
+                                    RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
 
-                                thisPatchServer.IsUsed = false;
+                                    await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+                                    RxLogger.Logger.Instance.Write(" > File Transfer Complete");
+                                    thisPatchServer.IsUsed = false;
 
-                                // File finished downoading successfully; allow next download to start and check hash
+                                    // File finished downoading successfully; allow next download to start and check hash
+                                    UnlockDownload();
+
+                                    // Check our hash, if it's not the same we re-queue
+                                    // todo: add a retry count to the file instruction, this is needed because if the servers file is actually broken you'll be in an infiniate download loop
+                                    if (hash != null && await Sha256.GetFileHashAsync(filePath) != hash)
+                                        throw new HashMistmatchException(); // Hash mismatch; throw exception
+
+                                    return null;
+                                }
+                                catch (WebException e)
+                                {
+                                    RxLogger.Logger.Instance.Write(
+                                        $"Error while attempting to transfer the file.\r\n{e.Message}");
+
+                                    //cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                                    if (e.Status == WebExceptionStatus.RequestCanceled)
+                                    {
+                                        RxLogger.Logger.Instance.Write("User cancelled operation.", RxLogger.Logger.ErrorLevel.ErrInfo);
+
+                                        // Mark current mirror failed
+                                        if (thisPatchServer != null)
+                                        {
+                                            thisPatchServer.HasErrored = true;
+                                            thisPatchServer.IsUsed = false;
+                                        }
+
+                                        // Unlock
+                                        UnlockDownload();
+
+                                        // Cancel
+                                        cancellationTokenSource.Cancel();
+
+                                        return null;
+                                    }
+
+                                    HttpWebResponse errorResponse = e.Response as HttpWebResponse;
+                                    if (errorResponse?.StatusCode >= (HttpStatusCode)400 && errorResponse?.StatusCode < (HttpStatusCode)500)
+                                    {
+                                        // 400 class errors will never resolve; do not retry
+                                        throw new TooManyRetriesException(new List<Exception> { e });
+                                    }
+
+                                    return e;
+                                }
+                            });
+
+                            // Download successfully completed
+                        }
+                        catch (TooManyRetriesException tooManyRetriesException)
+                        {
+                            RxLogger.Logger.Instance.Write("Too many retries; caught exceptions: ");
+                            foreach (Exception ex in tooManyRetriesException.Exceptions)
+                            {
+                                RxLogger.Logger.Instance.Write(ex.Message + "\r\n" + ex.StackTrace);
+                            }
+
+                            // Mark current mirror failed
+                            if (thisPatchServer != null)
+                                thisPatchServer.HasErrored = true;
+
+                            // Try the next best host; throw an exception if there is none
+                            if (_patcher.PopHost() == null)
+                            {
+                                // Unlock download to leave in clean state.
                                 UnlockDownload();
 
-                                // Check our hash, if it's not the same we re-queue
-                                // todo: add a retry count to the file instruction, this is needed because if the servers file is actually broken you'll be in an infiniate download loop
-                                if (hash != null && await Sha256.GetFileHashAsync(filePath) != hash)
-                                    throw new HashMistmatchException(); // Hash mismatch; throw exception
-
-                                return null;
+                                throw new NoReliableHostException();
                             }
-                            catch (WebException e)
-                            {
-                                RxLogger.Logger.Instance.Write(
-                                    $"Error while attempting to transfer the file.\r\n{e.Message}\r\n{e.StackTrace}");
-                                cancellationToken.ThrowIfCancellationRequested();
 
-                                HttpWebResponse errorResponse = e.Response as HttpWebResponse;
-                                if (errorResponse != null && errorResponse.StatusCode >= (HttpStatusCode) 400
-                                    && errorResponse.StatusCode < (HttpStatusCode) 500)
-                                {
-                                    // 400 class errors will never resolve; do not retry
-                                    throw new TooManyRetriesException(new List<Exception> {e});
-                                }
-
-                                return e;
-                            }
-                        });
-
-                        // Download successfully completed
-                    }
-                    catch (TooManyRetriesException tooManyRetriesException)
-                    {
-                        RxLogger.Logger.Instance.Write("Too many retries; caught exceptions: ");
-                        foreach (Exception ex in tooManyRetriesException.Exceptions)
-                        {
-                            RxLogger.Logger.Instance.Write(ex.Message + "\r\n" + ex.StackTrace);
+                            // Proceed execution with next mirror (retry loop)
+                            nextMirror = true;
+                            continue;
                         }
-
-                        // Mark current mirror failed
-                        if (thisPatchServer != null)
-                            thisPatchServer.HasErrored = true;
-
-                        // Try the next best host; throw an exception if there is none
-                        if (_patcher.PopHost() == null)
+                        catch (HashMistmatchException)
                         {
-                            // Unlock download to leave in clean state.
-                            UnlockDownload();
+                            RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
 
-                            throw new NoReliableHostException();
+                            // Mark current mirror failed
+                            if (thisPatchServer != null)
+                                thisPatchServer.HasErrored = true;
+
+                            // Try the next best host; throw an exception if there is none
+                            if (_patcher.PopHost() == null)
+                                throw new NoReliableHostException();
+
+                            // Reset progress and requeue download
+                            //await LoadNew(subPath, hash, cancellationTokenSource, progressCallback);
+                            nextMirror = true;
+                            continue;
                         }
-
-                        // Proceed execution with next mirror
-                        goto new_host_selected;
-                    }
-                    catch (HashMistmatchException)
-                    {
-                        RxLogger.Logger.Instance.Write($"Invalid file hash for {subPath} - Expected hash {hash}, requeuing download");
-
-                        // Mark current mirror failed
-                        if (thisPatchServer != null)
-                            thisPatchServer.HasErrored = true;
-
-                        // Try the next best host; throw an exception if there is none
-                        if (_patcher.PopHost() == null)
-                            throw new NoReliableHostException();
-
-                        // Reset progress and requeue download
-                        await LoadNew(subPath, hash, cancellationToken, progressCallback);
                     }
                 }
             }
