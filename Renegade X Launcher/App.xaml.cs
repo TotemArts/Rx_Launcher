@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using LauncherTwo.StartupInterpreter;
-using LauncherTwo.StartupInterpreter.Interpreters;
 using RxLogger;
 
 namespace LauncherTwo
@@ -58,6 +56,7 @@ namespace LauncherTwo
                 }
             }
 
+            // Not all expressions wants to show the MainWindow afterwards
             if (stopChecking) {
                 return;
             }

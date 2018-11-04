@@ -567,7 +567,7 @@ namespace LauncherTwo
                 IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
                 var localIps = host.AddressList.Where((a) => a.AddressFamily == AddressFamily.InterNetwork);
                 string localIpString = string.Join("\n", from ip in localIps select ip.ToString());
-                MessageBox.Show(String.Format("The server was started and will continue to run in the background. You can connect to it via LAN by pressing \"Join IP\" in the launcher, and then entering one of the IP addresses below.\n\n{0}\n\nIf you want to play over the internet, you can use the server list in the launcher or in game. Note that you likely need to forward port 7777 in your router and/or firewall to make internet games work.\n\nNote that launching the server via the launcher is intended for LAN servers, and some online functionality (such as leaderboard statistics) is disabled.", localIpString));
+                MessageBox.Show(string.Format("The server was started and will continue to run in the background. You can connect to it via LAN by pressing \"Join IP\" in the launcher, and then entering one of the IP addresses below.\n\n{0}\n\nIf you want to play over the internet, you can use the server list in the launcher or in game. Note that you likely need to forward port 7777 in your router and/or firewall to make internet games work.\n\nNote that launching the server via the launcher is intended for LAN servers, and some online functionality (such as leaderboard statistics) is disabled.", localIpString));
             }
             catch
             {
@@ -697,7 +697,16 @@ namespace LauncherTwo
                 {
                     Verb = "runas"
                 };
-                System.Diagnostics.Process.Start(startInfo);
+                try {
+                    Process.Start(startInfo);
+                } catch (Win32Exception) {
+                    // User could deny the Permission Prompt window.
+                    // In that case, the Process.Start will throw an 'Win32Exception' error.
+                    MessageBox.Show(string.Format("Permission denied. Installation cancelled."), "Renegade X: Installation", MessageBoxButton.OK);
+                }
+                catch (Exception) {
+                    MessageBox.Show(string.Format("Something went wrong. Please try again later."), "Renegade X: Installation", MessageBoxButton.OK);
+                }
                 Application.Current.Shutdown();
             }
             else

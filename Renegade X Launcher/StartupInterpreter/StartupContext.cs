@@ -1,4 +1,4 @@
-﻿namespace LauncherTwo.StartupInterpreter
+﻿namespace LauncherTwo
 {
     public class StartupContext
     {

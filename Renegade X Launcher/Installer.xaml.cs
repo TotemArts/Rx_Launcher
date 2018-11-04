@@ -95,11 +95,11 @@ namespace LauncherTwo
                 }
             } catch (OperationCanceledException) { // user cancelled operation
                 didSucceed = false;
-                //Application.Current.Shutdown(); // Wrong way (threads still running)
             } finally {
                 window.Close(); // Close ApplyUpdateWindow
-                task.Wait(); // Wait for all threads to be done
-                task.Dispose();
+                Application.Current.Shutdown(); // Wrong way (threads still running)
+                //task.Wait(); // Wait for all threads to be done
+                //task.Dispose();
             }
             
             RxLogger.Logger.Instance.Write($"Install finished, task state isCompleted = {task.IsCompleted}");

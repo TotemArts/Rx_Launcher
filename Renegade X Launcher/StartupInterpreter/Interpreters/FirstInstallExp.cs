@@ -1,7 +1,7 @@
 ﻿using RxLogger;
 using System;
 
-namespace LauncherTwo.StartupInterpreter.Interpreters
+namespace LauncherTwo
 {
     public class FirstInstallExp : IStartupExpression
     {

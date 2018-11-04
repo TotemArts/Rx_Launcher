@@ -1,9 +1,8 @@
 ﻿using System;
-using LauncherTwo.Tools;
 using RxLogger;
 using RXPatchLib;
 
-namespace LauncherTwo.StartupInterpreter.Interpreters
+namespace LauncherTwo
 {
     public class UpdateGameExp : IStartupExpression
     {

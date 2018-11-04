@@ -1,4 +1,4 @@
-﻿namespace LauncherTwo.StartupInterpreter.Interpreters
+﻿namespace LauncherTwo
 {
     public abstract class IStartupExpression
     {

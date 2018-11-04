@@ -1,9 +1,8 @@
-﻿using LauncherTwo.Tools;
-using RxLogger;
+﻿using RxLogger;
 using System;
 using System.Windows;
 
-namespace LauncherTwo.StartupInterpreter.Interpreters
+namespace LauncherTwo
 {
     public class PatchResultExp : IStartupExpression
     {

@@ -116,12 +116,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Tools\BannerTools.cs" />
-    <Compile Include="BitmapToImageSourceConverter.cs" />
+    <Compile Include="Converters\BitmapToImageSourceConverter.cs" />
     <Compile Include="GameInstallation.cs" />
     <Compile Include="Installer.xaml.cs">
       <DependentUpon>Installer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InstanceHandler.cs" />
+    <Compile Include="Tools\InstanceHandler.cs" />
     <Compile Include="Tools\LaunchTools.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -142,11 +142,10 @@
     <Compile Include="StartupInterpreter\Interpreters\UpdateGameExp.cs" />
     <Compile Include="StartupInterpreter\StartupContext.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
-    <Compile Include="TaskExtensions.cs" />
+    <Compile Include="Tools\TaskExtensions.cs" />
     <Compile Include="Tools\Utils.cs" />
-    <Compile Include="TrulyObservableCollection.cs" />
+    <Compile Include="Tools\TrulyObservableCollection.cs" />
     <Compile Include="UpdateServerModel.cs" />
-    <Compile Include="URI.cs" />
     <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\GeneralDownloadWindow.xaml.cs">
       <DependentUpon>GeneralDownloadWindow.xaml</DependentUpon>

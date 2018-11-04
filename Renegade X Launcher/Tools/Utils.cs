@@ -5,7 +5,7 @@ using System.Net.NetworkInformation;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
-namespace LauncherTwo.Tools
+namespace LauncherTwo
 {
     // This class contains useful utilities that can be accessed by everyone
     public static class Utils
