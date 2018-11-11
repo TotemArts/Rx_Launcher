@@ -11,7 +11,7 @@ namespace LauncherTwo
 {
     public abstract class EngineInstanceStartupParameters
     {
-        public string GetProcessPath ()
+        public virtual string GetProcessPath()
         {
             return GameInstallation.GetRootPath() + "Binaries\\UDKLift.exe";
         }
@@ -43,6 +43,7 @@ namespace LauncherTwo
         public string Password { get; set; }
         public string IpEndpoint { get; set; }
         public bool SkipIntroMovies { get; set; }
+        public bool Use64bit { get; set; }
 
         public override string GetProcessArguments ()
         {
@@ -62,6 +63,14 @@ namespace LauncherTwo
 
             arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username.Replace(' ', '\u00A0');
             return arguments;
+        }
+
+        public override string GetProcessPath()
+        {
+            if (Use64bit)
+                return GameInstallation.GetRootPath() + "Binaries\\Win64\\UDK.exe";
+            else
+                return GameInstallation.GetRootPath() + "Binaries\\Win32\\UDK.exe";
         }
 
     }

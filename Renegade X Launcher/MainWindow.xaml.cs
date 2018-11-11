@@ -523,6 +523,7 @@ namespace LauncherTwo
                 startupParameters.IpEndpoint = ipEndpoint;
                 startupParameters.Password = password;
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
+                startupParameters.Use64bit = Properties.Settings.Default.Binaries64;
 
                 GameInstance = EngineInstance.Start(startupParameters);
 
