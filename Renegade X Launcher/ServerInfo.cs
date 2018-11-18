@@ -1,21 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.ComponentModel;
-using System.Web;
 using Newtonsoft.Json;
-using System.IO;
-using System.Threading;
-using System.Windows.Controls;
 using System.Net.NetworkInformation;
-using LauncherTwo;
-using System.Dynamic;
 using System.Windows.Media.Imaging;
 using System.Windows;
-using RxLogger;
 
 namespace LauncherTwo
 {
@@ -468,18 +459,21 @@ namespace LauncherTwo
             await Task.WhenAll(pingTasks);
         }
 
-        static async Task PingAsync(ServerInfo serverInfo)
+        private static async Task PingAsync(ServerInfo serverInfo)
         {
-            try
+            using (Ping ping = new Ping())
             {
-                PingReply reply = await new Ping().SendPingAsync(serverInfo.IpAddress);
-                Logger.Instance.Write($"Pinging server {serverInfo.IpWithPort} returned {reply.RoundtripTime}ms latency");
-                serverInfo.Ping = (int)reply.RoundtripTime;
-                serverInfo.PropertyChanged?.Invoke(serverInfo, new PropertyChangedEventArgs("Ping"));
-            }
-            catch (Exception e)
-            {
-                Logger.Instance.Write($"Unable to ping server {serverInfo.IpWithPort} | {e.Message}\r\n{e.StackTrace}", Logger.ErrorLevel.ErrError);
+                try
+                {
+                    PingReply reply = await ping.SendPingAsync(serverInfo.IpAddress);
+                    RxLogger.Logger.Instance.Write($"Pinging server {serverInfo.IpWithPort} returned {reply.RoundtripTime}ms latency");
+                    serverInfo.Ping = (int)reply.RoundtripTime;
+                    serverInfo.PropertyChanged?.Invoke(serverInfo, new PropertyChangedEventArgs("Ping"));
+                }
+                catch (Exception e)
+                {
+                    RxLogger.Logger.Instance.Write($"Unable to ping server {serverInfo.IpWithPort} | {e.Message}\r\n{e.StackTrace}", RxLogger.Logger.ErrorLevel.ErrError);
+                }
             }
         }
 

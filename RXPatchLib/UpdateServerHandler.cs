@@ -62,5 +62,9 @@ namespace RXPatchLib
                 return null;
             }
         }
+        public void Dispose()
+        {
+            _updateServers.Clear();
+        }
     }
 }

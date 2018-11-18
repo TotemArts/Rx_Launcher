@@ -11,13 +11,11 @@ namespace LauncherTwo
     {
         public void StartupApp(object sender, StartupEventArgs e)
         {
-            //Determine if the permissionChange is successful after launcher update
+            // Application startup; Evaluating command-line arguments...
             bool didTryUpdate = false;
             bool isLogging = false;
-            bool stopChecking = false;
+            bool interrupt = false;
 
-            Logger.Instance.Write("Application starting up; checking command line options...");
-            
             // Use Interpreter design pattern to solve our command line options
             List<IStartupExpression> expressions = new List<IStartupExpression>
             {
@@ -29,13 +27,12 @@ namespace LauncherTwo
             
             foreach (string a in e.Args)
             {
-                Logger.Instance.Write("Parsing option: " + a);
-                // Create a context for each argument
+                // Create a context foreach argument
                 StartupContext context = new StartupContext
                 {
                     DidTryUpdate = false,
                     IsLogging = false,
-                    StopChecking = false,
+                    Interrupt = false,
                     Argument = a
                 };
                 foreach (IStartupExpression exp in expressions)
@@ -49,20 +46,19 @@ namespace LauncherTwo
                     if (context.IsLogging)
                         isLogging = true;
 
-                    if (context.StopChecking) {
-                        stopChecking = true;
+                    if (context.Interrupt) {
+                        interrupt = true;
                         break;
                     }
                 }
+                if (interrupt) { break; }
             }
 
-            // Not all expressions wants to show the MainWindow afterwards
-            if (stopChecking) {
+            // Not all expressions want to show the MainWindow afterwards
+            if (interrupt) {
                 return;
             }
-
-            Logger.Instance.Write("Done checking command line options");
-
+            
             if (LauncherTwo.Properties.Settings.Default.UpgradeRequired)
             {
                 Logger.Instance.Write("Upgrading properties...");
@@ -80,14 +76,15 @@ namespace LauncherTwo
                 {
                     MessageBox.Show("Error:\nUnable to start Renegade-X Launcher: Another instance is already running!",
                         "Renegade-X Launcher", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-                    Current.Shutdown();
+                    //Current.Shutdown();
+                    return; // No need to force shutdown
                 }
 
-                Logger.Instance.Write("Initial application startup complete, Creating new MainWindow");
-                new MainWindow().Show();
+                Logger.Instance.Write("Initial application startup complete, Creating new MainWindow...", Logger.ErrorLevel.ErrSuccess);
+                new MainWindow(isLogging).Show();
             }
 
-            Logger.Instance.Write("Exiting StartupApp...");
+            Logger.Instance.Write("Exiting application...");
         }
         
     }

@@ -71,12 +71,12 @@ namespace LauncherTwo.Views
                 return "pending";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
             {
-                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
+                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00;
                 return $"{perc:0.##}%";
             }
             else
             {
-                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00; ;
+                double perc = ((double)progress.Size.Done / (double)progress.Size.Total) * 100.00;
                 return $"{perc:0.##}%";
             }
         }
@@ -215,6 +215,8 @@ namespace LauncherTwo.Views
             }
         }
 
+        private bool didUserCancelled;
+
         private DirectoryPatcherProgressReport _progressReport;
         public DirectoryPatcherProgressReport ProgressReport
         {
@@ -264,6 +266,7 @@ namespace LauncherTwo.Views
         /// <param name="isInstall">Is this the first install</param>
         public ApplyUpdateWindow(Task patchTask, RxPatcher patcher, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
         {
+            didUserCancelled = false;
             TargetVersionString = targetVersionString;
             _cancellationTokenSource = cancellationTokenSource;
             string[] statusTitle = new string[]{"updated", "update"};
@@ -278,7 +281,7 @@ namespace LauncherTwo.Views
 
             statusTitleDict.TryGetValue(type, out statusTitle);
 
-            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", statusTitle[0]);
+            StatusMessage = string.Format("Please wait while Renegade X is being {0}.", statusTitle[0]);
 
             ServerMessage = patcher.UpdateServer?.Name ?? "pending";
             
@@ -291,39 +294,44 @@ namespace LauncherTwo.Views
             // Here we start the actual patching process, the whole thing from verification to applying.
             Task.Run(async () =>
             {
-                bool didSucceed = true;
-                while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
+                while (!patchTask.IsCompleted)
                 {
+                    await Task.Delay(500);
+
+                    ProgressReport = lastReport;
                     if ( _cancellationTokenSource.IsCancellationRequested ) {
                         //throw new OperationCanceledException();
-                        didSucceed = false;
-                        ProgressReport = lastReport;
+                        RxPatcher.Instance.Dispose(); // Dispose current connections
                         break;
                     }
-                    ProgressReport = lastReport;
                 }
-                ProgressReport = lastReport;
-
-                // Handle use-case: user cancelled
-                if (!didSucceed) {
-                    StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], "User cancelled operation.");
-                    RxLogger.Logger.Instance.Write(StatusMessage, RxLogger.Logger.ErrorLevel.ErrInfo);
-                    HasFinished = true;
-                    return;
-                }
-
+                
                 try
                 {
-                    await patchTask; // Collect exceptions.
-                    this.StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", statusTitle[0], TargetVersionString);
-                    RxLogger.Logger.Instance.Write($"Renegade X was successfully {statusTitle[0]} to version {TargetVersionString}.");
+                    bool didSucceed = !_cancellationTokenSource.IsCancellationRequested;
+                    
+                    if (didSucceed)
+                    {
+                        StatusMessage = string.Format("Renegade X was successfully {0} to version {1}.", statusTitle[0], TargetVersionString);
+                        RxLogger.Logger.Instance.Write($"Renegade X was successfully {statusTitle[0]} to version {TargetVersionString}.");
+                    }
+                    else
+                    {
+                        // Handle use-case: user cancelled / insufficient disk space
+                        string title = didUserCancelled ? "User cancelled operation." : "Insufficient disk space.";
+                        StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], title);
+                        RxLogger.Logger.Instance.Write(StatusMessage, RxLogger.Logger.ErrorLevel.ErrInfo);
+                    }
                 }
                 catch (Exception exception)
                 {
                     StatusMessage = string.Format("Renegade X could not be {0}. The following exception occurred:\n\n{1}", statusTitle[0], exception.Message);
                     RxLogger.Logger.Instance.Write($"Renegade X could not be {statusTitle[0]}. The following exception occurred:\n\n{exception.Message}\r\n{exception.StackTrace}");
                 }
-                HasFinished = true;
+                finally
+                { 
+                    HasFinished = true;
+                }
             }, _cancellationTokenSource.Token);
         }
 
@@ -352,8 +360,9 @@ namespace LauncherTwo.Views
 
             if (areYouSureDialog.DialogResult.Value == true)
             {
+                didUserCancelled = true;
                 _cancellationTokenSource.Cancel();
-                this.StatusMessage = "Operation cancelled by User";
+                StatusMessage = "Operation cancelled by User";
             }
         }
 

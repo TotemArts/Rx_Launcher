@@ -23,6 +23,7 @@ namespace LauncherTwo
     {
         public const bool ShowDebug = false;
         public bool VersionMismatch = false;
+        private bool IsLogOpen { get; } = false;
 
         /// <summary>
         /// Boolean that holds the state of the default movie.
@@ -87,8 +88,9 @@ namespace LauncherTwo
         private int _filterMinPlayers = 0;
         #endregion -= Filters =-
 
-        public MainWindow()
+        public MainWindow(bool isLogOpen = false)
         {
+            IsLogOpen = isLogOpen;
             RxLogger.Logger.Instance.Write("Initializing MainWindow...");
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
@@ -119,7 +121,7 @@ namespace LauncherTwo
                 {
                     Properties.Settings.Default.Installed = true;
                     Properties.Settings.Default.Save();
-                    if (Properties.Settings.Default.Username != "")
+                    if (!string.IsNullOrEmpty(Properties.Settings.Default.Username))
                     {
                         SD_Username.Content = Properties.Settings.Default.Username;
                     }
@@ -178,9 +180,8 @@ namespace LauncherTwo
             else
             {
                 SetMessageboxText("Game is out of date!");
-
-                bool wasUpdated;
-                ShowGameUpdateWindow(out wasUpdated);
+                
+                ShowGameUpdateWindow(out bool wasUpdated);
                 if (wasUpdated)
                 {
                     SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
@@ -596,8 +597,7 @@ namespace LauncherTwo
 
         private async void SD_ConnectIP_Click(object sender, RoutedEventArgs e)
         {
-            JoinIpWindow ipWindow = new JoinIpWindow();
-            ipWindow.Owner = this;
+            JoinIpWindow ipWindow = new JoinIpWindow() { Owner = this };
             ipWindow.ShowDialog();
             if (ipWindow.WantsToJoin)
             {
@@ -651,8 +651,7 @@ namespace LauncherTwo
         {
             SetMessageboxText("Game is out of date!");
 
-            bool wasUpdated;
-            ShowGameUpdateWindow(out wasUpdated);
+            ShowGameUpdateWindow(out bool wasUpdated);
             if (wasUpdated)
             {
                 SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
@@ -692,10 +691,11 @@ namespace LauncherTwo
             //Check if the user wants to install
             if (firstInstallDialog.DialogResult.Value == true)
             {
-                Uri path = new System.Uri(Assembly.GetExecutingAssembly().CodeBase);
-                ProcessStartInfo startInfo = new ProcessStartInfo(path.AbsoluteUri, "--firstInstall")
-                {
-                    Verb = "runas"
+                Uri path = new Uri(Assembly.GetExecutingAssembly().CodeBase);
+                string args = (IsLogOpen) ? "--log " : "";
+                args += "--firstInstall";
+                ProcessStartInfo startInfo = new ProcessStartInfo(path.AbsoluteUri, args) {
+                    Verb = "runas" // Run as admin
                 };
                 try {
                     Process.Start(startInfo);
@@ -707,7 +707,8 @@ namespace LauncherTwo
                 catch (Exception) {
                     MessageBox.Show(string.Format("Something went wrong. Please try again later."), "Renegade X: Installation", MessageBoxButton.OK);
                 }
-                Application.Current.Shutdown();
+                //Application.Current.Shutdown(); // No need to force shutdown
+                this.Close(); // Close MainWindow
             }
             else
             {

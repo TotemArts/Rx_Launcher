@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace LauncherTwo
 {
     /// <summary>
-    /// Model containing infor about an updateserver
+    /// Model containing information about an updateserver
     /// </summary>
     public class UpdateServerModel
     {

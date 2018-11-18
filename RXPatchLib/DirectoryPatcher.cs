@@ -311,12 +311,19 @@ namespace RXPatchLib
 
         internal async Task Analyze(CancellationTokenSource cancellationTokenSource, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructions_hash)
         {
+            var progress = new DirectoryPatchPhaseProgress
+            {
+                State = DirectoryPatchPhaseProgress.States.Indeterminate
+            };
+            progressCallback(progress);
+
             // Download instructions
             await PatchSource.Load("instructions.json", instructions_hash, cancellationTokenSource, (done, total, totalThreads) => { });
 
             // Open downloaded instructions.json and copy its contents to headerFileContents
             string headerFileContents;
-            using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            string instructionsPath = PatchSource.GetSystemPath("instructions.json");
+            using (var file = File.Open(instructionsPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (var streamReader = new StreamReader(file, Encoding.UTF8))
                 {
@@ -328,13 +335,39 @@ namespace RXPatchLib
             List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
 
             // Initialize progress-related variables
-            var progress = new DirectoryPatchPhaseProgress();
             var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
             var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
-            progress.SetTotals(instructions.Count, sizes.Sum());
+            long totalSize = 0L;
+            for (int i=0; i < instructions.Count; i++) {
+                //Logger.Instance.Write("Check file size: " + instructions[i].FullReplaceSize);
+                totalSize += instructions[i].FullReplaceSize;
+            }
+
+            // Check disk space by checking all instructions with their size (FullReplaceSize)
+            string drive = Path.GetPathRoot(new FileInfo(instructionsPath).FullName);
+            DriveInfo currentDrive = new DriveInfo(drive);
+            int KB = 1024, 
+                MB = KB * 1024,
+                GB = MB * 1024;
+            /*Logger.Instance.Write(string.Format("Sizes: {0} bytes ({1} GB), TotalSize: {2} bytes ({3} GB), Files: {4}, Available Space: {5} bytes ({6} GB)", 
+                            sum, (sum / GB), 
+                            totalSize, (totalSize / GB), 
+                            paths.Count(),
+                            currentDrive.AvailableFreeSpace, (currentDrive.AvailableFreeSpace / GB) )); */
+            if (totalSize > currentDrive.AvailableFreeSpace)
+            {
+                Logger.Instance.Write(string.Format("Not sufficient disk space on drive '{0}'! ({1} MB / {2} MB)",
+                    currentDrive.Name, (totalSize / MB), (currentDrive.AvailableFreeSpace / MB)), Logger.ErrorLevel.ErrError);
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                cancellationTokenSource.Cancel();
+                return;
+            }
+
+            // Ready to start download files from instructions
+            progress.SetTotals(instructions.Count, totalSize);
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
-
+            
             // This will ensure that all instruction hashes are at the BOTTOM of the order list.
             // These must be last as these are actions against complete files
             instructions = instructions.OrderBy(x => x.OldHash != "").ToList();
@@ -526,10 +559,11 @@ namespace RXPatchLib
         {
             var actions = new List<IFilePatchAction>();
             var progress = new DirectoryPatcherProgressReport();
-            Action<Action> reportProgress = (phaseAction) => {
+            void reportProgress(Action phaseAction)
+            {
                 phaseAction();
                 progressCallback.Report(ObjectEx.DeepClone(progress));
-            };
+            }
             var loadPhase = new LoadPhase(cancellationTokenSource, phaseProgress => reportProgress(() => progress.Load = phaseProgress));
 
             // Analyze files to determine which files to download and how to download them
@@ -543,8 +577,11 @@ namespace RXPatchLib
             // Wait for downloads to finish
             await loadPhase.AwaitAllTasksAndFinish();
 
-            // Apply the new files
-            await Apply(cancellationTokenSource, actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
+            // Apply the new files 
+            if (!cancellationTokenSource.IsCancellationRequested)
+            {
+                await Apply(cancellationTokenSource, actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
+            }
         }
     }
 }

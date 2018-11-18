@@ -1,5 +1,4 @@
-﻿using RxLogger;
-using System;
+﻿using System;
 
 namespace LauncherTwo
 {
@@ -17,13 +16,13 @@ namespace LauncherTwo
 
         public override void Evaluate(StartupContext context)
         {
-            Logger.Instance.Write("Startup parameters 'firstInstall' found - Starting RenX Installer");
+            RxLogger.Logger.Instance.Write("Startup parameters 'firstInstall' found - Starting RenX Installer");
             try
             {
                 Installer x = new Installer();
                 x.Show();
                 x.FirstInstall();
-                context.StopChecking = true;
+                context.Interrupt = true;
             } catch (Exception) { }
         }
     }

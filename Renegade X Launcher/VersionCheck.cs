@@ -1,11 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Net;
 using System.Windows;
 using Newtonsoft.Json;
@@ -135,27 +130,30 @@ namespace LauncherTwo
             {
                 try
                 {
-
                     versionJson = await client.DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
-
                 }
-                catch (WebException)
+                catch (WebException ex)
                 {
-                    MessageBox.Show("An error occurred while downloading version information, you can still play the game in single player but multiplayer might be unavailable.",
+                    // WHY?! There is no Singleplayer!! The update process needs to be finished before anyone can access the game
+                    MessageBox.Show("An error occurred while downloading version information, you can still play the game in singleplayer but multiplayer might be unavailable.",
                         "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                    RxLogger.Logger.Instance.Write($"Error while downloading launcher startup configuration, you can still play the game in single player but multiplayer might be unavailable.", RxLogger.Logger.ErrorLevel.ErrError);
+                    RxLogger.Logger.Instance.Write("Error while downloading launcher startup configuration, you can still play the game in singleplayer but multiplayer might be unavailable.\n" +
+                                                    "Error: " + ex.Message, RxLogger.Logger.ErrorLevel.ErrError);
+                } catch(Exception ex) {
+                    RxLogger.Logger.Instance.Write("Something went wrong during latest version check... \nError: " + ex.Message, RxLogger.Logger.ErrorLevel.ErrError);
                 }
             }
 
-            // If we dont have any versionJson, we cannot contiune anyway!
-            if (versionJson == "")
+            // If we dont have any versionJson, we cannot continue anyway!
+            if (string.IsNullOrEmpty(versionJson))
                 return;
 
             // Json parsing
             try
             {
                 versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 MessageBox.Show("Unable to load the RenegadeX Launcher, unable to parse JSON Version Information",
                     "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,6 +40,7 @@ namespace RXPatchLib
         public void Dispose()
         {
             //Debug.Assert(Task.WhenAll(_loadTasks.Values).IsCompleted);
+            //_loadTasks.Clear();
         }
 
         public string GetSystemPath(string subPath)
@@ -64,10 +63,14 @@ namespace RXPatchLib
         /// This controls concurrent downloading
         /// </summary>
         /// <returns>The return value can be ignored</returns>
-        private async Task LockDownload()
+        private async Task LockDownload(CancellationTokenSource cancellationTokenSource)
         {
             while (true)
             {
+                if (cancellationTokenSource.IsCancellationRequested) {
+                    break;
+                }
+
                 lock (_isDownloadingLock)
                 {
                     // This is where the threading of concurrent downloads happens, currently hardcoded to 12 but easily changed.
@@ -97,8 +100,7 @@ namespace RXPatchLib
 
         public async Task LoadNew(string subPath, string hash, CancellationTokenSource cancellationTokenSource, Action<long, long, byte> progressCallback)
         {
-            if (cancellationTokenSource.IsCancellationRequested)
-            {
+            if (cancellationTokenSource.IsCancellationRequested) {
                 return;
             }
 
@@ -129,10 +131,16 @@ namespace RXPatchLib
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
             // Since I can't await within a lock...
-            await LockDownload();
+            await LockDownload(cancellationTokenSource);
 
             using (MyWebClient webClient = new MyWebClient())
             {
+                if (cancellationTokenSource.IsCancellationRequested)
+                {
+                    RxLogger.Logger.Instance.Write($"Web client for {subPath} starting to shutdown due to Cancellation Requested");
+                    return;
+                }
+
                 webClient.DownloadProgressChanged += (o, args) =>
                 {
                     // Notify the RenX Updater window of a downloads progress
@@ -144,11 +152,7 @@ namespace RXPatchLib
                     // Notify our debug window of a downloads progress
                     AXDebug.AxDebuggerHandler.Instance.UpdateDownload(guid, args.BytesReceived, args.TotalBytesToReceive);
                 };
-                if (cancellationTokenSource.IsCancellationRequested)
-                {
-                    RxLogger.Logger.Instance.Write($"Web client for {subPath} starting to shutdown due to Cancellation Requested");
-                    return;
-                }
+                
 
                 bool nextMirror = true;
                 while (nextMirror)
@@ -192,8 +196,7 @@ namespace RXPatchLib
                                 {
                                     RxLogger.Logger.Instance.Write(
                                         $"Error while attempting to transfer the file.\r\n{e.Message}");
-
-                                    //cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                                    
                                     if (e.Status == WebExceptionStatus.RequestCanceled)
                                     {
                                         RxLogger.Logger.Instance.Write("User cancelled operation.", RxLogger.Logger.ErrorLevel.ErrInfo);
@@ -205,11 +208,13 @@ namespace RXPatchLib
                                             thisPatchServer.IsUsed = false;
                                         }
 
-                                        // Unlock
-                                        UnlockDownload();
+                                        nextMirror = false;
 
                                         // Cancel
                                         cancellationTokenSource.Cancel();
+
+                                        // Unlock download
+                                        UnlockDownload();
 
                                         return null;
                                     }
@@ -244,7 +249,6 @@ namespace RXPatchLib
                             {
                                 // Unlock download to leave in clean state.
                                 UnlockDownload();
-
                                 throw new NoReliableHostException();
                             }
 
@@ -262,7 +266,10 @@ namespace RXPatchLib
 
                             // Try the next best host; throw an exception if there is none
                             if (_patcher.PopHost() == null)
+                            {
+                                UnlockDownload();
                                 throw new NoReliableHostException();
+                            }
 
                             // Reset progress and requeue download
                             //await LoadNew(subPath, hash, cancellationTokenSource, progressCallback);

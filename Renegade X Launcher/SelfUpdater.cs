@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Net;
 using System.IO;
 using System.IO.Compression;
@@ -11,7 +6,7 @@ using System.Diagnostics;
 
 namespace LauncherTwo
 {
-    enum EUpdateState
+    public enum EUpdateState
     {
         NotStarted = 0,
         Downloading,
@@ -23,30 +18,15 @@ namespace LauncherTwo
     }
     public static class SelfUpdater
     {
-        static EUpdateState _updateState = EUpdateState.NotStarted;
-        static Views.UpdateDownloadWindow _updaterWindow = null;
-        static WebClient _client;
-        static string _patchHash;
+        private static EUpdateState _updateState = EUpdateState.NotStarted;
+        private static Views.UpdateDownloadWindow _updaterWindow = null;
+        private static WebClient _client;
+        private static string _patchHash;
 
-        static string GetTempDirectory()
-        {
-            return Path.GetTempPath() + @"\RxTmp\";
-        }
-
-        static string GetUpdaterPath()
-        {
-            return GetExtractDirectory() + @"SelfUpdateExecutor.exe";
-        }
-
-        static string GetExtractDirectory()
-        {
-            return GetTempDirectory() + @"launcher_update_extracted\";
-        }
-
-        static string GetSavePath()
-        {
-            return GetTempDirectory() + @"launcher_update.zip";
-        }
+        private static string GetTempDirectory() => Path.GetTempPath() + @"\RxTmp\";
+        private static string GetUpdaterPath() => GetExtractDirectory() + @"SelfUpdateExecutor.exe";
+        private static string GetExtractDirectory() => GetTempDirectory() + @"launcher_update_extracted\";
+        private static string GetSavePath() => GetTempDirectory() + @"launcher_update.zip";
 
         static EUpdateState GetUpdateState()
         {
@@ -69,7 +49,7 @@ namespace LauncherTwo
             }
         }
 
-        static void StartDownload(string url)
+        private static void StartDownload(string url)
         {
             try
             {
@@ -94,7 +74,7 @@ namespace LauncherTwo
             }
         }
 
-        static void StartExtract()
+        private static void StartExtract()
         {
             try
             {
@@ -112,7 +92,7 @@ namespace LauncherTwo
             }
         }
 
-        static void ReadyToInstall()
+        private static void ReadyToInstall()
         {
             _updateState = EUpdateState.ReadyToInstall;
             _updaterWindow.UpdateFinished = true;

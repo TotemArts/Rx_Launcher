@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +31,15 @@ namespace RXPatchLib
             System.Net.ServicePointManager.DefaultConnectionLimit = 50;
         }
 
+        public void Dispose()
+        {
+            UpdateServer = null;
+            WebPatchPath = null;
+            UpdateServerHandler.Dispose();
+            UpdateServerSelector.Dispose();
+            _instance = null;
+        }
+
         public void AddNewUpdateServer(string url, string friendlyName)
         {
             UpdateServerHandler.AddUpdateServer(url, friendlyName);
@@ -59,10 +66,15 @@ namespace RXPatchLib
 
             using (WebPatchSource patchSource = new WebPatchSource(this, downloadPath))
             {
-                var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
+                DirectoryPatcher patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
                 await patcher.ApplyPatchAsync(progress, cancellationTokenSource, instructionsHash);
-                DirectoryEx.DeleteContents(downloadPath);
-                DirectoryEx.DeleteContents(tempPath);
+
+                // Only delete download/temp folder when download is successfully finished
+                if (!cancellationTokenSource.IsCancellationRequested)
+                {
+                    DirectoryEx.DeleteContents(downloadPath);
+                    DirectoryEx.DeleteContents(tempPath);
+                }
 
                 // delete backup?
             }
@@ -70,6 +82,9 @@ namespace RXPatchLib
 
         public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationTokenSource cancellationTokenSource, string instructionsHash)
         {
+            if (cancellationTokenSource.IsCancellationRequested) {
+                return;
+            }
             Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
             WebPatchPath = patchPath;
 

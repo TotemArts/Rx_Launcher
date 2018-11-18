@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace LauncherTwo.Views
 {
@@ -29,14 +19,14 @@ namespace LauncherTwo.Views
         }
 
         
-        public GeneralDownloadWindow(CancellationTokenSource token, String windowTitle)
+        public GeneralDownloadWindow(CancellationTokenSource token, string windowTitle)
         {
             InitializeComponent();
             this._token = token;
             this.Title = windowTitle;
         }
 
-        public void SetStatusLabel(String status)
+        public void SetStatusLabel(string status)
         {
             this.StatusLabelContent.Content = status;
         }
@@ -88,10 +78,11 @@ namespace LauncherTwo.Views
         public void UpdateProgressBar(long currentAmount)
         {
             Dispatcher.Invoke(new Action(() => {
-                this.ProgressBar.Value = currentAmount; 
+                int percentage = (int)(((double)currentAmount / (double)_sizeOfFile) * 100);
+                this.ProgressBar.Value = percentage; 
                 if (this._sizeOfFile != 0)
                 {
-                    this.ProgressPercentage.Content = (int)currentAmount / (this._sizeOfFile / 100) + "%";
+                    this.ProgressPercentage.Content = percentage + "%";
                 }
                 else
                 {
@@ -103,8 +94,9 @@ namespace LauncherTwo.Views
         public void UpdateProgressBar(long currentAmount, long totalAmount)
         {
             this._sizeOfFile = totalAmount;
-            this.ProgressBar.Value = currentAmount;
-            this.ProgressPercentage.Content = (int)currentAmount / (this._sizeOfFile / 100) + "%";
+            int percentage = (int)(((double)currentAmount / (double)_sizeOfFile) * 100);
+            this.ProgressBar.Value = percentage;
+            this.ProgressPercentage.Content = percentage + "%";
         }
     }
 }

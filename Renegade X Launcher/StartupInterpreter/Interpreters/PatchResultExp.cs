@@ -1,5 +1,4 @@
-﻿using RxLogger;
-using System;
+﻿using System;
 using System.Windows;
 
 namespace LauncherTwo
@@ -20,7 +19,7 @@ namespace LauncherTwo
         {
             context.DidTryUpdate = true;
             string code = context.Argument.Substring("--patch-result=".Length);
-            Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
+            RxLogger.Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
             
             //If the code !=0 -> there is something wrong with the patching of the launcher
             if (code != "0" && code != "Success") {

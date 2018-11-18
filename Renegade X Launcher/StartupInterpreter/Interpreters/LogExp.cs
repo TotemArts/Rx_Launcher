@@ -1,5 +1,4 @@
-﻿using RxLogger;
-using System;
+﻿using System;
 
 namespace LauncherTwo
 {
@@ -16,7 +15,7 @@ namespace LauncherTwo
 
         public override void Evaluate(StartupContext context)
         {
-            Logger.Instance.StartLogConsole();
+            RxLogger.Logger.Instance.StartLogConsole();
             context.IsLogging = true;
         }
     }

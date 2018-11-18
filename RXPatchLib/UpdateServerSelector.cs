@@ -21,11 +21,10 @@ namespace RXPatchLib
 
     public class UpdateServerSelector
     {
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-
         private const string TestFile = "10kb_file";
         public Queue<UpdateServerEntry> Hosts;
         private readonly List<UpdateServerSelectorObject> CurrentHostsList = new List<UpdateServerSelectorObject>();
+        private List<HttpWebRequest> CurrentConnections = new List<HttpWebRequest>();
         private const int ServerRecordsToTake = 4;
 
         /// <summary>
@@ -77,10 +76,11 @@ namespace RXPatchLib
             RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}");
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
             request.Method = "GET";
-            request.Timeout = 10000; // max wait time = 10 sec
+            request.Timeout = 20000; // max wait time = 20 sec
 
             //Default to "not found"
             HttpStatusCode responseCode = HttpStatusCode.NotFound;
+            CurrentConnections.Add(request);
             try
             {
                 HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
@@ -91,6 +91,7 @@ namespace RXPatchLib
                 hostObject.HasErrored = true;
                 RxLogger.Logger.Instance.Write($"The host {hostObject.Uri.AbsoluteUri} seems to be offline");
             }
+            CurrentConnections.Remove(request);
 
             // Push host to queue if valid
             if (responseCode == HttpStatusCode.OK)
@@ -138,6 +139,20 @@ namespace RXPatchLib
 
             // No host found; throw exception
             throw new Exception("Could not select a reliable download server. Please try again later.");
+        }
+
+        public void Dispose()
+        {
+            Hosts?.Clear();
+            CurrentHostsList.Clear();
+
+            if (CurrentConnections.Count > 0) {
+                for (int i=0; i < CurrentConnections.Count; i++) {
+                    RxLogger.Logger.Instance.Write($"Aborting connection to host {CurrentConnections[i].Host}...");
+                    CurrentConnections[i].Abort();
+                }
+                CurrentConnections.Clear();
+            }
         }
     }
 }
