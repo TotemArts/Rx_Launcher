@@ -45,30 +45,23 @@ namespace RXPatchLib
                 if (CurrentHostsList.Count == 0)
                     return null;
 
-                // Take the top 4 servers
-                var selectedServers = CurrentHostsList.Take(ServerRecordsToTake).ToList();
-                if (selectedServers.Count > 0)
+                // Order them by connection count and take the top one off the pile
+                UpdateServerSelectorObject selectedServer = CurrentHostsList.OrderByDescending(x => x.ConnectionCount).FirstOrDefault();
+                
+                // If we didnt get null, ++ connection count and return it, otherwise return null
+                if (selectedServer != null)
                 {
-                    // Order them by connection count and take the top one off the pile
-                    var selectedServer = selectedServers.OrderBy(x => x.ConnectionCount).DefaultIfEmpty(null).FirstOrDefault();
+                    selectedServer.ConnectionCount++;
 
-                    // If we didnt get null, ++ connection count and return it, otherwise return null
-                    if (selectedServer != null)
-                    {
-                        selectedServer.ConnectionCount++;
+                    RxLogger.Logger.Instance.Write(
+                        $"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections against it");
 
-                        RxLogger.Logger.Instance.Write(
-                            $"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections against it");
-
-                        return selectedServer.UpdateServer;
-                    }
-
-                    // Server selection failed, return null
-                    return null;
+                    return selectedServer.UpdateServer;
                 }
-            }
 
-            return null;
+                // Server selection failed, return null
+                return null;
+            }
         }
 
         public async Task<bool> QueryHost(UpdateServerEntry hostObject)

@@ -96,14 +96,10 @@ namespace LauncherTwo
                             .Replace("\"", ""));
                     }
                 }
-
-                if (versionName.ToLower().Contains("beta"))
-                {
-                    versionNumber = 0;
-                }
-
+                
                 if (versionName == null) throw new Exception("No version number found.");
                 if (versionNumber == null) throw new Exception("No version number found.");
+                
                 _gameVersion = new Version
                 {
                     Name = versionName,

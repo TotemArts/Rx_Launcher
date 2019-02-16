@@ -336,10 +336,17 @@ namespace RXPatchLib
 
             // Initialize progress-related variables
             var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
-            var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
+            //var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
+            var sizes = new List<long>();
+            long currentSize = 0L;
             long totalSize = 0L;
             for (int i=0; i < instructions.Count; i++) {
-                //Logger.Instance.Write("Check file size: " + instructions[i].FullReplaceSize);
+                if (instructions[i].HasDelta) {
+                    currentSize += instructions[i].DeltaSize;
+                    sizes.Add(instructions[i].DeltaSize);
+                } else {
+                    sizes.Add(0L);
+                }
                 totalSize += instructions[i].FullReplaceSize;
             }
 
@@ -349,11 +356,11 @@ namespace RXPatchLib
             int KB = 1024, 
                 MB = KB * 1024,
                 GB = MB * 1024;
-            /*Logger.Instance.Write(string.Format("Sizes: {0} bytes ({1} GB), TotalSize: {2} bytes ({3} GB), Files: {4}, Available Space: {5} bytes ({6} GB)", 
-                            sum, (sum / GB), 
+            Logger.Instance.Write(string.Format("Instructions - Downloaded: {0} bytes ({1} GB), TotalSize: {2} bytes ({3} GB), Files: {4}, Available Disk Space: {5} bytes ({6} GB)",
+                            currentSize, (currentSize / GB),
                             totalSize, (totalSize / GB), 
                             paths.Count(),
-                            currentDrive.AvailableFreeSpace, (currentDrive.AvailableFreeSpace / GB) )); */
+                            currentDrive.AvailableFreeSpace, (currentDrive.AvailableFreeSpace / GB) ));
             if (totalSize > currentDrive.AvailableFreeSpace)
             {
                 Logger.Instance.Write(string.Format("Not sufficient disk space on drive '{0}'! ({1} MB / {2} MB)",
@@ -370,10 +377,11 @@ namespace RXPatchLib
             
             // This will ensure that all instruction hashes are at the BOTTOM of the order list.
             // These must be last as these are actions against complete files
-            instructions = instructions.OrderBy(x => x.OldHash != "").ToList();
+            instructions = instructions.OrderBy(x => x.OldHash != string.Empty).ToList();
 
             // Process each instruction in instructions.json
-            foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
+            var pairs = instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s });
+            foreach (var pair in pairs)
             {
                 var instruction = pair.Instruction;
 
