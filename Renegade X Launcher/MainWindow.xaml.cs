@@ -33,6 +33,7 @@ namespace LauncherTwo
         public const int ServerRefreshRate = 0; // 60 sec
         public static readonly int MaxPlayerCount = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
+        public TrulyObservableCollection<PlayerInfo> OFilteredPlayerList { get; set; }
         private DispatcherTimer _refreshTimer;
         private EngineInstance _gameInstance;
         public EngineInstance GameInstance
@@ -93,6 +94,7 @@ namespace LauncherTwo
             IsLogOpen = isLogOpen;
             RxLogger.Logger.Instance.Write("Initializing MainWindow...");
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
+            OFilteredPlayerList = new TrulyObservableCollection<PlayerInfo>();
 
             SourceInitialized += (s, a) =>
             {
@@ -298,6 +300,8 @@ namespace LauncherTwo
             var previousSelectedServer = GetSelectedServer();
 
             OFilteredServerList.Clear();
+            OFilteredPlayerList.Clear();
+
             this.TotalPlayersOnline = 0;
             foreach (ServerInfo info in ServerInfo.ActiveServers)
             {
@@ -341,6 +345,9 @@ namespace LauncherTwo
             if (previousSelectedServer != null)
             {
                 SetSelectedServer(previousSelectedServer.IpWithPort);
+                foreach (var player in previousSelectedServer.Players) {
+                    OFilteredPlayerList.Add(player);
+                }
             }
         }
 
@@ -454,6 +461,11 @@ namespace LauncherTwo
             Crates_Checkbx.Source = GetChkBxImg(selected.SpawnCrates);
             InfantryOnly_Checkbx.Source = GetChkBxImg(selected.VehicleLimit <= 0);
             Ranked_Checkbx.Source = GetChkBxImg(selected.Ranked);
+
+            OFilteredPlayerList.Clear();
+            foreach (var player in selected.Players) {
+                OFilteredPlayerList.Add(player);
+            }
 
             // Set version mismatch message visibility and join button opacity
             if (VersionCheck.GetGameVersionName() == selected.GameVersion)

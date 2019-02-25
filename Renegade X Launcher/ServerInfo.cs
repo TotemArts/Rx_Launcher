@@ -277,8 +277,7 @@ namespace LauncherTwo
                 RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl}");
                 try
                 {
-                    jsonText =
-                        await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
+                    jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
                 }
                 catch (Exception ex)
                 {
@@ -313,6 +312,7 @@ namespace LauncherTwo
                         newServer.GameVersion = data["Game Version"] ?? "Missing";
 
                         newServer.IpAddress = data["IP"] ?? "Missing";
+                        
 
                         //SET INTS
                         newServer.BotCount = data["Bots"] ?? -1;
@@ -347,6 +347,10 @@ namespace LauncherTwo
                         newServer.CountryName = countryInfo[0];
                         newServer.CountryCode = countryInfo[1];
 
+                        //SET LISTS
+                        newServer.Levels = GetServerLevels(data["Levels"]);
+                        newServer.Players = GetPlayerList(data["PlayerList"]);
+
                         //All work done, add current serverinfo to the main list
                         newActiveServers.Add(newServer);
                     }
@@ -365,7 +369,7 @@ namespace LauncherTwo
             ActiveServers = newActiveServers;
         }
 
-        private static bool ParseBool(String str, bool def = false)
+        private static bool ParseBool(string str, bool def = false)
         {
             bool b;
             if (bool.TryParse(str, out b))
@@ -374,7 +378,7 @@ namespace LauncherTwo
                 return def;
         }
 
-        private static int ParseInt(String str, int def = 0)
+        private static int ParseInt(string str, int def = 0)
         {
             int i;
             if (Int32.TryParse(str, out i))
@@ -383,13 +387,56 @@ namespace LauncherTwo
                 return def;
         }
 
-        private static double ParseDouble(String str, double def = 0)
+        private static double ParseDouble(string str, double def = 0)
         {
             double d;
             if (double.TryParse(str, out d))
                 return d;
             else
                 return def;
+        }
+
+        private static List<LevelInfo> GetServerLevels(dynamic data)
+        {
+            List<LevelInfo> levels = new List<LevelInfo>();
+
+            if (data != null)
+            {
+                foreach (var level in data)
+                {
+                    if (level != null)
+                    {
+                        LevelInfo newLevel = new LevelInfo
+                        {
+                            Name = level["Name"] ?? "Unknown",
+                            GUID = level["GUID"] ?? ""
+                        };
+                    }
+                }
+            }
+
+            return levels;
+        }
+
+        private static List<PlayerInfo> GetPlayerList(dynamic data)
+        {
+            List<PlayerInfo> players = new List<PlayerInfo>();
+
+            if (data != null)
+            {
+                foreach (var player in data)
+                {
+                    if (player != null)
+                    {
+                        PlayerInfo newPlayer = new PlayerInfo()
+                        {
+                            Name = player["Name"] ?? "Unknown"
+                        };
+                    }
+                }
+            }
+
+            return players;
         }
 
         public static GameMode GetGameMode(string map)
@@ -650,6 +697,9 @@ namespace LauncherTwo
         public string   CountryCode { get; set; }
         public string CountryName { get;  set; }
 
+        public List<LevelInfo> Levels { get; set; }
+        public List<PlayerInfo> Players { get; set; }
+
         public ServerInfo()
         {
             ServerName = string.Empty;
@@ -675,10 +725,10 @@ namespace LauncherTwo
             BotCount = -1;
             CountryCode = string.Empty;
 
+            Levels = new List<LevelInfo>();
+            Players = new List<PlayerInfo>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        
     }
 }

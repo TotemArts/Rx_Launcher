@@ -17,12 +17,13 @@
     UseLayoutRounding="True"
     KeyDown="Window_KeyDown"
     Icon="Icon_Silver.ico"
-    DataContext="{Binding RelativeSource={RelativeSource Self}}"
-    d:DataContext="{d:DesignData /SampleServers.xaml}" MinWidth="700" MinHeight="500" Height="750" Width="1000"
+    MinWidth="700" MinHeight="500" Height="750" Width="1000"
     Title="{Binding TitleValue}"
     WindowStartupLocation="CenterScreen"
     x:Name="LauncherTwo">
-
+    <local:RxWindow.DataContext>
+        <local:SampleServers />
+    </local:RxWindow.DataContext>
 
 
   <!-- BYRONS TEST RESOURCE -->
@@ -1044,6 +1045,8 @@
             <RowDefinition Height="4"/>
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
+          
+          <!-- Server Preview Video -->  
           <Border BorderThickness="1" VerticalAlignment="Top">
             <Border.BorderBrush>
               <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
@@ -1075,141 +1078,223 @@
                 </Button.Background>
               </Button>
 
-
-
             </StackPanel>
           </Border>
-          <Border x:Name="Info_Bot_Border" BorderThickness="1" Grid.Row="2">
-            <Border.BorderBrush>
-              <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-            </Border.BorderBrush>
-            <Border.Background>
-              <SolidColorBrush Color="{DynamicResource RenX_Window_Background_Color}"/>
-            </Border.Background>
-            <ScrollViewer Template="{DynamicResource ScrollViewerControlRenX}">
-              <Grid Margin="6">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
-                  <Label x:Name="SD_Name" Content="" Foreground="#BF35BAFF" HorizontalAlignment="Center" FontWeight="Bold"/>
-                </StackPanel>
-                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
-                  <Label Content="Game Length:" Foreground="White"/>
-                  <Label x:Name="SD_GameLength" Content="" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                  <Label Content="Player Limit:" Foreground="White"/>
-                  <Label x:Name="SD_PlayerLimit" Content="" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
-                  <Label Content="Vehicle Limit:" Foreground="White"/>
-                  <Label x:Name="SD_VehicleLimit" Content="" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                  <Label Content="Mine Limit:" Foreground="White"/>
-                  <Label x:Name="SD_MineLimit" Content="" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
-                  <Label Content="Game Mode:" Foreground="White"/>
-                  <Label x:Name="SD_GameMode" Content="" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="3"  Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                  <Rectangle x:Name="SD_CF" Width="32" Height="32" Margin="6,0,0,0">
-                    <Rectangle.Fill>
-                      <ImageBrush x:Name="SD_CFI" ImageSource="{StaticResource FlagBatch}" Stretch="none" AlignmentX="Left" AlignmentY="Top" ViewboxUnits="Absolute" Viewbox="-32,0,32,32"/>
-                    </Rectangle.Fill>
-                  </Rectangle>
-                  <Label x:Name="SD_CN" Content="" HorizontalAlignment="Center" Foreground="Gray" Padding="5,7,0,0"/>
-                </StackPanel>
-                <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal">
-                  <Image x:Name="Crates_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
-                  <Label Content="Crates" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-                  <Image x:Name="Autobalance_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
-                  <Label Content="Auto Balance" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal">
-                  <Image x:Name="Steam_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
-                  <Label Content="Steam Required" Foreground="White"/>
-                </StackPanel>
-                <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
-                    <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
-                    <Label Content="Infantry Only" Foreground="White"/>
-                </StackPanel>
-
-                <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal">
-                    <Image x:Name="Ranked_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
-                    <Label Content="Ranked" Foreground="White" />
-                </StackPanel>
-
-                <Grid x:Name="SD_VersionMismatch" Grid.Row="7" Grid.ColumnSpan="2" Visibility="Hidden">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                  </Grid.RowDefinitions>
-                  <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
-                    <Label Content="Version Mismatch - Unable to Join" Foreground="Red" HorizontalAlignment="Center" FontWeight="ExtraBold"/>
-                  </StackPanel>
-                  <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal">
-                    <Label Content="Server Version:" Foreground="Red"/>
-                    <Label x:Name="SD_ServerVersion" Content="" Foreground="Red" HorizontalAlignment="Center" FontWeight="Bold"/>
-                  </StackPanel>
-                  <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
-                    <Label Content="Your Version:" Foreground="Red"/>
-                    <Label x:Name="SD_GameVersion" Content="" Foreground="Red" HorizontalAlignment="Center" FontWeight="Bold"/>
-                  </StackPanel>
-                </Grid>
-                <!-- <Border BorderThickness="1" Margin="2" Grid.Row="7" d:IsHidden="True">
+          
+            <!-- Info Game -->
+            <TabControl Grid.Row="2" BorderThickness="1" Background="Transparent" SelectedIndex="0">
+                <TabControl.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                </TabControl.BorderBrush>
+                
+                <!-- Resources: Make tab background transparent -->
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="0,0,0,0" Margin="1,0" Padding="0,1">
                                         <Border.BorderBrush>
                                             <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                                         </Border.BorderBrush>
+                                        <ContentPresenter x:Name="ContentSite"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            ContentSource="Header"
+                                            Margin="10,2"/>
                                     </Border>
-                                    <Border BorderThickness="1" Margin="2" Grid.Row="7" Grid.Column="1" d:IsHidden="True">
-                                        <Border.BorderBrush>
-                                            <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                        </Border.BorderBrush>
-                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="#B2212121" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="Border" Property="Background" Value="#B2010304" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+                
+                <!-- Tab: Server Info -->
+                <TabItem>
+                    <!-- Header -->
+                    <TabItem.Header>
+                        <StackPanel>
+                            <TextBlock Text="Server Info" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                
+                    <!-- Content -->
+                    <Border x:Name="Info_Bot_Border" BorderThickness="1" >
+                        <Border.BorderBrush>
+                          <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                        </Border.BorderBrush>
+                        <Border.Background>
+                          <SolidColorBrush Color="{DynamicResource RenX_Window_Background_Color}"/>
+                        </Border.Background>
+                        <ScrollViewer Template="{DynamicResource ScrollViewerControlRenX}">
+                          <Grid Margin="6">
+                            <Grid.ColumnDefinitions>
+                              <ColumnDefinition Width="*"/>
+                              <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="Auto"/>
+                              <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
+                              <Label x:Name="SD_Name" Content="" Foreground="#BF35BAFF" HorizontalAlignment="Center" FontWeight="Bold"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                              <Label Content="Game Length:" Foreground="White"/>
+                              <Label x:Name="SD_GameLength" Content="" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                              <Label Content="Player Limit:" Foreground="White"/>
+                              <Label x:Name="SD_PlayerLimit" Content="" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                              <Label Content="Vehicle Limit:" Foreground="White"/>
+                              <Label x:Name="SD_VehicleLimit" Content="" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                              <Label Content="Mine Limit:" Foreground="White"/>
+                              <Label x:Name="SD_MineLimit" Content="" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
+                              <Label Content="Game Mode:" Foreground="White"/>
+                              <Label x:Name="SD_GameMode" Content="" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3"  Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                              <Rectangle x:Name="SD_CF" Width="32" Height="32" Margin="6,0,0,0">
+                                <Rectangle.Fill>
+                                  <ImageBrush x:Name="SD_CFI" ImageSource="{StaticResource FlagBatch}" Stretch="none" AlignmentX="Left" AlignmentY="Top" ViewboxUnits="Absolute" Viewbox="-32,0,32,32"/>
+                                </Rectangle.Fill>
+                              </Rectangle>
+                              <Label x:Name="SD_CN" Content="" HorizontalAlignment="Center" Foreground="Gray" Padding="5,7,0,0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal">
+                              <Image x:Name="Crates_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                              <Label Content="Crates" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                              <Image x:Name="Autobalance_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                              <Label Content="Auto Balance" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal">
+                              <Image x:Name="Steam_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                              <Label Content="Steam Required" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+                                <Image x:Name="InfantryOnly_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                                <Label Content="Infantry Only" Foreground="White"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="6" Grid.Column="0" Orientation="Horizontal">
+                                <Image x:Name="Ranked_Checkbx" Height="12" Width="12" Margin="6,0,0,0" Source="Resources/Checkbox_OFF.png"/>
+                                <Label Content="Ranked" Foreground="White" />
+                            </StackPanel>
+
+                            <Grid x:Name="SD_VersionMismatch" Grid.Row="7" Grid.ColumnSpan="2" Visibility="Hidden">
+                              <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                              </Grid.ColumnDefinitions>
+                              <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                              </Grid.RowDefinitions>
+                              <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
+                                <Label Content="Version Mismatch - Unable to Join" Foreground="Red" HorizontalAlignment="Center" FontWeight="ExtraBold"/>
+                              </StackPanel>
+                              <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                <Label Content="Server Version:" Foreground="Red"/>
+                                <Label x:Name="SD_ServerVersion" Content="" Foreground="Red" HorizontalAlignment="Center" FontWeight="Bold"/>
+                              </StackPanel>
+                              <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                <Label Content="Your Version:" Foreground="Red"/>
+                                <Label x:Name="SD_GameVersion" Content="" Foreground="Red" HorizontalAlignment="Center" FontWeight="Bold"/>
+                              </StackPanel>
+                            </Grid>
+                            <!-- 
+                              <Border BorderThickness="1" Margin="2" Grid.Row="7" d:IsHidden="True">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                </Border.BorderBrush>
+                            </Border>
+                            <Border BorderThickness="1" Margin="2" Grid.Row="7" Grid.Column="1" d:IsHidden="True">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                </Border.BorderBrush>
+                            </Border>
                                         
-                                    <Grid Margin="2" Grid.Row="6">
-                                        <Label Content="GDI" Foreground="White" Margin="0,1,114,1" Height="22"/>
-                                        <Label x:Name="SD_GDIScore" Content="{}{Bind}" Foreground="White" Margin="68,1,0,1" Height="22"/>
-                                        <Border BorderThickness="1" Margin="0" Height="24">
-                                            <Border.BorderBrush>
-                                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                            </Border.BorderBrush>
-                                        </Border>
-                                    </Grid>
-                                    <Grid Margin="2" Grid.Row="6" Grid.Column="1">
-                                        <Label Content="Nod" Foreground="White" Margin="0,1,114,1" Height="22"/>
-                                        <Label x:Name="SD_NodScore" Content="{}{Bind}" Foreground="White" Margin="68,1,0,1" Height="22"/>
-                                        <Border BorderThickness="1" Margin="0" Height="24">
-                                            <Border.BorderBrush>
-                                                <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
-                                            </Border.BorderBrush>
-                                        </Border>
+                            <Grid Margin="2" Grid.Row="6">
+                                <Label Content="GDI" Foreground="White" Margin="0,1,114,1" Height="22"/>
+                                <Label x:Name="SD_GDIScore" Content="{}{Bind}" Foreground="White" Margin="68,1,0,1" Height="22"/>
+                                <Border BorderThickness="1" Margin="0" Height="24">
+                                    <Border.BorderBrush>
+                                        <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                    </Border.BorderBrush>
+                                </Border>
+                            </Grid>
+                            <Grid Margin="2" Grid.Row="6" Grid.Column="1">
+                                <Label Content="Nod" Foreground="White" Margin="0,1,114,1" Height="22"/>
+                                <Label x:Name="SD_NodScore" Content="{}{Bind}" Foreground="White" Margin="68,1,0,1" Height="22"/>
+                                <Border BorderThickness="1" Margin="0" Height="24">
+                                    <Border.BorderBrush>
+                                        <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                                    </Border.BorderBrush>
+                                </Border>
                                       
-                                    </Grid>
-                                        -->
-              </Grid>
-            </ScrollViewer>
-          </Border>
+                            </Grid>
+                             -->
+                          </Grid>
+                        </ScrollViewer>
+                    </Border>
+                
+                </TabItem>
+                
+                <!-- Tab: Players -->
+                <TabItem>
+                    <!-- Header -->
+                    <TabItem.Header>
+                        <StackPanel Background="Transparent">
+                            <TextBlock Text="Players" Foreground="White" VerticalAlignment="Center"  />
+                        </StackPanel>
+                    </TabItem.Header>
+            
+                    <!-- Content -->
+                    <Border x:Name="Info_Bot_Border_Tab_Players" BorderThickness="1" >
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
+                        </Border.BorderBrush>
+                        <Border.Background>
+                            <SolidColorBrush Color="{DynamicResource RenX_Window_Background_Color}"/>
+                        </Border.Background>
+                        <Grid Margin="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Note: Player Rank & Team is not available at the moment -->
+                            <DataGrid IsReadOnly="True" x:Name="ServerPlayersGrid" GridLinesVisibility="None" MinRowHeight="20" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredPlayerList}" HorizontalScrollBarVisibility="Hidden" >
+                              <DataGrid.Columns>
+                                <DataGridTextColumn x:Name="PlayerNameColumn" Binding="{Binding PlayerName}" Header="Player Name" Width="*" Foreground="White" />
+                              </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+            </TabControl>
+        
         </Grid>
       </Grid>
     </Grid>

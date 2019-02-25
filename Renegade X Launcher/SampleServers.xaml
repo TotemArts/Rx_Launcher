@@ -1,9 +1,0 @@
-﻿<MainWindow xmlns="clr-namespace:LauncherTwo">
-    <MainWindow.OFilteredServerList>
-        <ServerInfo ServerName="Dummy server" MapName="dummy map" PlayerCount="1" MaxPlayers="10" Ping="123"/>
-        <ServerInfo ServerName="Dummy server" MapName="dummy map" PlayerCount="1" MaxPlayers="10" Ping="123"/>
-        <ServerInfo ServerName="Dummy server" MapName="dummy map" PlayerCount="1" MaxPlayers="10" Ping="123"/>
-        <ServerInfo ServerName="Dummy server" MapName="dummy map" PlayerCount="1" MaxPlayers="10" Ping="123"/>
-        <ServerInfo ServerName="Dummy server" MapName="dummy map" PlayerCount="1" MaxPlayers="10" Ping="123"/>
-    </MainWindow.OFilteredServerList>
-</MainWindow>
