@@ -33,7 +33,7 @@ namespace LauncherTwo
     {
         public override string GetProcessArguments()
         {
-            return "server CNC-Walls_Flying -nosteam";
+            return "server CNC-Walls -nosteam";
         }
     }
 
