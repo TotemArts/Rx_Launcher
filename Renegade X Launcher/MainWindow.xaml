@@ -17,13 +17,15 @@
     UseLayoutRounding="True"
     KeyDown="Window_KeyDown"
     Icon="Icon_Silver.ico"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
     MinWidth="700" MinHeight="500" Height="750" Width="1000"
     Title="{Binding TitleValue}"
     WindowStartupLocation="CenterScreen"
     x:Name="LauncherTwo">
-    <local:RxWindow.DataContext>
+    <!-- Testing purposes only -->
+    <!--<local:RxWindow.DataContext>
         <local:SampleServers />
-    </local:RxWindow.DataContext>
+    </local:RxWindow.DataContext>-->
 
 
   <!-- BYRONS TEST RESOURCE -->
@@ -1105,10 +1107,10 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="Border" Property="Background" Value="#B2212121" />
+                                                    <Setter TargetName="Border" Property="Background" Value="#B2010304" />
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="False">
-                                            <Setter TargetName="Border" Property="Background" Value="#B2010304" />
+                                            <Setter TargetName="Border" Property="Background" Value="#B2212121" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -1285,9 +1287,9 @@
                             </Grid.ColumnDefinitions>
                             
                             <!-- Note: Player Rank & Team is not available at the moment -->
-                            <DataGrid IsReadOnly="True" x:Name="ServerPlayersGrid" GridLinesVisibility="None" MinRowHeight="20" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredPlayerList}" HorizontalScrollBarVisibility="Hidden" >
+                            <DataGrid IsReadOnly="True" x:Name="ServerPlayersGrid" GridLinesVisibility="None" MinRowHeight="20" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredServerPlayerList}" HorizontalScrollBarVisibility="Hidden" >
                               <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="PlayerNameColumn" Binding="{Binding PlayerName}" Header="Player Name" Width="*" Foreground="White" />
+                                <DataGridTextColumn x:Name="ServerPlayerNameColumn" Binding="{Binding Name}" Header="Player Name" Width="*" Foreground="White" />
                               </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

@@ -1,25 +1,28 @@
-﻿using System.Collections.Generic;
-
-namespace LauncherTwo
+﻿namespace LauncherTwo
 {
     public class SampleServers
     {
+        public string TitleValue { get; } = "Renegade-X Test";
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
-        
+        public TrulyObservableCollection<PlayerInfo> OFilteredServerPlayerList { get; set; }
+        public bool IsLaunchingPossible { get; } = false;
+
+
         public SampleServers()
         {
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
-
+            OFilteredServerPlayerList = new TrulyObservableCollection<PlayerInfo>();
             CreateTestData();
         }
 
         private void CreateTestData()
         {
+            OFilteredServerList.Clear();
             OFilteredServerList.Add(new ServerInfo()
             {
                 ServerName = "Dummy Server 1",
-                MapName = "dummy map",
-                SimplifiedMapName = "dummy map",
+                MapName = "CNC-Field",
+                SimplifiedMapName = "Field",
                 MapMode = ServerInfo.GameMode.Cnc,
                 TimeLimit = 120,
                 PlayerCount = 4,
@@ -35,28 +38,28 @@ namespace LauncherTwo
                 SpawnCrates = true,
                 MineLimit = 20,
                 VehicleLimit = 12,
-                Players = new List<PlayerInfo>() {
+                Players = new TrulyObservableCollection<PlayerInfo>() {
                     new PlayerInfo{ Name = "Noob1" },
+                    new PlayerInfo{ Name = "[B] Bot1" },
                     new PlayerInfo{ Name = "Noob2" },
                     new PlayerInfo{ Name = "Noob3" },
-                    new PlayerInfo{ Name = "Bot1" }
                 },
-                Levels = new List<LevelInfo>() {
+                Levels = new TrulyObservableCollection<LevelInfo>() {
                     new LevelInfo{ Name = "Dummy Level 1", GUID = "000" }
                 }
             });
             OFilteredServerList.Add(new ServerInfo()
             {
                 ServerName = "Dummy Server 2",
-                MapName = "dummy map",
-                SimplifiedMapName = "dummy map",
-                MapMode = ServerInfo.GameMode.Dm,
+                MapName = "CNC-Walls",
+                SimplifiedMapName = "Walls",
+                MapMode = ServerInfo.GameMode.Cnc,
                 TimeLimit = 300,
-                PlayerCount = 1,
+                PlayerCount = 3,
                 MaxPlayers = 10,
                 Ping = 100,
                 Ranked = false,
-                PasswordProtected = true,
+                PasswordProtected = false,
                 SteamRequired = false,
                 AllowPm = true,
                 UsesBots = true,
@@ -65,18 +68,20 @@ namespace LauncherTwo
                 SpawnCrates = true,
                 MineLimit = 24,
                 VehicleLimit = 12,
-                Players = new List<PlayerInfo>() {
-                    new PlayerInfo{ Name = "Bot1" }
+                Players = new TrulyObservableCollection<PlayerInfo>() {
+                    new PlayerInfo{ Name = "[B] Bot1" },
+                    new PlayerInfo{ Name = "[B] Bot2" },
+                    new PlayerInfo{ Name = "[B] Bot3" }
                 },
-                Levels = new List<LevelInfo>() {
+                Levels = new TrulyObservableCollection<LevelInfo>() {
                     new LevelInfo{ Name = "Dummy Level 1", GUID = "000" }
                 }
             });
             OFilteredServerList.Add(new ServerInfo()
             {
                 ServerName = "Dummy Server 3",
-                MapName = "dummy map",
-                SimplifiedMapName = "dummy map",
+                MapName = "CNC-Islands",
+                SimplifiedMapName = "Island",
                 MapMode = ServerInfo.GameMode.Cnc,
                 TimeLimit = 300,
                 PlayerCount = 1,
@@ -86,19 +91,25 @@ namespace LauncherTwo
                 PasswordProtected = true,
                 SteamRequired = false,
                 AllowPm = true,
-                UsesBots = true,
-                BotCount = 1,
+                UsesBots = false,
+                BotCount = 0,
                 AutoBalance = true,
                 SpawnCrates = true,
                 MineLimit = 24,
                 VehicleLimit = 12,
-                Players = new List<PlayerInfo>() {
-                    new PlayerInfo{ Name = "Bot1" }
+                Players = new TrulyObservableCollection<PlayerInfo>() {
+                    new PlayerInfo{ Name = "The All Mighty Gabe Newell" }
                 },
-                Levels = new List<LevelInfo>() {
+                Levels = new TrulyObservableCollection<LevelInfo>() {
                     new LevelInfo{ Name = "Dummy Level 1", GUID = "000" }
                 }
             });
+
+            OFilteredServerPlayerList.Clear();
+            foreach (var player in OFilteredServerList[0].Players)
+            {
+                OFilteredServerPlayerList.Add(player);
+            }
         }
         
     }

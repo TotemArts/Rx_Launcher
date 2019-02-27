@@ -396,9 +396,9 @@ namespace LauncherTwo
                 return def;
         }
 
-        private static List<LevelInfo> GetServerLevels(dynamic data)
+        private static TrulyObservableCollection<LevelInfo> GetServerLevels(dynamic data)
         {
-            List<LevelInfo> levels = new List<LevelInfo>();
+            TrulyObservableCollection<LevelInfo> levels = new TrulyObservableCollection<LevelInfo>();
 
             if (data != null)
             {
@@ -411,6 +411,8 @@ namespace LauncherTwo
                             Name = level["Name"] ?? "Unknown",
                             GUID = level["GUID"] ?? ""
                         };
+
+                        levels.Add(newLevel);
                     }
                 }
             }
@@ -418,9 +420,9 @@ namespace LauncherTwo
             return levels;
         }
 
-        private static List<PlayerInfo> GetPlayerList(dynamic data)
+        private static TrulyObservableCollection<PlayerInfo> GetPlayerList(dynamic data)
         {
-            List<PlayerInfo> players = new List<PlayerInfo>();
+            TrulyObservableCollection<PlayerInfo> players = new TrulyObservableCollection<PlayerInfo>();
 
             if (data != null)
             {
@@ -432,6 +434,7 @@ namespace LauncherTwo
                         {
                             Name = player["Name"] ?? "Unknown"
                         };
+                        players.Add(newPlayer);
                     }
                 }
             }
@@ -697,8 +700,8 @@ namespace LauncherTwo
         public string   CountryCode { get; set; }
         public string CountryName { get;  set; }
 
-        public List<LevelInfo> Levels { get; set; }
-        public List<PlayerInfo> Players { get; set; }
+        public TrulyObservableCollection<LevelInfo> Levels { get; set; }
+        public TrulyObservableCollection<PlayerInfo> Players { get; set; }
 
         public ServerInfo()
         {
@@ -725,8 +728,8 @@ namespace LauncherTwo
             BotCount = -1;
             CountryCode = string.Empty;
 
-            Levels = new List<LevelInfo>();
-            Players = new List<PlayerInfo>();
+            Levels = new TrulyObservableCollection<LevelInfo>();
+            Players = new TrulyObservableCollection<PlayerInfo>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

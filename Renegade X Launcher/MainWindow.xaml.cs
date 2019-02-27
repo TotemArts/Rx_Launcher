@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace LauncherTwo
 {
@@ -28,12 +29,12 @@ namespace LauncherTwo
         /// <summary>
         /// Boolean that holds the state of the default movie.
         /// </summary>
-        private Boolean _defaultMoviePlays = false;
+        private bool _defaultMoviePlays = false;
 
         public const int ServerRefreshRate = 0; // 60 sec
         public static readonly int MaxPlayerCount = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
-        public TrulyObservableCollection<PlayerInfo> OFilteredPlayerList { get; set; }
+        public TrulyObservableCollection<PlayerInfo> OFilteredServerPlayerList { get; set; }
         private DispatcherTimer _refreshTimer;
         private EngineInstance _gameInstance;
         public EngineInstance GameInstance
@@ -59,7 +60,7 @@ namespace LauncherTwo
         public int TotalPlayersOnline {get { return this._totalPlayersOnline; } private set
             {
                 this._totalPlayersOnline = value;
-                this.NotifyPropertyChanged("TitleValue");       
+                this.NotifyPropertyChanged("TitleValue");
             } }
         public bool IsLaunchingPossible { get { return GameInstance == null && VersionMismatch == false; } }
 
@@ -94,7 +95,7 @@ namespace LauncherTwo
             IsLogOpen = isLogOpen;
             RxLogger.Logger.Instance.Write("Initializing MainWindow...");
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
-            OFilteredPlayerList = new TrulyObservableCollection<PlayerInfo>();
+            OFilteredServerPlayerList = new TrulyObservableCollection<PlayerInfo>();
 
             SourceInitialized += (s, a) =>
             {
@@ -137,7 +138,7 @@ namespace LauncherTwo
 
             //SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
-
+            
             SD_GameVersion.Content = VersionCheck.GetGameVersionName();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
@@ -300,7 +301,7 @@ namespace LauncherTwo
             var previousSelectedServer = GetSelectedServer();
 
             OFilteredServerList.Clear();
-            OFilteredPlayerList.Clear();
+            OFilteredServerPlayerList.Clear();
 
             this.TotalPlayersOnline = 0;
             foreach (ServerInfo info in ServerInfo.ActiveServers)
@@ -345,10 +346,13 @@ namespace LauncherTwo
             if (previousSelectedServer != null)
             {
                 SetSelectedServer(previousSelectedServer.IpWithPort);
-                foreach (var player in previousSelectedServer.Players) {
-                    OFilteredPlayerList.Add(player);
-                }
+                
+                // Refresh player list
+                RefreshServerPlayerList(previousSelectedServer);
+                ServerPlayersGrid.UpdateLayout();
             }
+
+            ServerInfoGrid.UpdateLayout();
         }
 
         private ServerInfo GetSelectedServer()
@@ -451,9 +455,8 @@ namespace LauncherTwo
             SD_ServerVersion.Content = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
             SD_CN.Content = selected.CountryName;
-
-            Rect r;
-            ServerInfo.FlagCodes.TryGetValue(selected.CountryCode, out r);
+            
+            ServerInfo.FlagCodes.TryGetValue(selected.CountryCode, out Rect r);
             this.SD_CFI.Viewbox = r;
             
             Autobalance_Checkbx.Source = GetChkBxImg(selected.AutoBalance);
@@ -462,10 +465,8 @@ namespace LauncherTwo
             InfantryOnly_Checkbx.Source = GetChkBxImg(selected.VehicleLimit <= 0);
             Ranked_Checkbx.Source = GetChkBxImg(selected.Ranked);
 
-            OFilteredPlayerList.Clear();
-            foreach (var player in selected.Players) {
-                OFilteredPlayerList.Add(player);
-            }
+            // Refresh player list
+            RefreshServerPlayerList(selected);
 
             // Set version mismatch message visibility and join button opacity
             if (VersionCheck.GetGameVersionName() == selected.GameVersion)
@@ -490,6 +491,7 @@ namespace LauncherTwo
             //sb.Begin();
 
             ServerInfoGrid.UpdateLayout();
+            ServerPlayersGrid.UpdateLayout();
         }
 
         public void SetMessageboxText(string text)
@@ -763,6 +765,29 @@ namespace LauncherTwo
         private void ServerInfoGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             JoinSelectedServer();
+        }
+
+        private void RefreshServerPlayerList(ServerInfo serverInfo)
+        {
+            // Clear list
+            OFilteredServerPlayerList.Clear();
+
+            if (serverInfo == null) {
+                return;
+            }
+
+            // Filter
+            List<PlayerInfo> sortedList = serverInfo.Players.OrderBy((p) => {
+                if (p.Name.Contains("[B]")) {
+                    return 1;
+                }
+                return -1;
+            }).ToList();
+            
+            // Add players
+            foreach (var player in sortedList) {
+                OFilteredServerPlayerList.Add(player);
+            }
         }
     }
 }

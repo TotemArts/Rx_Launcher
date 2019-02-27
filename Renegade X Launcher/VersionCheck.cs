@@ -62,7 +62,7 @@ namespace LauncherTwo
             }
             else
             {
-                return "Open Beta 5.16";
+                return "Open Beta 5.370";
             }
         }
 
