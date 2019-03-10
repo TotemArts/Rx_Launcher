@@ -138,7 +138,8 @@ namespace LauncherTwo
 
             //SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
-            
+            //ServerPlayersGrid.Items.SortDescriptions.Add(new SortDescription(ServerPlayerNameColumn.SortMemberPath, ListSortDirection.Ascending));
+
             SD_GameVersion.Content = VersionCheck.GetGameVersionName();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
@@ -320,7 +321,7 @@ namespace LauncherTwo
                     OFilteredServerList.Add(info);
             }
 
-            bool sameVersionOnly = (SD_Filter_SameVersionOnly.IsChecked.HasValue) ? SD_Filter_SameVersionOnly.IsChecked.Value : false;
+            bool sameVersionOnly = SD_Filter_SameVersionOnly.IsChecked ?? false;
 
             for (int i = OFilteredServerList.Count - 1; i > -1; i--)
             {
@@ -473,14 +474,14 @@ namespace LauncherTwo
             {
                 VersionMismatch = false;
                 SD_VersionMismatch.Visibility = Visibility.Hidden;
-                this.Join_Server_Btn.Background.Opacity = 1.0;
+                this.Join_Server_Btn.Opacity = 1.0;
                 this.Join_Server_Btn.Content = "Join Server";
             }
             else
             {
                 VersionMismatch = true;
                 SD_VersionMismatch.Visibility = Visibility.Visible;
-                this.Join_Server_Btn.Background.Opacity = 0.5;
+                this.Join_Server_Btn.Opacity = 0.5;
                 this.Join_Server_Btn.Content = "Server Version Mismatch";
             }
             
@@ -767,7 +768,7 @@ namespace LauncherTwo
             JoinSelectedServer();
         }
 
-        private void RefreshServerPlayerList(ServerInfo serverInfo)
+        private void RefreshServerPlayerList(ServerInfo serverInfo, ListSortDirection sortDirection = ListSortDirection.Ascending)
         {
             // Clear list
             OFilteredServerPlayerList.Clear();
@@ -777,17 +778,48 @@ namespace LauncherTwo
             }
 
             // Filter
-            List<PlayerInfo> sortedList = serverInfo.Players.OrderBy((p) => {
-                if (p.Name.Contains("[B]")) {
+            List<PlayerInfo> sortedList = serverInfo.Players.ToList();
+            sortedList.Sort((PlayerInfo p1, PlayerInfo p2) => {
+                if (p1.Name.Contains("[B]")) {
                     return 1;
                 }
-                return -1;
-            }).ToList();
+                if (p2.Name.Contains("[B]")) {
+                    return -1;
+                }
+                int direction = (sortDirection == ListSortDirection.Descending) ? -1 : 1;
+                return string.Compare(p1.Name, p2.Name, StringComparison.InvariantCultureIgnoreCase) * direction;
+            });
             
             // Add players
             foreach (var player in sortedList) {
                 OFilteredServerPlayerList.Add(player);
             }
+        }
+
+        private void ServerPlayersGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            if (!ServerPlayersGrid.CanUserSortColumns) {
+                return;
+            }
+
+            // Get column
+            DataGridColumn column = e.Column;
+
+            // Set sorting order
+            ListSortDirection direction = (column.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+            column.SortDirection = direction;
+            
+            // Sort
+            ServerInfo server = GetSelectedServer();
+            if (server != null) {
+                RefreshServerPlayerList(server, direction);
+            }
+
+            // Prevent built-in sorting
+            e.Handled = true;
+
+            // Update Layout
+            ServerPlayersGrid.UpdateLayout();
         }
     }
 }

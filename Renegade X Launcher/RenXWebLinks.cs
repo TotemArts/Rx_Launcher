@@ -1,5 +1,15 @@
 ﻿public static class RenXWebLinks
 {
     public static readonly char RenxServerSettingSpaceSymbol = ';';
-    public const string RenxActiveServerJsonUrl = "http://serverlist.renegade-x.com/servers_long.jsp"; // "http://serverlist.renegade-x.com/servers.jsp";
+
+    /**
+     * Data contains basic details about the active servers.
+     */
+    private const string RenxServerJsonUrl = "http://serverlist.renegade-x.com/servers.jsp";
+    /**
+     * Data contains advanced details about the active servers.
+     * Same as 'RenxServerJsonUrl' with addition data of Players and playable Levels.
+     */
+    private const string RenxServerLongJsonUrl = "http://serverlist.renegade-x.com/servers_long.jsp";
+    public const string RenxActiveServerJsonUrl = RenxServerLongJsonUrl;
 }

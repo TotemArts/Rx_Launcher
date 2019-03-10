@@ -36,7 +36,14 @@
       <Setter Property="FontStyle" Value="Normal" />
       <Setter Property="BorderBrush" Value="#515a60"/>
       <Setter Property="BorderThickness" Value="2"/>
-      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="Padding" Value="3,4" />
+    </Style>
+    <Style x:Key="DataHeaderMini" TargetType="{x:Type DataGridColumnHeader}">
+      <Setter Property="Background" Value="#9910171B" />
+      <Setter Property="FontStyle" Value="Normal" />
+      <Setter Property="BorderBrush" Value="#515a60"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="3,4" />
     </Style>
     <Style x:Key="DataGridStyle" TargetType="{x:Type DataGridRowHeader}">
       <Setter Property="BorderBrush" Value="Transparent"/>
@@ -919,14 +926,16 @@
         <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
       <DockPanel Grid.Row="0" x:Name="Header" Background="#EE0B1A22">
-        <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="24" FontFamily="{DynamicResource Font Awesome}" FontSize="11" Content="&#xF044;" Click="SD_EditUsernameBtn_Click" />
+        <Button DockPanel.Dock="Left" Margin="6,6,3,6" x:Name="SD_EditUsernameBtn" Width="25" Height="24" Click="SD_EditUsernameBtn_Click" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+          <TextBlock FontFamily="{DynamicResource Font Awesome}" FontSize="11" Text="&#xF044;" TextWrapping="Wrap" Width="11" Height="9" Padding="0" Foreground="{DynamicResource ButtonText}" /> 
+        </Button>
         <Label DockPanel.Dock="Left" Margin="3,6,3,6" x:Name="SD_Username" Height="25" Padding="0" Content="Player Name" FontSize="18" VerticalContentAlignment="Center" Foreground="{StaticResource WindowText}"/>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="0,0,5,0">
           <Button x:Name="SD_LaunchGameBtn" ToolTip="Launches Renegade X without joining any server" Width="90" FontSize="11" Content="Launch Game" Click="SD_LaunchGame_Click" IsEnabled="{Binding IsLaunchingPossible}" Style="{StaticResource TopBarButtons}" Margin="3,15"/>
           <Button x:Name="SD_JoinIPBtn" ToolTip="Direct connect to a Renegade X server by address" Width="50" FontSize="11" Content="Join IP" Click="SD_ConnectIP_Click" IsEnabled="{Binding IsLaunchingPossible}" Style="{StaticResource TopBarButtons}" Margin="3,15"/>
           <Button DockPanel.Dock="Right" x:Name="SD_LaunchServerBtn" ToolTip="Launches a standalone server" Width="90"  FontSize="11" Content="Launch Server" Click="SD_LaunchServer_Click" Style="{StaticResource TopBarButtons}"/>
-          <Button DockPanel.Dock="Right" x:Name="SD_SettingsBtn" ToolTip="Open the settings menu" Width="68" FontSize="11" Content="⚙ Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center" Style="{StaticResource TopBarButtons}"/>
+          <Button DockPanel.Dock="Right" x:Name="SD_SettingsBtn" ToolTip="Open the settings menu" Width="70" FontSize="11" Content="⚙ Settings" Click="SD_OpenSettingWindow" VerticalContentAlignment="Center" Style="{StaticResource TopBarButtons}"/>
         </StackPanel>
 
         <!--<Button DockPanel.Dock="Right" Margin="3" x:Name="SD_LaunchEditorBtn" Width="94" Height="25" FontSize="11" Content="Launch Editor" Click="SD_LaunchEditor_Click"/>-->
@@ -949,6 +958,7 @@
             <RowDefinition Height="4"/>
             <RowDefinition Height="auto"/>
           </Grid.RowDefinitions>
+          <!-- Filter -->
           <Border Grid.Row="1" x:Name="FilterControlsBorder" Background="#B2010304" BorderThickness="1">
             <Border.BorderBrush>
               <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
@@ -993,17 +1003,27 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="&#xF002;" Width="25" Height="25" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Margin="6" Foreground="{StaticResource WindowText}"/>
                 <TextBox Grid.Column="1" x:Name="sv_ServerSearch" Height="23" TextWrapping="Wrap" Width="159" Background="#199DD2FF" Foreground="White" TextChanged="sv_ServerSearch_TextChanged" Margin="6"/>
-                <Button Grid.Column="2" x:Name="sd_Refresh" Width="25" Height="25" Content="&#xF021;" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Click="sd_Refresh_MouseDown" Margin="6"/>
+                <Button Grid.Column="2" x:Name="sd_Refresh" Width="25" Height="25" Click="sd_Refresh_MouseDown" Margin="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    <TextBlock Text="&#xF021;" FontFamily="{DynamicResource Font Awesome}" FontSize="16" Width="14" Height="14" TextWrapping="Wrap" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                </Button>
               </Grid>
             </Grid>
           </Border>
+          
+          <!-- DataGrid ServerInfo -->
           <Border Grid.Row="3" x:Name="Servers_Border" Background="#B2010304" BorderThickness="1">
             <Border.BorderBrush>
               <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </Border.BorderBrush>
-            <DataGrid IsReadOnly="True" x:Name="ServerInfoGrid" GridLinesVisibility="None" MinRowHeight="20" SelectionChanged="ServerInfoGrid_SelectionChanged" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredServerList}" HorizontalScrollBarVisibility="Hidden" MouseDoubleClick="ServerInfoGrid_MouseDoubleClick">
+             
+            <DataGrid IsReadOnly="True" x:Name="ServerInfoGrid" GridLinesVisibility="None" MinRowHeight="20" SelectionChanged="ServerInfoGrid_SelectionChanged" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredServerList}" HorizontalScrollBarVisibility="Hidden">
               <DataGrid.Columns>
-                <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" CanUserResize="False">
+                <DataGridTemplateColumn x:Name="PasswordedNameColumn" Width="10" CanUserResize="False" ToolTipService.ToolTip="Password Protected">
+                  <DataGridTemplateColumn.HeaderTemplate>
+                    <DataTemplate>
+                      <Image Source="Resources/LockIcon.png" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.HeaderTemplate>
                   <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                       <Image Source="{Binding LockImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -1011,7 +1031,12 @@
                   </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn x:Name="GameModeColumn" Width="10" CanUserResize="False">
+                <DataGridTemplateColumn x:Name="GameModeColumn" Width="10" CanUserResize="False" ToolTipService.ToolTip="Game Mode">
+                  <DataGridTemplateColumn.HeaderTemplate>
+                    <DataTemplate>
+                      <Image Source="Resources/cnc_modeIcon.png" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.HeaderTemplate>
                   <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                       <Image Source="{Binding ModeImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -1019,20 +1044,31 @@
                   </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn x:Name="RankedColumn" Width="10" CanUserResize="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image Source="{Binding RankImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn x:Name="RankedColumn" Width="10" CanUserResize="False" ToolTipService.ToolTip="Ranked">
+                  <DataGridTemplateColumn.HeaderTemplate>
+                    <DataTemplate>
+                      <Image Source="Resources/trophy.png" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.HeaderTemplate>
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <Image Source="{Binding RankedImage}" Width="10" Height="10" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" Foreground="White" />
-                <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding SimplifiedMapName}" Header="Map" Width="100" Foreground="#FF98ABAE"/>
-                <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort"/>
-                <DataGridTextColumn x:Name="PingColumn" Binding="{Binding PingString}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort"/>
+                <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" Foreground="White" ToolTipService.ToolTip="Server Name" />
+                <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding SimplifiedMapName}" Header="Map" Width="100" Foreground="#FF98ABAE" ToolTipService.ToolTip="Map"/>
+                <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort" ToolTipService.ToolTip="Players" />
+                <DataGridTextColumn x:Name="PingColumn" Binding="{Binding PingString}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort" ToolTipService.ToolTip="Ping (lower is better)" />
               </DataGrid.Columns>
+              <DataGrid.RowStyle>
+                 <Style TargetType="{x:Type DataGridRow}">
+                     <EventSetter Event="MouseDoubleClick" Handler="ServerInfoGrid_MouseDoubleClick" />
+                 </Style>
+              </DataGrid.RowStyle>
             </DataGrid>
+              
           </Border>
           <Border Grid.Row="5" x:Name="MessageBox_Border" BorderThickness="1">
             <Border.BorderBrush>
@@ -1068,16 +1104,32 @@
                   <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                 </Border.BorderBrush>
 
-                <MediaElement x:Name="sv_MapPreviewVid" Width="320" Height ="180" Source="..\\PreviewVids\\Default.mp4" MediaEnded="MediaEndedHandler" Volume="0" LoadedBehavior="Manual">
-
-                </MediaElement>
+                <MediaElement x:Name="sv_MapPreviewVid" Width="320" Height ="180" Source="..\\PreviewVids\\Default.mp4" MediaEnded="MediaEndedHandler" Volume="0" LoadedBehavior="Manual" />
 
                 <!--<Image x:Name="sv_MapPreview" Width="314" Height="157" Stretch="Fill" Source="{Binding Source={x:Static resx:Resources.___map_pic_cnc_goldrush}, Converter={StaticResource bitmapToImageSourceConverter}}"/>-->
               </Border>
-              <Button x:Name="Join_Server_Btn" Content="Select a Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Foreground="#FFB0B0B0">
-                <Button.Background>
-                  <SolidColorBrush Color="#5935BAFF" Opacity="0.5"/>
-                </Button.Background>
+              <Button x:Name="Join_Server_Btn" Content="Select a Server" Margin="3" Height="48" FontSize="24" Click="Join_Server_Btn_Click" IsEnabled="{Binding IsLaunchingPossible}" Opacity="0.5">
+                <Button.Style>
+                   <Style TargetType="{x:Type Button}">
+                       <Setter Property="Background" Value="#5935BAFF" />
+                       <Setter Property="Foreground" Value="{DynamicResource ButtonTextHover}" />
+                       <Setter Property="Template">
+                          <Setter.Value>
+                             <ControlTemplate TargetType="{x:Type Button}">
+                                <Border Background="{TemplateBinding Background}">
+                                   <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                             </ControlTemplate>
+                          </Setter.Value>
+                       </Setter>
+                       <Style.Triggers>
+                          <Trigger Property="IsMouseOver" Value="True">
+                              <Setter Property="Background" Value="#9935BAFF" />
+                              <Setter Property="Foreground" Value="{DynamicResource ButtonTextHover}" />
+                          </Trigger>
+                       </Style.Triggers>
+                   </Style>
+                </Button.Style>
               </Button>
 
             </StackPanel>
@@ -1107,7 +1159,7 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="Border" Property="Background" Value="#B2010304" />
+                                            <Setter TargetName="Border" Property="Background" Value="#B2010304" />
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="False">
                                             <Setter TargetName="Border" Property="Background" Value="#B2212121" />
@@ -1129,7 +1181,7 @@
                     </TabItem.Header>
                 
                     <!-- Content -->
-                    <Border x:Name="Info_Bot_Border" BorderThickness="1" >
+                    <Border x:Name="Info_Bot_Border" BorderThickness="0" >
                         <Border.BorderBrush>
                           <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                         </Border.BorderBrush>
@@ -1274,7 +1326,7 @@
                     </TabItem.Header>
             
                     <!-- Content -->
-                    <Border x:Name="Info_Bot_Border_Tab_Players" BorderThickness="1" >
+                    <Border x:Name="Info_Bot_Border_Tab_Players" BorderThickness="0" >
                         <Border.BorderBrush>
                             <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
                         </Border.BorderBrush>
@@ -1287,9 +1339,9 @@
                             </Grid.ColumnDefinitions>
                             
                             <!-- Note: Player Rank & Team is not available at the moment -->
-                            <DataGrid IsReadOnly="True" x:Name="ServerPlayersGrid" GridLinesVisibility="None" MinRowHeight="20" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeader}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" SelectionMode="Single" ItemsSource="{Binding OFilteredServerPlayerList}" HorizontalScrollBarVisibility="Hidden" >
+                            <DataGrid IsReadOnly="True" x:Name="ServerPlayersGrid" Sorting="ServerPlayersGrid_Sorting" GridLinesVisibility="None" MinRowHeight="20" Foreground="White" AutoGenerateColumns="False" ColumnHeaderStyle="{DynamicResource DataHeaderMini}" RowDetailsVisibilityMode="Visible" AlternatingRowBackground="#00000000" RowBackground="#00000000" RowHeaderStyle="{DynamicResource DataGridStyle}" Background="Transparent" VerticalScrollBarVisibility="Visible" Style="{DynamicResource RenXDataGrid}" CanUserAddRows="False" CanUserResizeRows="False" CanUserDeleteRows="False" CanUserSortColumns="True" SelectionMode="Single" ItemsSource="{Binding OFilteredServerPlayerList}" HorizontalScrollBarVisibility="Hidden">
                               <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="ServerPlayerNameColumn" Binding="{Binding Name}" Header="Player Name" Width="*" Foreground="White" />
+                                <DataGridTextColumn x:Name="ServerPlayerNameColumn" Binding="{Binding Name}" Header="Player Name" Width="*" Foreground="White" SortDirection="Ascending" />
                               </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

@@ -32,12 +32,12 @@
                 <SolidColorBrush Color="{DynamicResource RenX_Window_Border_Color}"/>
             </Border.BorderBrush>
         </Border>
-        <Label Content="Username" Margin="124,0" FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" Width="64">
+        <Label Content="Username:" FontFamily="Arial" Grid.Row="1" HorizontalAlignment="Center" Width="Auto">
             <Label.Foreground>
                 <SolidColorBrush Color="{DynamicResource RenXFontColor}"/>
             </Label.Foreground>
         </Label>
-        <TextBox x:Name="SD_UsernameBox" Margin="90,0,82,0" Grid.Row="2" TextWrapping="Wrap" Background="#FF6E8BB0">
+        <TextBox x:Name="SD_UsernameBox" Margin="80,0" Grid.Row="2" TextWrapping="Wrap" Background="#FF6E8BB0">
             <TextBox.Foreground>
                 <SolidColorBrush Color="#FF111111"/>
             </TextBox.Foreground>

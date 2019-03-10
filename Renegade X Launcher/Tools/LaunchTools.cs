@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
-using System.IO;
-using System.Net;
 
 namespace LauncherTwo
 {
@@ -33,7 +27,7 @@ namespace LauncherTwo
     {
         public override string GetProcessArguments()
         {
-            return "server CNC-Walls_Flying -nosteam";
+            return "server CNC-Walls -nosteam";
         }
     }
 
@@ -78,7 +72,7 @@ namespace LauncherTwo
     public class EngineInstance
     {
         public EngineInstanceStartupParameters StartupParameters { get; protected set; }
-        public String IpEndpoint = "";
+        public string IpEndpoint = "";
         public Task Task { get; protected set; }
 
         public static EngineInstance Start(EngineInstanceStartupParameters startupParameters)

@@ -277,7 +277,11 @@ namespace LauncherTwo
                 RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl}");
                 try
                 {
-                    jsonText = await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
+                    WebClient client = new WebClient
+                    {
+                        Encoding = System.Text.Encoding.UTF8
+                    };
+                    jsonText = await client.DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
                 }
                 catch (Exception ex)
                 {
@@ -406,13 +410,20 @@ namespace LauncherTwo
                 {
                     if (level != null)
                     {
-                        LevelInfo newLevel = new LevelInfo
+                        try
                         {
-                            Name = level["Name"] ?? "Unknown",
-                            GUID = level["GUID"] ?? ""
-                        };
+                            string levelName = (level["Name"] ?? "Unknown");
+                            string levelGUID = (level["GUID"] ?? "");
+                            LevelInfo newLevel = new LevelInfo
+                            {
+                                Name = levelName,
+                                GUID = levelGUID
+                            };
 
-                        levels.Add(newLevel);
+                            levels.Add(newLevel);
+                        } catch (Exception) {
+                            // Don't crash when something is wrong with the level
+                        }
                     }
                 }
             }
@@ -430,11 +441,18 @@ namespace LauncherTwo
                 {
                     if (player != null)
                     {
-                        PlayerInfo newPlayer = new PlayerInfo()
+                        try
                         {
-                            Name = player["Name"] ?? "Unknown"
-                        };
-                        players.Add(newPlayer);
+                            string playerName = (player["Name"] ?? "Unknown");
+                            
+                            PlayerInfo newPlayer = new PlayerInfo()
+                            {
+                                Name = playerName
+                            };
+                            players.Add(newPlayer);
+                        } catch (Exception) {
+                            // Don't crash when something is wrong with the player name
+                        }
                     }
                 }
             }
@@ -663,17 +681,20 @@ namespace LauncherTwo
         {
             get
             {
-                if (this._rankedImage == null && this.Ranked)
-                        this._rankedImage = new BitmapImage(new Uri("Resources/RankedIcon.png", UriKind.Relative));
+                if (_rankedImage == null && this.Ranked)
+                    _rankedImage = new BitmapImage(new Uri("Resources/RankedIcon.png", UriKind.Relative));
 
-                return this._rankedImage;
+                if (_rankedImage == null)
+                    _rankedImage = Utils.CreateEmptyBitmapImage(2, 2);
+
+                return _rankedImage;
             }
         }
 
         // SIDE BAR INFO
         public string   IpAddress { get; set; }
-        public int Port { get; set; }
-        public string IpWithPort
+        public int      Port { get; set; }
+        public string   IpWithPort
         {
             get
             {
@@ -698,7 +719,7 @@ namespace LauncherTwo
         public int      CrateRespawnRate { get; set; }
         public int      TimeLimit { get; set; }
         public string   CountryCode { get; set; }
-        public string CountryName { get;  set; }
+        public string   CountryName { get;  set; }
 
         public TrulyObservableCollection<LevelInfo> Levels { get; set; }
         public TrulyObservableCollection<PlayerInfo> Players { get; set; }

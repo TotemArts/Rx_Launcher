@@ -1,9 +1,12 @@
 ﻿using RxLogger;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace LauncherTwo
 {
@@ -104,6 +107,38 @@ namespace LauncherTwo
             }
 
             return pingable;
+        }
+
+        public static BitmapSource CreateEmtpyBitmapSource(int width, int height)
+        {
+            /*PixelFormat pf = pixelFormat;
+            int rawStride = (width * pf.BitsPerPixel + 7) / 8;
+            var rawImage = new byte[rawStride * height];
+            var bitmap = BitmapSource.Create(width, height, 96, 96, pf, null, rawImage, rawStride);
+            return bitmap;*/
+
+            PixelFormat pixelFormat = PixelFormats.Indexed1;
+            return BitmapSource.Create(width, height, 96, 96, pixelFormat, new BitmapPalette(new List<Color> { Colors.Transparent }), new byte[] { 0, 0, 0, 0 }, 1);
+        }
+        public static BitmapImage CreateEmptyBitmapImage(int width, int height)
+        {
+            BitmapSource bitmapSource = CreateEmtpyBitmapSource(width, height);
+
+            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+            MemoryStream memoryStream = new MemoryStream();
+            BitmapImage bImg = new BitmapImage();
+
+            encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+            encoder.Save(memoryStream);
+
+            memoryStream.Position = 0;
+            bImg.BeginInit();
+            bImg.StreamSource = memoryStream;
+            bImg.EndInit();
+
+            memoryStream.Close();
+
+            return bImg;
         }
 
     }
