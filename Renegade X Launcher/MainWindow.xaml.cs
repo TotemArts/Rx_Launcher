@@ -780,10 +780,10 @@ namespace LauncherTwo
             // Filter
             List<PlayerInfo> sortedList = serverInfo.Players.ToList();
             sortedList.Sort((PlayerInfo p1, PlayerInfo p2) => {
-                if (p1.Name.Contains("[B]")) {
+                if (p1.Name.StartsWith("[B]")) {
                     return 1;
                 }
-                if (p2.Name.Contains("[B]")) {
+                if (p2.Name.StartsWith("[B]")) {
                     return -1;
                 }
                 int direction = (sortDirection == ListSortDirection.Descending) ? -1 : 1;
