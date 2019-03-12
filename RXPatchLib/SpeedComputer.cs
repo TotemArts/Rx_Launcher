@@ -41,7 +41,8 @@ namespace RXPatchLib
                 {
                     return 0;
                 }
-                return (long)((double)dValue / ((double)dTime / 1000.0) + .5);
+                long bps = (long)((double)dValue / ((double)dTime / 1000.0) + .5);
+                return (bps > 0) ? bps : 0;
             }
         }
 

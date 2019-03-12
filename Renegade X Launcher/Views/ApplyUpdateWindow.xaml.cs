@@ -133,17 +133,19 @@ namespace LauncherTwo.Views
                 return "pending";
             else if (progress.State == DirectoryPatchPhaseProgress.States.Indeterminate)
             {
+                var bytesPerSecond = progressWithSpeed.BytesPerSecond;
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
-                var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
+                var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(bytesPerSecond);
                 double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
-                return string.Format("{0} / ~{1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
+                return string.Format("{0} / ~{1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(bytesPerSecond), speedUnitAndScale.Unit, perc);
             }
             else
             {
+                var bytesPerSecond = progressWithSpeed.BytesPerSecond;
                 var unitAndScale = UnitAndScale.GetPreferredByteFormat(progress.Size.Total);
-                var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(progressWithSpeed.BytesPerSecond);
+                var speedUnitAndScale = UnitAndScale.GetPreferredByteFormat(bytesPerSecond);
                 double perc = (progress.Size.Done / (double)progress.Size.Total) * 100.00;
-                return string.Format("{0} / {1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(progressWithSpeed.BytesPerSecond), speedUnitAndScale.Unit, perc);
+                return string.Format("{0} / {1} {2} ({3} {4}/s - {5:#.##}%)", unitAndScale.GetFormatted(progress.Size.Done), unitAndScale.GetFormatted(progress.Size.Total), unitAndScale.Unit, speedUnitAndScale.GetFormatted(bytesPerSecond), speedUnitAndScale.Unit, perc);
             }
         }
 

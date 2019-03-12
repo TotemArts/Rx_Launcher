@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RXPatchLib
+﻿namespace RXPatchLib
 {
     public struct UnitAndScale
     {
@@ -19,7 +13,7 @@ namespace RXPatchLib
 
         public static UnitAndScale GetPreferredByteFormat(long value, string minScale = null, string maxScale = null)
         {
-            string[] scaleNames = { "B", "KiB", "MiB", "GiB" };
+            string[] scaleNames = { "B", "KB", "MB", "GB" };
             int scaleIndex;
             long scaleDiv = 1;
             bool allowedMinScale = (minScale == null);

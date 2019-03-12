@@ -17,12 +17,12 @@ namespace RXPatchLib
         protected override WebRequest GetWebRequest(Uri address)
         {
             var w = base.GetWebRequest(address);
-            w.Timeout = 10 * 1000;
+            w.Timeout = 10 * 1000; // ms
             return w;
         }
     }
 
-    class WebPatchSource : IPatchSource, IDisposable
+    public class WebPatchSource : IPatchSource, IDisposable
     {
         readonly Dictionary<string, Task> _loadTasks = new Dictionary<string, Task>();
         readonly RxPatcher _patcher;
