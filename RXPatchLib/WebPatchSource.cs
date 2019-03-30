@@ -173,22 +173,26 @@ namespace RXPatchLib
                                         throw new NoReliableHostException();
 
                                     // Mark this patch server as currently used (is active)
-                                    thisPatchServer.IsUsed = true;
-
-                                    // Download file and wait until finished
+                                    thisPatchServer.IsInUse = true;
                                     RxLogger.Logger.Instance.Write($"Starting file transfer: {thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}");
 
-                                    await webClient.DownloadFileTaskAsync(new Uri($"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}"), filePath);
+                                    // Download file and wait until finished
+                                    string url = $"{thisPatchServer.Uri.AbsoluteUri}/{_patcher.WebPatchPath}/{subPath}";
+                                    await webClient.DownloadFileTaskAsync(new Uri(url), filePath);
                                     RxLogger.Logger.Instance.Write(" > File Transfer Complete");
-                                    thisPatchServer.IsUsed = false;
+                                    thisPatchServer.IsInUse = false;
 
                                     // File finished downoading successfully; allow next download to start and check hash
                                     UnlockDownload();
 
                                     // Check our hash, if it's not the same we re-queue
                                     // todo: add a retry count to the file instruction, this is needed because if the servers file is actually broken you'll be in an infiniate download loop
-                                    if (hash != null && await Sha256.GetFileHashAsync(filePath) != hash)
-                                        throw new HashMistmatchException(); // Hash mismatch; throw exception
+                                    if (hash != null)
+                                    {
+                                        string currentHash = await Sha256.GetFileHashAsync(filePath);
+                                        if (currentHash != hash)
+                                            throw new HashMistmatchException(); // Hash mismatch; throw exception
+                                    }
 
                                     return null;
                                 }
@@ -205,7 +209,7 @@ namespace RXPatchLib
                                         if (thisPatchServer != null)
                                         {
                                             thisPatchServer.HasErrored = true;
-                                            thisPatchServer.IsUsed = false;
+                                            thisPatchServer.IsInUse = false;
                                         }
 
                                         nextMirror = false;

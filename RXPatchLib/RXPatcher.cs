@@ -52,8 +52,7 @@ namespace RXPatchLib
 
         public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
         {
-
-            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
+            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsInUse && !x.HasErrored);
         }
 
         public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationTokenSource cancellationTokenSource, string instructionsHash)

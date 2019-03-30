@@ -335,7 +335,8 @@ namespace RXPatchLib
             List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
 
             // Initialize progress-related variables
-            var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
+            IEnumerable<string> paths = instructions.Select( i => GetTargetPath(i.Path) );
+
             //var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
             var sizes = new List<long>();
             long currentSize = 0L;
@@ -365,6 +366,8 @@ namespace RXPatchLib
             {
                 Logger.Instance.Write(string.Format("Not sufficient disk space on drive '{0}'! ({1} MB / {2} MB)",
                     currentDrive.Name, (totalSize / MB), (currentDrive.AvailableFreeSpace / MB)), Logger.ErrorLevel.ErrError);
+
+                // Throw
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
                 cancellationTokenSource.Cancel();
                 return;
@@ -377,16 +380,16 @@ namespace RXPatchLib
             
             // This will ensure that all instruction hashes are at the BOTTOM of the order list.
             // These must be last as these are actions against complete files
-            instructions = instructions.OrderBy(x => x.OldHash != string.Empty).ToList();
+            instructions = instructions.OrderBy(x => !string.IsNullOrEmpty(x.OldHash)).ToList();
 
             // Process each instruction in instructions.json
             var pairs = instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s });
             foreach (var pair in pairs)
             {
-                var instruction = pair.Instruction;
+                FilePatchInstruction instruction = pair.Instruction;
 
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
-                string targetFilePath = Path.Combine(_targetPath, instruction.Path);
+                string targetFilePath = GetTargetPath(instruction.Path);
 
                 // Determine action(s) to take based on instruction; any new actions get passed to the callback
                 await BuildFilePatchAction(instruction, targetFilePath, callback);
@@ -403,6 +406,7 @@ namespace RXPatchLib
 
         private async Task BuildFilePatchAction(FilePatchInstruction instruction, string targetFilePath, Action<IFilePatchAction> callback)
         {
+            // Create hash from instruction file content
             string installedHash = await Sha256.GetFileHashAsync(targetFilePath);
             bool isOld = installedHash == instruction.OldHash;
 
@@ -457,10 +461,11 @@ namespace RXPatchLib
 
             // Create our workers, but clamp the value to 4, we dont want to cook peoples PC's
             // (on testing with using all cores, it maxed out my 24 core server, but it did patch in about 30 seconds!)
-            Logger.Instance.Write(
-                $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount)} of them");
 
-            for (var i = 0; i < (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount); i++)
+            int maxThreads = (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount);
+            Logger.Instance.Write($"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {maxThreads} of them");
+
+            for (var i = 0; i < maxThreads; i++)
             {
                 Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
                 bgWorkers.Add(new BackgroundWorker() {WorkerSupportsCancellation = true});

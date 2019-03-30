@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RxLogger;
 
 namespace RXPatchLib
 {
@@ -15,13 +11,15 @@ namespace RXPatchLib
     {
         public Uri Uri;
         public string Name;
-        public bool IsUsed;
+        public bool IsInUse;
         public bool HasErrored;
 
         public UpdateServerEntry(string url, string name)
         {
             Uri = new Uri(url);
             Name = name;
+            IsInUse = false;
+            HasErrored = false;
         }
     }
 
@@ -44,7 +42,7 @@ namespace RXPatchLib
         }
 
         /// <summary>
-        /// Selects the best patch server in the list that both is not in use, and has not errored
+        /// Selects the best patch server in the list that both is not in use and doesn't have any errors
         /// </summary>
         /// <returns>An UpdateServerEntry of the host found, or Null if no more hosts exist</returns>
         public UpdateServerEntry SelectBestPatchServer()
@@ -52,16 +50,20 @@ namespace RXPatchLib
             lock (_updateServers)
             {
                 var thisServerEntry =
-                    _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => x != null && !x.HasErrored && !x.IsUsed);
+                    _updateServers.DefaultIfEmpty(null).FirstOrDefault(x => x != null && !x.HasErrored && !x.IsInUse);
                 if (thisServerEntry != null)
                 {
-                    thisServerEntry.IsUsed = true; // Mark is as used so it's not used again
+                    thisServerEntry.IsInUse = true; // Mark is as used so it's not used again
                     return thisServerEntry;
                 }
 
                 return null;
             }
         }
+
+        /// <summary>
+        /// Disposes all path servers
+        /// </summary>
         public void Dispose()
         {
             _updateServers.Clear();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace RXPatchLib
@@ -22,10 +21,9 @@ namespace RXPatchLib
     public class UpdateServerSelector
     {
         private const string TestFile = "10kb_file";
-        public Queue<UpdateServerEntry> Hosts;
+        public readonly Queue<UpdateServerEntry> Hosts = new Queue<UpdateServerEntry>();
         private readonly List<UpdateServerSelectorObject> CurrentHostsList = new List<UpdateServerSelectorObject>();
         private List<HttpWebRequest> CurrentConnections = new List<HttpWebRequest>();
-        private const int ServerRecordsToTake = 4;
 
         /// <summary>
         /// Gets the next UpdateServerEntry that has the least amount of connections to it
@@ -64,14 +62,14 @@ namespace RXPatchLib
             }
         }
 
-        public async Task<bool> QueryHost(UpdateServerEntry hostObject)
+        private async Task<bool> QueryHost(UpdateServerEntry hostObject)
         {
-            RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}");
+            RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}.");
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
             request.Method = "GET";
             request.Timeout = 20000; // max wait time = 20 sec
 
-            //Default to "not found"
+            // Default to "not found"
             HttpStatusCode responseCode = HttpStatusCode.NotFound;
             CurrentConnections.Add(request);
             try
@@ -82,7 +80,7 @@ namespace RXPatchLib
             catch
             {
                 hostObject.HasErrored = true;
-                RxLogger.Logger.Instance.Write($"The host {hostObject.Uri.AbsoluteUri} seems to be offline");
+                RxLogger.Logger.Instance.Write($"The host {hostObject.Uri.AbsoluteUri} seems to be offline.");
             }
             CurrentConnections.Remove(request);
 
@@ -97,7 +95,7 @@ namespace RXPatchLib
                     CurrentHostsList.Add(new UpdateServerSelectorObject(hostObject));
                 }
 
-                RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue");
+                RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue.");
 
                 return true;
             }
@@ -110,10 +108,7 @@ namespace RXPatchLib
             // Safety check
             if (inHosts.Count == 0)
                 throw new Exception("No download servers are available; please try again later.");
-
-            // Initialize new Hosts queue
-            Hosts = new Queue<UpdateServerEntry>();
-
+            
             // Initialize query to each host
             List<Task<bool>> tasks = inHosts.Select(QueryHost).ToList();
 
@@ -136,7 +131,7 @@ namespace RXPatchLib
 
         public void Dispose()
         {
-            Hosts?.Clear();
+            Hosts.Clear();
             CurrentHostsList.Clear();
 
             if (CurrentConnections.Count > 0) {

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
@@ -74,7 +70,10 @@ namespace RXPatchLib
         public void SetTotals(long totalItems, long totalSize)
         {
             Items.Total = totalItems;
+            Items.Done = 0;
+
             Size.Total = totalSize;
+            Size.Done = 0;
         }
 
         public DirectoryPatchPhaseProgressItem AddItem()
