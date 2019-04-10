@@ -490,43 +490,8 @@ namespace LauncherTwo
         /// <returns>The name of the country that belongs to the IPAddress</returns>
         static async Task<string[]> GrabCountry(string ipAddress)
         {
-            //GET CountryCode
-            //If the Ip is known, we can check the country.
-            //Otherwise, assume CountryCode and name is missing
-            if (ipAddress != "Missing")
-            {
-                string[] countryCode;
-                //First check the cache if we already have the current ip, this reduces the call to the api
-                CountryCodeCache.TryGetValue(ipAddress, out countryCode);
-                //If the CountryCode was not found in the cache (null), grab it from the api
-                //Else, use the CountryCode from the cache
-                if (countryCode == null)
-                {
-                    try
-                    {
-                        //Grab the Countrycode and name
-                        string countryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + ipAddress);
-                        var countryResults = JsonConvert.DeserializeObject<dynamic>(countryJson);
-
-                        //Add Countrycode and name to cache and return
-                        CountryCodeCache.Add(ipAddress, new string[2] {(string)countryResults["countryName"], (string)countryResults["countryCode"]});
-                        return new string[2] { (string)countryResults["countryName"], (string)countryResults["countryCode"] };
-                    }
-                    catch
-                    {
-                        //If the api does not respond in any way, assume CountryCode is missing
-                        return new string[2] { "Unknown", "Unknown" };
-                    }
-                }
-                else
-                {
-                    return countryCode;
-                }
-            }
-            else
-            {
-                return new string[2] { "Unknown", "Unknown" };
-            }
+            // TODO: reimplement
+            return new string[2] { "Unknown", "Unknown" };
         }
 
 
