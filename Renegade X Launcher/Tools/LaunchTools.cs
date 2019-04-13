@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace LauncherTwo
@@ -10,9 +11,7 @@ namespace LauncherTwo
             return GameInstallation.GetRootPath() + "Binaries\\UDKLift.exe";
         }
 
-        public abstract string GetProcessArguments ();
-        
-
+        public abstract string GetProcessArguments();
     }
 
     public class EditorInstanceStartupParameters : EngineInstanceStartupParameters

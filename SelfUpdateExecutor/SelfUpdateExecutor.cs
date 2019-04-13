@@ -273,8 +273,36 @@ namespace SelfUpdateExecutor
             {
                 return SelfUpdateStatus.DirectoryMissingFailure;
             }
+            catch (IOException)
+            {
+                // We're likely attempting to move across volumes; attempt a copy instead
+                copyDirectory(source, target);
+                //deleteDirectory(source); // We can't delete the source, because it's a running application.
+            }
 
             return SelfUpdateStatus.Success;
+        }
+
+        static void copyDirectory(string source, string target)
+        {
+            // Create target directory
+            Directory.CreateDirectory(target);
+
+            // Copy files from source to target
+            var files = Directory.GetFiles(source);
+            foreach (string file in files)
+            {
+                string filename = System.IO.Path.GetFileName(file);
+                File.Copy(file, target + "\\" + filename, true);
+            }
+
+            // Copy subdirectories from source to target
+            var directories = Directory.GetDirectories(source);
+            foreach (string directory in directories)
+            {
+                string directoryName = System.IO.Path.GetDirectoryName(directory);
+                copyDirectory(directory, target + "\\" + directoryName);
+            }
         }
     }
 }
