@@ -286,8 +286,10 @@ namespace LauncherTwo
                 RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl}");
                 try
                 {
-                    jsonText =
-                        await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
+                    var client = new WebClient();
+                    client.Headers.Set("User-Agent", "RenX-Launcher (" + VersionCheck.GetLauncherVersionName() + ")");
+                    client.QueryString.Set("id", "launcher");
+                    jsonText = await client.DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
                 }
                 catch (Exception ex)
                 {
