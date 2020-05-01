@@ -13,7 +13,6 @@ namespace SelfUpdateExecutor
     {
         /** Constants */
         const int MillisecondsToWait = 10000; // 10 seconds
-        const string LauncherExeFilename = "\\Renegade X Launcher.exe";
         const string TargetPathSwitch = "--target=";
         const string ProcessIDSwitch = "--pid=";
 
@@ -134,7 +133,10 @@ namespace SelfUpdateExecutor
             }
 
             // Startup new launcher; failure is irresolvable
-            Process.Start(targetPath + LauncherExeFilename, "--patch-result=" + status);
+            List<string> files = Directory.GetFiles(targetPath).ToList();
+            Regex reg = new Regex(@"\\([\w\s-_]*?\.exe)");
+            string launcherExecutable = files.Where(file => reg.IsMatch(file)).First(file => reg.Match(file).Groups[0].Value.ToLower().Contains("launcher"));
+            Process.Start(launcherExecutable, $"--patch-result={status}");
         }
 
         /**
