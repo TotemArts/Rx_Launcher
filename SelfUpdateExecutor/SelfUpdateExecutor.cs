@@ -300,7 +300,7 @@ namespace SelfUpdateExecutor
             var directories = Directory.GetDirectories(source);
             foreach (string directory in directories)
             {
-                string directoryName = System.IO.Path.GetDirectoryName(directory);
+                string directoryName = System.IO.Path.GetFileName(directory);
                 copyDirectory(directory, target + "\\" + directoryName);
             }
         }
