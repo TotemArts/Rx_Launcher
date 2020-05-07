@@ -1024,7 +1024,16 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" Foreground="White" />
+                <DataGridTemplateColumn x:Name="ServerNameColumn" Header="Server Name" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding ServerNamePrefix}" Foreground="Green"/>
+                                <TextBlock Text="{Binding ServerName}" Foreground="White"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding SimplifiedMapName}" Header="Map" Width="100" Foreground="#FF98ABAE"/>
                 <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort"/>
                 <DataGridTextColumn x:Name="PingColumn" Binding="{Binding PingString}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort"/>

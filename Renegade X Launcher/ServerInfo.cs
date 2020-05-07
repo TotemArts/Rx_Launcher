@@ -315,6 +315,12 @@ namespace LauncherTwo
                         //SET STRINGS
                         newServer.ServerName = data["Name"] ?? "Missing";
 
+                        newServer.ServerNamePrefix = data["NamePrefix"] ?? "";
+                        if (newServer.ServerNamePrefix != "" && !newServer.ServerNamePrefix.EndsWith(" "))
+                        {
+                            newServer.ServerNamePrefix = newServer.ServerNamePrefix + " ";
+                        }
+
                         newServer.MapName = data["Current Map"] ?? "Missing";
 
                         newServer.SimplifiedMapName = GetPrettyMapName(newServer.MapName);
@@ -504,6 +510,7 @@ namespace LauncherTwo
         public string SimplifiedMapName { get; set; }
         public GameMode MapMode { get; set; }
         public bool Ranked { get; set; }
+        public string ServerNamePrefix { get; set; }
         // Raw ping value
         public int Ping { get; set; }
         // Value used to sort ping in the server list
