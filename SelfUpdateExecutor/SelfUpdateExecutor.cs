@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.IO;
@@ -25,7 +21,7 @@ namespace SelfUpdateExecutor
         static void Main(string[] args)
         {
             // Setup default values
-            string sourcePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string sourcePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             string targetPath = "";
             int processId = 0;
 
@@ -103,13 +99,13 @@ namespace SelfUpdateExecutor
          */
         static void execute(string sourcePath, string targetPath, int processId)
         {
+            Directory.SetCurrentDirectory(Path.GetTempPath());
             string backupPath = targetPath + "_removeme";
 
             // Apply launcher self-update
-            SelfUpdateStatus status = SelfUpdateStatus.UnhandledException;
             try
             {
-                status = apply(sourcePath, targetPath, backupPath, processId);
+                SelfUpdateStatus status = apply(sourcePath, targetPath, backupPath, processId);
 
                 if (status == SelfUpdateStatus.Success)
                 {
@@ -134,6 +130,7 @@ namespace SelfUpdateExecutor
             }
 
             // Startup new launcher; failure is irresolvable
+            Directory.SetCurrentDirectory(targetPath);
             Process.Start(targetPath + LauncherExeFilename, "--patch-result=" + status);
         }
 
