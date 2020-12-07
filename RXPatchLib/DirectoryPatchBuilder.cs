@@ -64,12 +64,11 @@ namespace RXPatchLib
 
             var instructions = new List<FilePatchInstruction>();
 
-            Console.WriteLine($"There are {instructions.Count} instructions in this update package");
-
             Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "full");
             Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "delta");
 
             var allPaths = oldPaths.Union(newPaths).ToArray();
+            Console.WriteLine($"There are {allPaths.Length} instructions in this update package");
             foreach (var path in allPaths)
             {
                 // oldPath and newPath refer to files
