@@ -6,9 +6,16 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace RXPatchLib
 {
+    struct PatchMetadata
+    {
+        public string instructions_hash;
+        public string version_name;
+        public int version_number;
+    }
     public class DirectoryPatchBuilder : IDisposable
     {
         readonly SHA256CryptoServiceProvider _cryptoProvider = new SHA256CryptoServiceProvider();
@@ -33,6 +40,23 @@ namespace RXPatchLib
                 return BitConverter.ToString(_cryptoProvider.ComputeHash(stream)).Replace("-", string.Empty);
         }
 
+        [DllImport("kernel32", CharSet = CharSet.Unicode)]
+        static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
+        public Tuple<String, int> GetVersionInfo(string rootPath)
+        {
+            string versionFilePath = rootPath + Path.DirectorySeparatorChar + "UDKGame" + Path.DirectorySeparatorChar + "Config" + Path.DirectorySeparatorChar + "DefaultRenegadeX.ini";
+
+            // Get version name
+            var versionName = new StringBuilder();
+            GetPrivateProfileString("RenX_Game.Rx_Game", "GameVersion", "", versionName, 255, versionFilePath);
+
+            // Get version number
+            var versionNumberString = new StringBuilder();
+            GetPrivateProfileString("RenX_Game.Rx_Game", "GameVersionNumber", "", versionNumberString, 255, versionFilePath);
+            int versionNumber = int.Parse(versionNumberString.ToString());
+
+            return new Tuple<String, int>(versionName.ToString(), versionNumber);
+        }
         public async Task CreatePatchAsync(string oldRootPath, string newRootPath, string patchPath)
         {
             var oldPaths = DirectoryPathIterator.GetChildPathsRecursive(oldRootPath).ToArray();
@@ -40,12 +64,11 @@ namespace RXPatchLib
 
             var instructions = new List<FilePatchInstruction>();
 
-            RxLogger.Logger.Instance.Write($"There are {instructions.Count} instructions in this update package");
-
             Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "full");
             Directory.CreateDirectory(patchPath + Path.DirectorySeparatorChar + "delta");
 
             var allPaths = oldPaths.Union(newPaths).ToArray();
+            Console.WriteLine($"There are {allPaths.Length} instructions in this update package");
             foreach (var path in allPaths)
             {
                 // oldPath and newPath refer to files
@@ -114,18 +137,29 @@ namespace RXPatchLib
             // Write instructions
             try
             {
-                RxLogger.Logger.Instance.Write($"Writing Instruction.json out to {patchPath + Path.DirectorySeparatorChar}instructions.json");
+                Console.WriteLine($"Writing Instruction.json out to {patchPath + Path.DirectorySeparatorChar}instructions.json");
                 string instructionsString = JsonConvert.SerializeObject(instructions);
                 File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions.json", instructionsString);
 
-                RxLogger.Logger.Instance.Write($"Writing Instructions_hash.txt out to {patchPath + Path.DirectorySeparatorChar}instructions_hash.txt");
-                // Write SHA256 hash of instructions.json to instructions_hash.txt
-                File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "instructions_hash.txt",
-                    await Sha256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json"));
+                // Generate metadata
+                var patchMetadata = new PatchMetadata();
+
+                // Calculate instructions hash
+                patchMetadata.instructions_hash = await Sha256.GetFileHashAsync(patchPath + Path.DirectorySeparatorChar + "instructions.json");
+
+                // Get version info
+                var version_info = GetVersionInfo(newRootPath);
+                patchMetadata.version_name = version_info.Item1;
+                patchMetadata.version_number = version_info.Item2;
+
+                // Serialize metadata
+                Console.WriteLine($"Writing metadata.json out to {patchPath + Path.DirectorySeparatorChar}metadata.json");
+                string patchMetadataString = JsonConvert.SerializeObject(patchMetadata);
+                File.WriteAllText(patchPath + Path.DirectorySeparatorChar + "metadata.json", patchMetadataString);
             }
             catch(Exception ex)
             {
-                RxLogger.Logger.Instance.Write($"Exception while attempting to write instruction JSON or Hash file.\r\n{ex.Message}\r\n{ex.StackTrace}");
+                Console.WriteLine($"Exception while attempting to write instruction JSON or Hash file.\r\n{ex.Message}\r\n{ex.StackTrace}");
             }
         }
     }

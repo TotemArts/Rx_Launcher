@@ -83,10 +83,6 @@ GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/release.
 GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/beta.json"
 GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/server.json"
 
-# Generate legacy version file
-$Json.launcher.version_number = 76
-GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/legacy.json"
-
 # Dry-Run cleanup
 if ($DryRun) {
 	# Checkout master

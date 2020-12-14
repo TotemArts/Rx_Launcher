@@ -1057,10 +1057,19 @@
                   </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="ServerNameColumn" Binding="{Binding ServerName}" Header="Server Name" Width="*" Foreground="White" ToolTipService.ToolTip="Server Name" />
+                <DataGridTemplateColumn x:Name="ServerNameColumn" Header="Server Name" Width="*" ToolTipService.ToolTip="Server Name">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding ServerNamePrefix}" Foreground="Green"/>
+                                <TextBlock Text="{Binding ServerName}" Foreground="White"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn x:Name="MapNameColumn" Binding="{Binding SimplifiedMapName}" Header="Map" Width="100" Foreground="#FF98ABAE" ToolTipService.ToolTip="Map"/>
-                <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort" ToolTipService.ToolTip="Players" />
-                <DataGridTextColumn x:Name="PingColumn" Binding="{Binding PingString}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort" ToolTipService.ToolTip="Ping (lower is better)" />
+                <DataGridTextColumn x:Name="PlayerCountColumn" Binding="{Binding PlayerCountString}" Header="Players" Width="68" Foreground="#FF98ABAE" SortMemberPath="PlayerCountSort" ToolTipService.ToolTip="Players"/>
+                <DataGridTextColumn x:Name="PingColumn" Binding="{Binding PingString}" Header="Ping" Width="48" Foreground="#FF88A4A8" SortMemberPath="PingSort" ToolTipService.ToolTip="Ping (lower is better)"/>
               </DataGrid.Columns>
               <DataGrid.RowStyle>
                  <Style TargetType="{x:Type DataGridRow}">

@@ -281,6 +281,8 @@ namespace LauncherTwo
                     {
                         Encoding = System.Text.Encoding.UTF8
                     };
+                    client.Headers.Set("User-Agent", "RenX-Launcher (" + VersionCheck.GetLauncherVersionName() + ")");
+                    client.QueryString.Set("id", "launcher");
                     jsonText = await client.DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
                 }
                 catch (Exception ex)
@@ -306,6 +308,12 @@ namespace LauncherTwo
                         ServerInfo newServer = new ServerInfo();
                         //SET STRINGS
                         newServer.ServerName = data["Name"] ?? "Missing";
+
+                        newServer.ServerNamePrefix = data["NamePrefix"] ?? "";
+                        if (newServer.ServerNamePrefix != "" && !newServer.ServerNamePrefix.EndsWith(" "))
+                        {
+                            newServer.ServerNamePrefix = newServer.ServerNamePrefix + " ";
+                        }
 
                         newServer.MapName = data["Current Map"] ?? "Missing";
 
@@ -564,6 +572,7 @@ namespace LauncherTwo
         public string SimplifiedMapName { get; set; }
         public GameMode MapMode { get; set; }
         public bool Ranked { get; set; }
+        public string ServerNamePrefix { get; set; }
         // Raw ping value
         public int Ping { get; set; }
         // Value used to sort ping in the server list
