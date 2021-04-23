@@ -34,7 +34,7 @@
         <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="75" MinWidth="250">
             <StackPanel>
                 <CheckBox Content="Skip Movies" Margin="1,0,0,2" ToolTip="Disables all movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
-                <CheckBox Content="Use 64bit" Margin="1,0,0,2" ToolTip="Use 64bit binaries instead of 32bit" IsChecked="{Binding Settings.Use64Bit}"/>
+                <CheckBox Content="Use 64bit" Margin="1,0,0,2" ToolTip="Use 64bit binaries instead of 32bit" IsChecked="{Binding Settings.Use64Bit}" IsEnabled="False" />
                 <Separator Height="5" Margin="2"/>
                 <DockPanel RenderTransformOrigin="0.505,1.732">
                     <Button x:Name="BT_Verify" Content=" ✔ Verify Game Integrity " ToolTip="Resets all game settings; verifies integrity" Margin="5" Height="21" HorizontalAlignment="Left" VerticalContentAlignment="Center" Click="Verify_Click" />
