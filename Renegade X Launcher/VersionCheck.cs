@@ -126,6 +126,7 @@ namespace LauncherTwo
 
         public static async Task UpdateLatestVersions()
         {
+            string productKey = Properties.Settings.Default.ProductKey;
             string versionJson = "";
             dynamic versionData = null;
 
@@ -180,16 +181,16 @@ namespace LauncherTwo
             { 
                 _latestGameVersion = new Version
                 {
-                    Name = versionData["game"]["version_name"],
-                    Number = versionData["game"]["version_number"],
+                    Name = versionData[productKey]["version_name"],
+                    Number = versionData[productKey]["version_number"],
                 };
-                InstructionsHash = versionData["game"]["instructions_hash"];
-                GamePatchPath = versionData["game"]["patch_path"];
+                InstructionsHash = versionData[productKey]["instructions_hash"];
+                GamePatchPath = versionData[productKey]["patch_path"];
 
                 try
                 {
                     // Server URL's list & Friendly Names
-                    foreach (var x in versionData["game"]["mirrors"].ToObject<dynamic>())
+                    foreach (var x in versionData[productKey]["mirrors"].ToObject<dynamic>())
                         RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
                 }
                 catch (Exception ex)
