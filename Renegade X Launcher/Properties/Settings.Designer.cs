@@ -82,7 +82,7 @@ namespace LauncherTwo.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("game")]
+        [global::System.Configuration.DefaultSettingValueAttribute("sdk")]
         public string ProductKey {
             get {
                 return ((string)(this["ProductKey"]));

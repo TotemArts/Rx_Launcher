@@ -18,7 +18,7 @@
       <Value Profile="(Default)">https://static.renegade-x.com/launcher_data/version/release.json</Value>
     </Setting>
     <Setting Name="ProductKey" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">game</Value>
+      <Value Profile="(Default)">sdk</Value>
     </Setting>
     <Setting Name="Installed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
