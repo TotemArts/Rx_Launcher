@@ -95,7 +95,7 @@ Are you sure you want to continue?</Text>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="DesktopFolder" Name="Desktop"/>
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="Renegade X">
+        <Directory Id="INSTALLFOLDER" Name="Renegade X SDK">
           <!--<util:PermissionEx User="Users" GenericAll="yes"/>-->
           <Directory Id="InstallLocationLauncher" Name="Launcher">
           </Directory>
@@ -105,7 +105,7 @@ Are you sure you want to continue?</Text>
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="Renegade X"/>
+        <Directory Id="ApplicationProgramsFolder" Name="Renegade X SDK"/>
       </Directory>
     </Directory>   
   </Fragment>
@@ -136,9 +136,9 @@ Are you sure you want to continue?</Text>
          <CreateFolder Directory="InstallLocationBinaries"/>
 
          <!--Set the registry keys for all the to be deleted folders -->
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X SDK" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X SDK" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
+         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X SDK" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>
          
          <!--Set the delete folders on uninstall(This will delete everything in them aswell thus uninstalling the game-->
          <util:RemoveFolderEx Id="RemoveLocationEngine" On="uninstall" Property="REGISTERKEYENGINE"/>
@@ -161,7 +161,7 @@ Are you sure you want to continue?</Text>
                   WorkingDirectory="APPLICATIONROOTDIRECTORY"
                   Icon="SetupIcon"/>
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X SDK" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </ComponentGroup> 
   </Fragment>
