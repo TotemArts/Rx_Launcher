@@ -10,7 +10,7 @@ $bin = "bin/"
 $release_branch_prefix = "release/"
 
 if ($SourceBranch -ne "master") {
-    $release_branch_prefix = "$SourceBranch/release/"
+    $release_branch_prefix = "${SourceBranch}-release/"
 }
 
 function UpdateJsonVersion([string]$JsonContent) {
