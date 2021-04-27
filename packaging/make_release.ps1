@@ -7,6 +7,11 @@ Param(
 $initial_branch = (git symbolic-ref --short -q HEAD)
 $version_file = "..\Renegade X Launcher\VersionCheck.cs"
 $bin = "bin/"
+$release_branch_prefix = "release/"
+
+if ($SourceBranch -ne "master") {
+    $release_branch_prefix = "$SourceBranch/release/"
+}
 
 function UpdateJsonVersion([string]$JsonContent) {
 	$Json = $JsonContent | ConvertFrom-Json
@@ -59,7 +64,7 @@ $Json = UpdateJsonVersion (Invoke-WebRequest -URI "https://static.renegade-x.com
 (Get-Content $version_file).replace('Name = "0.00"', ('Name = "' + $Json.launcher.version_name + '"')).replace("Number = 00", ("Number = " + $Json.launcher.version_number)) | Set-Content $version_file
 
 # Snap a release branch
-$release_branch = "release/" + $Json.launcher.version_name
+$release_branch = "$release_branch_prefix" + $Json.launcher.version_name
 git checkout -b $release_branch
 git commit -m ("Set version for release ``" + $Json.launcher.version_name + "``") $version_file
 
