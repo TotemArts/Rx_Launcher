@@ -189,9 +189,33 @@ namespace LauncherTwo
 
                 try
                 {
-                    // Server URL's list & Friendly Names
-                    foreach (var x in versionData[productKey]["mirrors"].ToObject<dynamic>())
-                        RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
+                    // Server URL's list & Friendly Names (product section)
+                    if (versionData[productKey]["mirrors"] != null)
+                    {
+                        foreach (var mirror in versionData[productKey]["mirrors"].ToObject<dynamic>())
+                        {
+                            RxPatcher.Instance.AddNewUpdateServer(mirror["url"].ToString());
+                        }
+                    }
+
+                    // Server URLs list & friendly names (global section)
+                    if (versionData["mirrors"] != null)
+                    {
+                        foreach (var mirror in versionData["mirrors"].ToObject<dynamic>())
+                        {
+                            if (mirror["products"] != null)
+                            {
+                                foreach (var product in mirror["products"].ToObject<dynamic>())
+                                {
+                                    if (productKey == product.ToString())
+                                    {
+                                        RxPatcher.Instance.AddNewUpdateServer(mirror["url"].ToString());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

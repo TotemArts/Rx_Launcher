@@ -47,7 +47,7 @@ namespace RXPatch
             var mirrorUrl = patchUrl.Substring(0, splitIndex + 1);
             var patchPath = patchUrl.Substring(splitIndex + 1);
             RxPatcher.Instance.WebPatchPath = patchPath;
-            RxPatcher.Instance.AddNewUpdateServer(mirrorUrl, "");
+            RxPatcher.Instance.AddNewUpdateServer(mirrorUrl);
 
             var entry = RxPatcher.Instance.GetNextUpdateServerEntry();
             //await RxPatcher.Instance.UpdateServerSelector.QueryHost(entry);

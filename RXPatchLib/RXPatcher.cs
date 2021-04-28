@@ -33,9 +33,9 @@ namespace RXPatchLib
             System.Net.ServicePointManager.DefaultConnectionLimit = 50;
         }
 
-        public void AddNewUpdateServer(string url, string friendlyName)
+        public void AddNewUpdateServer(string url)
         {
-            UpdateServerHandler.AddUpdateServer(url, friendlyName);
+            UpdateServerHandler.AddUpdateServer(url);
         }
 
         public UpdateServerEntry GetNextUpdateServerEntry()
@@ -77,7 +77,7 @@ namespace RXPatchLib
 
             var bestHost = UpdateServerSelector.Hosts.Dequeue();
 
-            Console.WriteLine("#######HOST: {0} ({1})", bestHost.Uri, bestHost.Name);
+            Console.WriteLine("#######HOST: {0}", bestHost.Uri);
             await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructionsHash);
         }
 

@@ -189,19 +189,6 @@ namespace LauncherTwo.Views
                 NotifyPropertyChanged("StatusMessage");
             }
         }
-        private string _serverMessage;
-        public string ServerMessage
-        {
-            get
-            {
-                return _serverMessage;
-            }
-            private set
-            {
-                _serverMessage = value;
-                NotifyPropertyChanged("ServerMessage");
-            }
-        }
         private string _targetVersionString;
         public string TargetVersionString
         {
@@ -280,11 +267,6 @@ namespace LauncherTwo.Views
             statusTitleDict.TryGetValue(type, out statusTitle);
 
             this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", statusTitle[0]);
-
-            if (patcher.UpdateServer == null)
-                this.ServerMessage = "pending";
-            else
-                this.ServerMessage = patcher.UpdateServer.Name;
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", statusTitle[1]);

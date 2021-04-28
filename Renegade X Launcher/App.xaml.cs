@@ -61,7 +61,7 @@ namespace LauncherTwo
                     x.FirstInstall();
                     return;
                 }
-                else if(a.StartsWith("--UpdateGame="))//Manually opdate the game to a given URL.
+                else if(a.StartsWith("--UpdateGame=")) // Manually update the game to a given URL.
                 {
                     // Close any other instances of the RenX-Launcher
                     if ( InstanceHandler.IsAnotherInstanceRunning() )
@@ -75,7 +75,7 @@ namespace LauncherTwo
                     var progress = new Progress<DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
 
-                    RxPatcher.Instance.AddNewUpdateServer(patchUrl, "");
+                    RxPatcher.Instance.AddNewUpdateServer(patchUrl);
                     System.Threading.Tasks.Task task = RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
 
                     var window = new Views.ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
