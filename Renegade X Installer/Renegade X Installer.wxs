@@ -136,9 +136,9 @@ Are you sure you want to continue?</Text>
          <CreateFolder Directory="InstallLocationBinaries"/>
 
          <!--Set the registry keys for all the to be deleted folders -->
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
-         <RegistryValue Root="HKCU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>
+         <RegistryValue Root="HKMU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationEngine" Type="string" Value="[InstallLocationEngine]" KeyPath="no"/>
+         <RegistryValue Root="HKMU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationUDKGame" Type="string" Value="[InstallLocationUDKGame]" KeyPath="no"/>
+         <RegistryValue Root="HKMU" Key="Software\Totem Arts\Renegade X" Name="InstallLocationBinaries" Type="string" Value="[InstallLocationBinaries]" KeyPath="no"/>
          
          <!--Set the delete folders on uninstall(This will delete everything in them aswell thus uninstalling the game-->
          <util:RemoveFolderEx Id="RemoveLocationEngine" On="uninstall" Property="REGISTERKEYENGINE"/>
