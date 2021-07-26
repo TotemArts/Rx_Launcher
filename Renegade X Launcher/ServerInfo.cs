@@ -281,7 +281,7 @@ namespace LauncherTwo
 
             try
             {
-                string serverListUrl = RenXWebLinks.RenxActiveServerJsonUrl;
+                string serverListUrl = LauncherTwo.Properties.Settings.Default.ServerListUrl;
                 string jsonText = "";
                 //Grab the string from the RenX Website.
                 RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {serverListUrl}");

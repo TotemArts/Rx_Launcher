@@ -38,8 +38,8 @@ namespace LauncherTwo
         {
             _launcherVersion = new Version
             {
-                Name = "0.88",
-                Number = 88
+                Name = "0.89",
+                Number = 89
             };
         }
 
