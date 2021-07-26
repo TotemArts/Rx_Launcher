@@ -1,11 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Net;
 using System.Windows;
 using Newtonsoft.Json;
@@ -38,8 +33,8 @@ namespace LauncherTwo
         {
             _launcherVersion = new Version
             {
-                Name = "0.89",
-                Number = 89
+                Name = "0.00",
+                Number = 00
             };
         }
 
