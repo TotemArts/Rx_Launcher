@@ -9,13 +9,13 @@ Remove-Item -Force "launcher-*.zip" *>$null
 Remove-Item -Force "Renegade_X_Installer-*.msi" *>$null
 
 # Cleanup the build; check your PATH if this fails
-devenv "../Renegade X Launcher.sln" /clean
+& "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" "../Renegade X Launcher.sln" /t:clean
 
 # Make extra sure the installer is deleted
 Remove-Item -Recurse -Force "../Renegade X Installer/bin/"
 
 # Build the launcher; check your PATH if this fails
-devenv "../Renegade X Launcher.sln" /build "Release"
+& "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" "../Renegade X Launcher.sln" /t:"restore;build" /p:Configuration=Release /p:Platform=x86
 
 # Copy launcher binaries to /bin
 ROBOCOPY "../Renegade X Launcher/bin/Release" $launcher_bin *.dll *.exe *.config /S /XF *.vshost*
