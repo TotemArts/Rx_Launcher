@@ -281,22 +281,23 @@ namespace LauncherTwo
 
             try
             {
+                string serverListUrl = RenXWebLinks.RenxActiveServerJsonUrl;
                 string jsonText = "";
                 //Grab the string from the RenX Website.
-                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl}");
+                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {serverListUrl}");
                 try
                 {
                     var client = new WebClient();
                     client.Headers.Set("User-Agent", "RenX-Launcher (" + VersionCheck.GetLauncherVersionName() + ")");
                     client.QueryString.Set("id", "launcher");
-                    jsonText = await client.DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
+                    jsonText = await client.DownloadStringTaskAsync(serverListUrl);
                 }
                 catch (Exception ex)
                 {
                     RxLogger.Logger.Instance.Write($"Server JSON Downloading Issue: {ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
                 }
 
-                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl} Complete");
+                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {serverListUrl} Complete");
 
                 if (jsonText == "")
                     return;

@@ -58,7 +58,7 @@ function GenerateJSON($Json, [string]$Url) {
 git checkout $SourceBranch
 
 # Get new version
-$Json = UpdateJsonVersion (Invoke-WebRequest -URI "https://static.renegade-x.com/launcher_data/version/release.json").Content
+$Json = UpdateJsonVersion (Invoke-WebRequest -URI "https://static.ren-x.com/launcher_data/version/release.json").Content
 
 # Replace version is version file
 (Get-Content $version_file).replace('Name = "0.00"', ('Name = "' + $Json.launcher.version_name + '"')).replace("Number = 00", ("Number = " + $Json.launcher.version_number)) | Set-Content $version_file
@@ -84,9 +84,9 @@ $Json.launcher.patch_hash = ( Get-FileHash -Algorithm SHA256 $package_zip ).Hash
 
 # Generate standard version files
 New-Item -ItemType Directory -Path ($bin + "version/")
-GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/release.json"
-GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/beta.json"
-GenerateJSON $Json "https://static.renegade-x.com/launcher_data/version/server.json"
+GenerateJSON $Json "https://static.ren-x.com/launcher_data/version/release.json"
+GenerateJSON $Json "https://static.ren-x.com/launcher_data/version/beta.json"
+GenerateJSON $Json "https://static.ren-x.com/launcher_data/version/server.json"
 
 # Dry-Run cleanup
 if ($DryRun) {

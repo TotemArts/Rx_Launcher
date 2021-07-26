@@ -8,6 +8,6 @@ using System.Threading.Tasks;
     public static class RenXWebLinks
     {
         public static readonly char RenxServerSettingSpaceSymbol = ';';
-        public const string RenxActiveServerJsonUrl = "https://serverlist.renegade-x.com/servers.jsp";
+        public const string RenxActiveServerJsonUrl = "https://serverlist.ren-x.com/servers.jsp";
     }
 
