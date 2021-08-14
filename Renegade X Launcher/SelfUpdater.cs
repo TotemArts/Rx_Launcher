@@ -23,19 +23,19 @@ namespace LauncherTwo
     }
     public static class SelfUpdater
     {
-        static EUpdateState _updateState = EUpdateState.NotStarted;
-        static Views.UpdateDownloadWindow _updaterWindow = null;
-        static WebClient _client;
-        static string _patchHash;
+        static eUpdateState UpdateState = eUpdateState.NotStarted;
+        static Views.UpdateDownloadWindow UpdaterWindow = null;
+        static WebClient Client;
+
 
         static string GetTempDirectory()
         {
             return Path.GetTempPath() + @"\RxTmp\";
         }
 
-        static string GetUpdaterPath()
+        static string GetBatPath()
         {
-            return GetExtractDirectory() + @"SelfUpdateExecutor.exe";
+            return GetTempDirectory() + "install.bat";
         }
 
         static string GetExtractDirectory()
@@ -59,11 +59,10 @@ namespace LauncherTwo
             // TODO: Cancel whichever state is currently happening.
         }
 
-        public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow, string url, string hash)
+        public static void StartUpdate(Views.UpdateDownloadWindow aUpdaterWindow, string url)
         {
-            _updaterWindow = aUpdaterWindow;
-            _patchHash = hash;
-            if (_updateState != EUpdateState.Downloading && _updateState != EUpdateState.Extracting && _updateState != EUpdateState.ReadyToInstall)
+            UpdaterWindow = aUpdaterWindow;
+            if (UpdateState != eUpdateState.Downloading && UpdateState != eUpdateState.Extracting && UpdateState != eUpdateState.ReadyToInstall)
             {
                 StartDownload(url);
             }
@@ -126,19 +125,55 @@ namespace LauncherTwo
                 if (_updateState == EUpdateState.ReadyToInstall)
                 {
                     string installLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    string executableName = System.Reflection.Assembly.GetExecutingAssembly().Location;
+
                     string pidString = Process.GetCurrentProcess().Id.ToString();
+                    string contents = string.Join("\r\n", new string[]
+                    {
+                        "cd /D \"" + Path.GetTempPath() + "\"",
 
-                    // Build ProcessStartInfo
-                    ProcessStartInfo startInfo = new ProcessStartInfo(GetUpdaterPath(), "\"--target=" + installLocation + "\" --pid=" + pidString);
+                        // Wait for the launcher to close.
+                        ":wait_for_close",
+                        "tasklist /FI \"PID eq " + pidString + "\" /FO csv /NH | find \"\"\"" + pidString + "\"\"\" > nul",
+                        "if not errorlevel 1 (",
+                        "    timeout /t 1 > nul",
+                        "    goto :wait_for_close",
+                        ")",
+
+                        // Clean up possible left behind files from previous installation attempt. (If it fails, abort update.)
+                        "set patch_result=1",
+                        "if exist \"" + installLocation + "_removeme\" (",
+                        "    rmdir \"" + installLocation + "_removeme\" /s /q || goto :restart",
+                        ")",
+
+                        // Move away old version. (If it fails, abort update.)
+                        "set patch_result=2",
+                        "move \"" + installLocation + "\" \"" + installLocation + "_removeme\" || goto :restart",
+
+                        // Copy new version and remove old version. (These are sufficiently unlikely to fail to ignore failures.)
+                        "set patch_result=0",
+                        "xcopy \"" + GetExtractDirectory().TrimEnd('\\') + "\" \"" + installLocation + "\" /v /f /e /s /r /h /y /i",
+                        "rmdir \"" + installLocation + "_removeme\" /s /q",
+
+                        // Restart launcher.
+                        ":restart",
+                        "start \"\" \"" + executableName + "\" --patch-result=%patch_result%",
+
+                        // Clean up. (This also removes this batch file!)
+                        "rmdir \"" + GetTempDirectory().TrimEnd('\\') + "\" /s /q",
+                    });
+                    if (!Directory.Exists(GetTempDirectory()))
+                    {
+                        throw new Exception("Temp directory failure, can not initialize bat file.");
+                    }
+                    File.WriteAllText(GetBatPath(), contents);
+
+                    ProcessStartInfo startInfo = new ProcessStartInfo(GetBatPath(), "/B");
                     startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    startInfo.WorkingDirectory = Path.GetTempPath();
-                    startInfo.Verb = "runas";
 
-                    // Build Process
                     Process process = new Process();
                     process.StartInfo = startInfo;
-
-                    // Start process
+                    process.StartInfo.Verb = "runas";
                     process.Start();
                 }
             }
@@ -162,20 +197,8 @@ namespace LauncherTwo
             }
             else
             {
-                _updaterWindow.StatusLabel.Content = "Download Finished; verifying...";
-
-                // Verify the hash of the download
-                if (_patchHash == "" || _patchHash == RXPatchLib.Sha256.GetFileHash(GetSavePath()))
-                {
-                    // Download valid; begin extraction
-                    StartExtract();
-                }
-                else
-                {
-                    // Hash mismatch; set an error
-                    _updateState = EUpdateState.Error;
-                    _updaterWindow.StatusLabel.Content = "Hash mismatch";
-                }
+                UpdaterWindow.StatusLabel.Content = "Download Finished";
+                StartExtract();
             }
         }
 

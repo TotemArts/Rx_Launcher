@@ -9,134 +9,109 @@ using System.Threading.Tasks;
 
 namespace RXPatchLib
 {
-
-    public class UpdateServerSelectorObject
-    {
-        public UpdateServerEntry UpdateServer; // stores the update server object for the server in question
-        public int ConnectionCount; //Stores the amount of times this server was used, it's used for selecting the next best server
-
-        public UpdateServerSelectorObject(UpdateServerEntry updateServerEntry)
-        {
-            UpdateServer = updateServerEntry;
-        }
-    }
-
     public class UpdateServerSelector
     {
-        CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        private const string TestFile = "10kb_file";
-        public Queue<UpdateServerEntry> Hosts;
-        private readonly List<UpdateServerSelectorObject> CurrentHostsList = new List<UpdateServerSelectorObject>();
-        private const int ServerRecordsToTake = 4;
+        int? bestHostIndex = null;
+        long bestHostRtt = 0;
+        object bestHostLock = new object();
 
         /// <summary>
-        /// Gets the next UpdateServerEntry that has the least amount of connections to it
+        /// Check if the host is reachable by loading the patch subfolder
+        /// If host is reachable, ping to determine the best connection
         /// </summary>
-        /// <returns></returns>
-        public UpdateServerEntry GetNextAvailableServerEntry()
-        {
-            lock (CurrentHostsList)
-            {
-                if (CurrentHostsList.Count == 0)
-                    return null;
-
-                // Remove any server that has errored
-                CurrentHostsList.RemoveAll(server => server.UpdateServer.HasErrored);
-
-                // If we have ran out of hosts, then return null.
-                if (CurrentHostsList.Count == 0)
-                    return null;
-
-                // Take the top 4 servers
-                var selectedServers = CurrentHostsList.Take(ServerRecordsToTake).ToList();
-                if (selectedServers.Count > 0)
+        /// <param name="fullHost">An Uri containing the full host path e.g.: "http://rxp-nyc.cncirc.net/Patch5282b/"</param>
+        /// <param name="index">The index of this host in the main hostArray</param>
+        /// <returns>A task object with no usefull data other than task info</returns>
+        async Task CheckAndPingHost(Uri fullHost, int index)
+        {  
+                //Try getting a response from the desired patch folder on the host
+                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(fullHost);
+                request.Method = "GET";
+                //Default to "not found"
+                System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
+                try
                 {
-                    // Order them by connection count and take the top one off the pile
-                    var selectedServer = selectedServers.OrderBy(x => x.ConnectionCount).DefaultIfEmpty(null).FirstOrDefault();
-
-                    // If we didnt get null, ++ connection count and return it, otherwise return null
-                    if (selectedServer != null)
-                    {
-                        selectedServer.ConnectionCount++;
-
-                        RxLogger.Logger.Instance.Write(
-                            $"I have picked the server {selectedServer.UpdateServer.Uri.AbsoluteUri} as it has only {selectedServer.ConnectionCount} connections against it");
-
-                        return selectedServer.UpdateServer;
-                    }
-
-                    // Server selection failed, return null
-                    return null;
+                    response = ((System.Net.HttpWebResponse)request.GetResponse()).StatusCode; //This needs to become async... For now it will do
                 }
-            }
+                catch
+                {                           
+                    Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", fullHost));
+                }
 
-            return null;
-        }
-
-        public async Task<bool> QueryHost(UpdateServerEntry hostObject)
-        {
-            RxLogger.Logger.Instance.Write($"Attempting to contact host {hostObject.Uri.AbsoluteUri}");
-
-            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(hostObject.Uri.AbsoluteUri + TestFile);
-            request.Method = "GET";
-
-            //Default to "not found"
-            System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
-            try
-            {
-                response = ((System.Net.HttpWebResponse)await request.GetResponseAsync()).StatusCode;
-            }
-            catch
-            {
-                hostObject.HasErrored = true;
-                RxLogger.Logger.Instance.Write($"The host {hostObject.Uri.AbsoluteUri} seems to be offline");
-            }
-
-            // Push host to queue if valid
+            //If host response from the desired patch folder on the host is OK
+            //Ping the host and determine the best RoundTripTime
+            //Else -> Don't use this host and don't ever set this index as the desired index
             if (response == System.Net.HttpStatusCode.OK)
             {
-                lock (Hosts)
+                try
                 {
-                    Hosts.Enqueue(hostObject);
-
-                    // We can keep track of the list via this, including connection count
-                    CurrentHostsList.Add(new UpdateServerSelectorObject(hostObject));
+                    using (var ping = new Ping())
+                    {
+                        var reply = await ping.SendPingAsync(fullHost.Host, 5000, CancellationTokenSource.Token);
+                        Trace.WriteLine(string.Format("Ping to {0}: {1}.", fullHost, reply.RoundtripTime));
+                        lock (bestHostLock)
+                        {
+                            if (!bestHostIndex.HasValue || reply.RoundtripTime < bestHostRtt)
+                            {
+                                bestHostRtt = reply.RoundtripTime;
+                                bestHostIndex = index;
+                            }
+                        }
+                    }
                 }
-
-                RxLogger.Logger.Instance.Write($"Added host {hostObject.Uri.AbsoluteUri} to the hosts queue");
-
-                return true;
+                catch (PingException)
+                {
+                    Trace.WriteLine(string.Format("Ping to {0} failed.", fullHost));
+                }
+                catch (OperationCanceledException)
+                {
+                    Trace.WriteLine(string.Format("Ping to {0} canceled.", fullHost));
+                }
             }
 
-            return false;
         }
 
-        public async Task SelectHosts(List<UpdateServerEntry> inHosts)
+        /// <summary>
+        /// Select the host with the lowest ping.
+        /// 
+        /// Allows all hosts at least 500 ms to reply. After 500 ms (earlier if possible), the best server is selected.
+        /// Allows all hosts to reply within 100 ms after the best host replied, to avoid incorrect results due to scheduling. (Somewhat pedantic.)
+        /// If no pings were received within the default system timeout, a random server is selected.
+        /// </summary>
+        /// <param name="fullHosts"></param>
+        /// <returns></returns>
+        public async Task<int> SelectHostIndex(ICollection<Uri> fullHosts)
         {
-            // Safety check
-            if (inHosts.Count == 0)
-                throw new Exception("No download servers are available; please try again later.");
+            Contract.Assume(fullHosts.Count > 0);
 
-            // Initialize new Hosts queue
-            Hosts = new Queue<UpdateServerEntry>();
-
-            // Initialize query to each host
-            List<Task<bool>> tasks = inHosts.Select(QueryHost).ToList();
-
-            // Return when we have our best host; continue populating list in background
-            while (tasks.Any())
+            //If there is only one host, return index 0
+            if (fullHosts.Count == 1) 
             {
-                var task = await Task.WhenAny(tasks);
-                tasks.Remove(task);
-
-                // Good mirror found; return result
-                if (task.Result)
-                    return;
+                return 0;
             }
 
-            // No host found; throw exception
-            throw new Exception("Could not select a reliable download server. Please try again later.");
+            //Ping and statuscheck all Hosts and determine the best host to download from
+            Task[] pingTasks = fullHosts.Select((host, index) => CheckAndPingHost(host, index)).ToArray();
+            await Task.WhenAll(pingTasks).ProceedAfter(500);
+            foreach (var task in pingTasks)
+            {
+                task
+                    .ContinueWith((result) =>
+                    {
+                        CancellationTokenSource.CancelAfter(100);
+                    }, TaskContinuationOptions.OnlyOnRanToCompletion)
+                    .Forget();
+            }
+
+            await Task.WhenAll(pingTasks).ProceedIfCanceled().CancelAfter(5000);
+            if (bestHostIndex == null)
+            {      
+                throw new Exception("Could not select a reliable downloadserver. Please try again later...");
+            }
+
+            return (int)bestHostIndex;// ?? new Random().Next(hosts.Count); //This random needs to change. It can select a dead server!
         }
     }
 }

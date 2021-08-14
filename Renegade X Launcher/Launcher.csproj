@@ -121,8 +121,10 @@
     <Compile Include="Installer.xaml.cs">
       <DependentUpon>Installer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InstanceHandler.cs" />
+    <Compile Include="IrcController.cs" />
     <Compile Include="LaunchTools.cs" />
+    <Compile Include="MapPreviewSettings.cs" />
+    <Compile Include="MovieRenamer.cs" />
     <Compile Include="PingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -135,14 +137,18 @@
     </Compile>
     <Compile Include="SelfUpdater.cs" />
     <Compile Include="ServerInfo.cs" />
+    <Compile Include="ServerQueue.cs" />
     <Compile Include="Steam\SteamLogin.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TrulyObservableCollection.cs" />
-    <Compile Include="UpdateServerModel.cs" />
+    <Compile Include="UpdateServerSelector.cs" />
     <Compile Include="URI.cs" />
     <Compile Include="VersionCheck.cs" />
     <Compile Include="Views\GeneralDownloadWindow.xaml.cs">
       <DependentUpon>GeneralDownloadWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\IrcWindow.xaml.cs">
+      <DependentUpon>IrcWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ServerSelectView.xaml.cs">
       <DependentUpon>ServerSelectView.xaml</DependentUpon>
@@ -161,6 +167,9 @@
     </Compile>
     <Compile Include="Views\UpdateAvailableWindow.xaml.cs">
       <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SeekerDownloadWindow.xaml.cs">
+      <DependentUpon>SeekerDownloadWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UpdateDownloadWindow.xaml.cs">
       <DependentUpon>UpdateDownloadWindow.xaml</DependentUpon>
@@ -205,6 +214,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\IrcWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ServerSelectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -226,6 +239,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\UpdateAvailableWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SeekerDownloadWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -252,6 +269,8 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Launcher_1_TemporaryKey.pfx" />
+    <None Include="Launcher_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest">
       <SubType>Designer</SubType>
@@ -259,7 +278,6 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
@@ -298,6 +316,10 @@
       <Project>{d846d108-d95b-4488-ba01-e487da220c17}</Project>
       <Name>SteamWebAPI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UDKSeeker\UDKSeeker.csproj">
+      <Project>{605f489b-1c72-4ffa-afda-3388bca59d1e}</Project>
+      <Name>UDKSeeker</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tools\" />
@@ -326,10 +348,70 @@
     <Resource Include="Resources\rx_Background.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="PreviewVids\CNC-Canyon_day.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\CNC-Canyon_Night.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\CNC-Eyes.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\CNC-TrainingYard.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Complex.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Default.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Field-Day.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\CNC-Field_Night.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Goldrush.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Islands.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Lakeside.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\CNC-Mesa_ii_Day.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\MesaII.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Under.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Volcano.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Walls.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\Whiteout.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PreviewVids\X-Mountain.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Seeker.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Install_Back.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\__country_flags.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\flags.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\IrcBack.png" />

@@ -33,7 +33,7 @@ namespace LauncherTwo
     {
         private static readonly Dictionary<string, BannerInfo> _banners = new Dictionary<string, BannerInfo>()
         {
-            { "Default", new BannerInfo("https://renegade-x.com/", new BitmapImage(new Uri("Resources/defaultBanner.png", UriKind.Relative))) }
+            { "Default", new BannerInfo("http://www.renegade-x.com/", new BitmapImage(new Uri("Resources/defaultBanner.png", UriKind.Relative))) }
         };
 
         public static ImageSource GetBanner(string ipAddress)
@@ -69,20 +69,17 @@ namespace LauncherTwo
 
         public static void Setup()
         {
+
             ParseBanners();
+
         }
 
         private static void ParseBanners()
         {
-            if (VersionCheck.BannersUrl == null)
-            {
-                Debug.Print("Error: BannersUrl is null in ParseBanners");
-            }
-
             try
             {
                 //Grab the string from the RenX Website.
-                string jsonText = new WebClient().DownloadString(VersionCheck.BannersUrl);
+                string jsonText = new WebClient().DownloadString(RenXWebLinks.RenxBannersJsonUrl);
 
                 //Turn it into a JSon object that we can parse.
                 var results = JsonConvert.DeserializeObject<dynamic>(jsonText);

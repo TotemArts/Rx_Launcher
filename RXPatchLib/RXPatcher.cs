@@ -17,91 +17,39 @@ namespace RXPatchLib
         const string DownloadSubPath = "download"; // Note that this directory will be automatically emptied after patching.
         const string TempSubPath = "apply"; // Note that this directory will be automatically emptied after patching.
 
-        //public UpdateServerSelector Selector = null;
-
-        public UpdateServerEntry UpdateServer = null;
-        public string WebPatchPath = null;
-
-        private static RxPatcher _instance;
-        public static RxPatcher Instance => _instance ?? (_instance = new RxPatcher());
-
-        public readonly UpdateServerHandler UpdateServerHandler = new UpdateServerHandler();
-        public UpdateServerSelector UpdateServerSelector = new UpdateServerSelector();
-
-        public RxPatcher()
+        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
         {
-            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
-        }
-
-        public void AddNewUpdateServer(string url)
-        {
-            UpdateServerHandler.AddUpdateServer(url);
-        }
-
-        public UpdateServerEntry GetNextUpdateServerEntry()
-        {
-            return UpdateServerHandler.SelectBestPatchServer();
-        }
-
-        public IEnumerable<UpdateServerEntry> GetCurrentlyUsedUpdateServerEntries()
-        {
-
-            return UpdateServerHandler.GetUpdateServers().Where(x => x.IsUsed);
-        }
-
-        public async Task ApplyPatchFromWebDownloadTask(UpdateServerEntry baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
-        {
-            UpdateServer = baseUrl;
-
             var backupPath = CreateBackupPath(applicationDirPath);
             var downloadPath = CreateDownloadPath(applicationDirPath);
             var tempPath = CreateTempPath(applicationDirPath);
 
-            using (var patchSource = new WebPatchSource(this, downloadPath))
+            using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
             {
                 var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-                await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
+                await patcher.ApplyPatchAsync(progress, cancellationToken);
                 DirectoryEx.DeleteContents(downloadPath);
                 DirectoryEx.DeleteContents(tempPath);
-
-                // delete backup?
             }
         }
-
-        public async Task ApplyPatchFromWeb(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
+        public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
         {
-            Contract.Assert(UpdateServerHandler.GetUpdateServers().Count > 0);
-            WebPatchPath = patchPath;
-
-            await UpdateServerSelector.SelectHosts(UpdateServerHandler.GetUpdateServers());
-
-            var bestHost = UpdateServerSelector.Hosts.Dequeue();
-
-            Console.WriteLine("#######HOST: {0}", bestHost.Uri);
-            await ApplyPatchFromWebDownloadTask(bestHost, targetPath, applicationDirPath, progress, cancellationToken, instructionsHash);
+            Contract.Assert(baseUrls.Length > 0);
+            var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
+            int index = await new UpdateServerSelector().SelectHostIndex(hosts);
+            var bestHost = baseUrls[index];
+            Console.WriteLine("#######HOST: {0}", bestHost);
+            await ApplyPatchFromWeb(bestHost, targetPath, applicationDirPath, progress, cancellationToken);
         }
 
-        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
+        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
         {
             var backupPath = CreateBackupPath(applicationDirPath);
             var tempPath = CreateTempPath(applicationDirPath);
 
             var patchSource = new FileSystemPatchSource(patchPath);
             var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-            await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
+            await patcher.ApplyPatchAsync(progress, cancellationToken);
         }
-
-        public UpdateServerEntry PopHost()
-        {
-            // Lock Hosts queue and dequeue next host to BaseURL.
-            if (UpdateServerSelector != null && UpdateServerSelector.Hosts.Count != 0)
-                lock (UpdateServerSelector.Hosts)
-                    UpdateServer = UpdateServerSelector.Hosts.Dequeue();
-
-            // Lock Hosts queue and dequeue next host to BaseURL.
-            return UpdateServer;
-        }
-        
 
         private static string CreateBackupPath(string applicationDirPath)
         {

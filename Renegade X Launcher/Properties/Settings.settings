@@ -14,20 +14,17 @@
     <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ProductKey" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">game</Value>
+    <Setting Name="VersionUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://renegade-x.com/launcher_data/Post5002version.json</Value>
+    </Setting>
+    <Setting Name="UseSeeker" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Installed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Binaries64" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="VersionUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://static.ren-x.com/launcher_data/version/release.json</Value>
-    </Setting>
-    <Setting Name="ServerListUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://serverlist.ren-x.com/servers.jsp</Value>
+    <Setting Name="Use64Bit" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

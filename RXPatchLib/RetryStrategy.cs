@@ -16,10 +16,10 @@ namespace RXPatchLib
             public Exception Exception;
         }
 
-        readonly ITimeProvider _timeProvider;
-        readonly TimeSpan _testIntervalLength = new TimeSpan(0, 0, 60);
-        readonly int _maxExceptionsInInterval = 2;
-        readonly TimeSpan _delayAfterException = new TimeSpan(0, 0, 2);
+        ITimeProvider TimeProvider;
+        TimeSpan TestIntervalLength = new TimeSpan(0, 0, 40);
+        int MaxExceptionsInInterval = 10;
+        TimeSpan DelayAfterException = new TimeSpan(0, 0, 4);
 
         public RetryStrategy(ITimeProvider timeProvider = null)
         {

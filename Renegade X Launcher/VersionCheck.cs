@@ -1,6 +1,11 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Net;
 using System.Windows;
 using Newtonsoft.Json;
@@ -22,19 +27,15 @@ namespace LauncherTwo
         static Version _latestLauncherVersion;
         static Version _latestGameVersion;
 
-        public static string InstructionsHash;
-        public static string GamePatchPath = null;
-        public static UpdateServerModel[] GamePatchUrls = null;
+        public static string[] GamePatchUrls = null;
         public static string LauncherPatchUrl = null;
-        public static string LauncherPatchHash = null;
-        public static string BannersUrl = null;
 
         static VersionCheck()
         {
             _launcherVersion = new Version
             {
-                Name = "0.00",
-                Number = 00
+                Name = "0.61",
+                Number = 061,
             };
         }
 
@@ -121,96 +122,33 @@ namespace LauncherTwo
 
         public static async Task UpdateLatestVersions()
         {
-            string productKey = Properties.Settings.Default.ProductKey;
             string versionJson = "";
             dynamic versionData = null;
 
             try
-            {
-                versionJson = await new WebClient().DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
-            }
-            catch (WebException ex)
-            {
-                MessageBox.Show("An error occurred while downloading version information, you can still play the game in single player but multiplayer might be unavailable.",
-                    "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Error while downloading launcher startup configuration, you can still play the game in single player but multiplayer might be unavailable.", Logger.ErrorLevel.ErrError);
-            }
-
-            // If we dont have any versionJson, we cannot contiune anyway!
-            if (versionJson == "")
-                return;
-
-            // Json parsing
-            try
-            {
-                versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
-            } catch (Exception ex)
-            {
-                MessageBox.Show("Unable to load the RenegadeX Launcher, unable to parse JSON Version Information",
-                    "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Unable to load the RenegadeX Launcher, unable to parse JSON Version Information", Logger.ErrorLevel.ErrError);
-            }
-
-            // Launcher parsing
-            try
-            {
-                _latestLauncherVersion = new Version
+            {                
+                var versionJson = await new WebClient().DownloadStringTaskAsync(Properties.Settings.Default.VersionUrl);
+                var versionData = JsonConvert.DeserializeObject<dynamic>(versionJson);
+                LatestLauncherVersion = new Version
                 {
                     Name = versionData["launcher"]["version_name"],
                     Number = versionData["launcher"]["version_number"],
                 };
-
-                LauncherPatchUrl = versionData["launcher"]["patch_url"];
-                LauncherPatchHash = versionData["launcher"]["patch_hash"];
-                BannersUrl = versionData["launcher"]["banners_url"];
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error occurred while loading the launcher version information.\r\nIt's recommended that you download the launcher again from www.renegade-x.com/download",
-                    "RenegadeX Launcher", MessageBoxButton.OK, MessageBoxImage.Error);
-                RxLogger.Logger.Instance.Write($"Error loading the launcher version information.\r\nIt's recommended that you download the launcher again from www.renegade-x.com", Logger.ErrorLevel.ErrError);
-            }
-
-            // Game parsing
-            try
-            { 
-                _latestGameVersion = new Version
+                LatestGameVersion = new Version
                 {
-                    Name = versionData[productKey]["version_name"],
-                    Number = versionData[productKey]["version_number"],
+                    Name = versionData["game"]["version_name"],
+                    Number = versionData["game"]["version_number"],
                 };
-                InstructionsHash = versionData[productKey]["instructions_hash"];
-                GamePatchPath = versionData[productKey]["patch_path"];
-
-                try
+                GamePatchUrls = versionData["game"]["patch_urls"].ToObject<string[]>();
+                LauncherPatchUrl = versionData["launcher"]["patch_url"];
+            }
+            catch
+            {
+                LatestLauncherVersion = new Version
                 {
-                    // Server URL's list & Friendly Names (product section)
-                    if (versionData[productKey]["mirrors"] != null)
-                    {
-                        foreach (var mirror in versionData[productKey]["mirrors"].ToObject<dynamic>())
-                        {
-                            RxPatcher.Instance.AddNewUpdateServer(mirror["url"].ToString());
-                        }
-                    }
-
-                    // Server URLs list & friendly names (global section)
-                    if (versionData["mirrors"] != null)
-                    {
-                        foreach (var mirror in versionData["mirrors"].ToObject<dynamic>())
-                        {
-                            if (mirror["products"] != null)
-                            {
-                                foreach (var product in mirror["products"].ToObject<dynamic>())
-                                {
-                                    if (productKey == product.ToString())
-                                    {
-                                        RxPatcher.Instance.AddNewUpdateServer(mirror["url"].ToString());
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    // Server URL's list & Friendly Names
+                    foreach (var x in versionData["game"]["mirrors"].ToObject<dynamic>())
+                        RxPatcher.Instance.AddNewUpdateServer(x["url"].ToString(), x["name"].ToString());
                 }
                 catch (Exception ex)
                 {
@@ -236,8 +174,7 @@ namespace LauncherTwo
 
         public static bool IsLauncherOutOfDate()
         {
-            return _launcherVersion.Number != 0 // Suppress for development builds
-                && _latestLauncherVersion.Number > _launcherVersion.Number;
+            return _latestLauncherVersion.Number > _launcherVersion.Number;
         }
 
         public static bool IsGameOutOfDate()

@@ -6,6 +6,7 @@ using LauncherTwo.Views;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Reflection;
+using System.Globalization;svn/svn.renegade-x.com/svn/main/Launcher_WPF/Renegade X Launcher
 using System.Net;
 using System;
 using System.Windows.Threading;
@@ -21,16 +22,28 @@ namespace LauncherTwo
 {
     public partial class MainWindow : RxWindow, INotifyPropertyChanged
     {
-        public const bool ShowDebug = false;
-        public bool VersionMismatch = false;
+        /*
+            NOT IMPLEMENTED
+            public readonly Dictionary<string, int[]> FlagCodes = new Dictionary<string, int[]>()
+            {
+                { "FR", new[]{-112,-64}},
+                { "US", new[]{-208,-208} }
+            };
+            */
+        private readonly string MAP_REPO_ADRESS = "ftp://launcher-repo.renegade-x.com/";
+
+        public const bool SHOW_DEBUG = false;
 
         /// <summary>
         /// Boolean that holds the state of the default movie.
         /// </summary>
         private Boolean _defaultMoviePlays = false;
 
-        public const int ServerRefreshRate = 0; // 60 sec
-        public static readonly int MaxPlayerCount = 64;
+        private ServerQueue serverQueue = new ServerQueue();
+
+        public const int SERVER_REFRESH_RATE = 10000; // 10 sec
+        public const int SERVER_AUTO_PING_RATE = 30000; // 30 sec
+        public static readonly int MAX_PLAYER_COUNT = 64;
         public TrulyObservableCollection<ServerInfo> OFilteredServerList { get; set; }
         private DispatcherTimer _refreshTimer;
         private EngineInstance _gameInstance;
@@ -54,7 +67,8 @@ namespace LauncherTwo
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName() + " | Players online: " + this.TotalPlayersOnline; } }
+        public string TitleValue { get { return "Renegade-X Launcher v" + VersionCheck.GetLauncherVersionName(); } }
+        public bool IsLaunchingPossible { get { return GameInstance == null; } }
 
         private int _totalPlayersOnline = 0;
         public int TotalPlayersOnline {get { return this._totalPlayersOnline; } private set
@@ -86,25 +100,34 @@ namespace LauncherTwo
         }
 
         #region -= Filters =-
-        private int _filterMaxPlayers = MaxPlayerCount; // Default to max
-        private int _filterMinPlayers = 0;
+        private int filter_MaxPlayers = 64;
+        private int filter_MinPlayers = 0;
         #endregion -= Filters =-
 
         public MainWindow()
         {
             OFilteredServerList = new TrulyObservableCollection<ServerInfo>();
 
+            InitializeComponent();
+
+            SetMessageboxText(MESSAGE_IDLE); // This must be set before any asynchronous code runs, as it might otherwise be overridden.
+            ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
+
+            SD_GameVersion.Text = VersionCheck.GetGameVersionName();
+
+            BannerTools.Setup();
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
+
+            
+
             SourceInitialized += (s, a) =>
             {
                 StartCheckingVersions();
 
-                if (ServerRefreshRate > 0)
-                {
-                    _refreshTimer = new DispatcherTimer();
-                    _refreshTimer.Interval = new TimeSpan(0, 0, ServerRefreshRate);
-                    _refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
-                    _refreshTimer.Start();
-                }
+                _refreshTimer = new DispatcherTimer();
+                _refreshTimer.Interval = new TimeSpan(0, 0, ServerRefreshRate);
+                _refreshTimer.Tick += (object sender, EventArgs e) => StartRefreshingServers();
+                _refreshTimer.Start();
                 StartRefreshingServers();
 
                 if (VersionCheck.GetGameVersionName() == "Unknown")
@@ -137,6 +160,8 @@ namespace LauncherTwo
             ServerInfoGrid.Items.SortDescriptions.Add(new SortDescription(PlayerCountColumn.SortMemberPath, ListSortDirection.Ascending));
 
             SD_GameVersion.Content = VersionCheck.GetGameVersionName();
+
+            BannerTools.Setup();
             SD_ClanHeader.Cursor = BannerTools.GetBannerLink(null) != "" ? Cursors.Hand : null;
 
             //due to the mediaelement being set to manual control, we need to start the previewvid in the constructor
@@ -145,7 +170,8 @@ namespace LauncherTwo
 
         private async Task CheckVersionsAsync()
         {
-            await VersionCheck.UpdateLatestVersions();
+            Task updateTask = VersionCheck.UpdateLatestVersions();
+            await updateTask;
 
             if (!VersionCheck.IsLauncherOutOfDate())
             {
@@ -160,11 +186,6 @@ namespace LauncherTwo
                 if (updateInstallPending)
                 {
                     Close();
-                }
-                else
-                {
-                    // Get banners; consider moving this later
-                    BannerTools.Setup();
                 }
                 return;
             }
@@ -187,11 +208,8 @@ namespace LauncherTwo
                 {
                     SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
                 }
-                SD_GameVersion.Content = VersionCheck.GetGameVersionName();
+                SD_GameVersion.Text = VersionCheck.GetGameVersionName();
             }
-
-            // Get banners; consider moving this later
-            BannerTools.Setup();
         }
 
         private void StartCheckingVersions()
@@ -217,46 +235,31 @@ namespace LauncherTwo
             }
             else
             {
-                //Get the previous vid that plays and store it. Nullify the playing vid so no handle is open
-                Uri previousVid = sv_MapPreviewVid.Source;
-                sv_MapPreviewVid.Source = null;
-
                 // Close any other instances of the RenX-Launcher
                 if (InstanceHandler.IsAnotherInstanceRunning())
                     InstanceHandler.KillDuplicateInstance();
 
                 var targetDir = GameInstallation.GetRootPath();
                 var applicationDir = Path.Combine(GameInstallation.GetRootPath(), "patch");
-                var patchPath = VersionCheck.GamePatchPath;
                 var patchUrls = VersionCheck.GamePatchUrls;
                 var patchVersion = VersionCheck.GetLatestGameVersionName();
 
                 var progress = new Progress<DirectoryPatcherProgressReport>();
                 var cancellationTokenSource = new CancellationTokenSource();
+                Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-                RxLogger.Logger.Instance.Write($"Starting game update | TargetDir: {targetDir} | AppDir: {applicationDir} | PatchPath: {patchPath},| PatchVersion: {patchVersion}");
-                Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
-
-                RxLogger.Logger.Instance.Write("Download complete, Showing ApplyUpdateWindow");
-                var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
+                var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, ApplyUpdateWindow.UpdateWindowType.Update);
                 window.Owner = this;
                 window.ShowDialog();
 
                 VersionCheck.UpdateGameVersion();
                 wasUpdated = true;
-
-                //Resume playback of vid
-                sv_MapPreviewVid.Source = previousVid;
-                sv_MapPreviewVid.Play();
-
-                // Refresh server list
-                StartRefreshingServers();
             }
         }
 
         void DownloadLauncherUpdate(out bool updateInstallPending)
         {
-            UpdateDownloadWindow theWindow = new UpdateDownloadWindow(VersionCheck.LauncherPatchUrl, VersionCheck.LauncherPatchHash);
+            UpdateDownloadWindow theWindow = new UpdateDownloadWindow(VersionCheck.LauncherPatchUrl);
             theWindow.Owner = this;
             theWindow.ShowDialog();
 
@@ -364,7 +367,178 @@ namespace LauncherTwo
 
         private void Join_Server_Btn_Click(object sender, RoutedEventArgs e)
         {
-            JoinSelectedServer();
+            ServerInfo SelectedServerInfo = GetSelectedServer();
+            if (SelectedServerInfo != null)
+            {
+                string password = null;
+                if (GetSelectedServer().PasswordProtected)
+                {
+                    PasswordWindow PassWindow = new PasswordWindow();
+                    PassWindow.Owner = this;
+                    PassWindow.ShowDialog();
+                    if (!PassWindow.WantsToJoin)
+                    {
+                        return;
+                    }
+                    password = PassWindow.Password;
+                }
+
+                //Is the seeker activated in the settings? Yes: launch seeker. No: launch game without seeker
+                if (Properties.Settings.Default.UseSeeker)
+                {
+                    #region Seeker
+
+                    this.Join_Server_Btn.IsEnabled = false;
+
+                   // var x = new CustomContentSeeker.Controller(MAP_REPO_ADRESS);
+
+                   // x.SearchMaps(GetSelectedServer().IPWithPort);
+
+                    //Create new cancellation token and source
+                    CancellationTokenSource source = new CancellationTokenSource();
+                    CancellationToken token = source.Token;
+
+                    //Create the seeker object to seek maps
+                    CustomContentSeeker.UdkSeeker Udkseeker = new CustomContentSeeker.UdkSeeker(MAP_REPO_ADRESS, "Launcher", "CustomMaps199");
+                    //Get the maplist of the server
+                    CustomContentSeeker.JSONRotationRetriever JSON = new CustomContentSeeker.JSONRotationRetriever(GetSelectedServer().IPWithPort);
+                    List<CustomContentSeeker.Level> Levels = JSON.getMaps();
+
+                    //Prepare seekerwindow and show it
+                    SeekerDownloadWindow seekerWindow = new SeekerDownloadWindow(source);
+                    seekerWindow.Show();
+
+                    //Create a task that will iterate through all maps in the maplist. Return the status at the end of the task
+                    //Default the status is "Finished" which means everything went according to plan
+                    //Everything else will result in an question in which the game wont start untill given permission, but all the other maps that don't throw an error will be downloaded.
+                    Task<CustomContentSeeker.UdkSeeker.Status> task = new Task<CustomContentSeeker.UdkSeeker.Status>(() =>
+                    {
+                        CustomContentSeeker.UdkSeeker.Status currentStatus = CustomContentSeeker.UdkSeeker.Status.Finished;//Status is finished untill other status gets pushed
+                        if (Levels != null && Levels.Count > 0)
+                        {
+                            
+                            foreach (CustomContentSeeker.Level Level in Levels)
+                            {
+                                if (token.IsCancellationRequested)
+                                {
+                                    currentStatus = CustomContentSeeker.UdkSeeker.Status.Cancelled;
+                                    break;
+                                }
+                                CustomContentSeeker.UdkSeeker.Status Status = Udkseeker.Seek(Level.Name, Level.GUID);//Seek a map
+                                if (Status != CustomContentSeeker.UdkSeeker.Status.MapSucces)
+                                {
+                                    currentStatus = Status;
+                                    Console.WriteLine("Could not download all the maps on the server. It may be possible you can't play all the maps.\nContinue downloading the other maps? (Y/N)");
+
+                                }
+                            }
+                        }
+                        else//something wrong with the maplist? (No JSON) Show maplisterror
+                        {
+                            currentStatus = CustomContentSeeker.UdkSeeker.Status.MaplistError;
+                            Dispatcher.Invoke(() => seekerWindow.Status = currentStatus.ToString());
+                        }
+                        return currentStatus;
+                    }, token);
+
+
+                    //Create another cancellationsource for the UI task
+                    //CancellationTokenSource source2 = new CancellationTokenSource();
+                    //CancellationToken token2 = source2.Token;
+                    //Task to update the statuswindow of the seeker
+                    Task task2 = new Task(() =>
+                    {
+                        while (task.Status == TaskStatus.Running)
+                        {
+                            seekerWindow.initProgressBar(Udkseeker.TotalAmountOfBytes);
+                            if (!source.IsCancellationRequested)
+                            {
+                                seekerWindow.Status = "Downloading: " + Udkseeker.currMap;
+                            }
+                            else
+                            {
+                                seekerWindow.Status = "Cancelling...";
+                            }
+                            seekerWindow.updateProgressBar(Udkseeker.DownloadedBytes);
+                            Thread.Sleep(500);
+                        }
+                        Dispatcher.Invoke(() => this.Join_Server_Btn.IsEnabled = true);
+                    });
+
+                    //Start both tasks and download all maps
+                    task.Start();
+                    task2.Start();
+
+                    //Wait for the seeker to finish
+                    await task;
+                    
+                    
+                    //If the seeker returned "Finished", everything went according to plan->Start the game & end other tasks
+                    if (task.Result == CustomContentSeeker.UdkSeeker.Status.Finished)
+                    {
+                        //Clean up tasks and windows
+                        task.Dispose();
+                        //source2.Cancel();
+                        seekerWindow.Close();
+
+                        seekerWindow = null;
+                        Udkseeker = null;
+
+                        await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start game
+                        this.Join_Server_Btn.IsEnabled = true;
+                    }
+                    else//Something went wrong, ask if game needs to be started anyway
+                    {
+                        if(seekerWindow.IsActive)
+                        {
+                            seekerWindow.Close();
+                        }
+                        seekerWindow.ToggleProgressBar();
+                        seekerWindow.Status = task.Result.ToString();
+                        task.Dispose();
+                       //source2.Cancel();
+
+                        string sMessageBoxText = "Not all maps have been downloaded... Launch the game anyway?";
+                        string sCaption = "Renegade X Seeker";
+
+                        MessageBoxButton btnMessageBox = MessageBoxButton.YesNo;
+                        MessageBoxImage icnMessageBox = MessageBoxImage.Question;
+
+                        MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+                        switch (rsltMessageBox)
+                        {
+                            case MessageBoxResult.Yes:
+                                seekerWindow.Close();
+
+                                seekerWindow = null;
+                                Udkseeker = null;
+                                await StartGameInstance(GetSelectedServer().IPWithPort, password);
+                                this.Join_Server_Btn.IsEnabled = true;
+                                break;
+                            case MessageBoxResult.No:
+                                seekerWindow.Close();
+                                seekerWindow = null;
+                                Udkseeker = null;
+                                this.Join_Server_Btn.IsEnabled = true;
+                                break;
+                            default:
+                                seekerWindow.Close();
+                                seekerWindow = null;
+                                Udkseeker = null;
+                                this.Join_Server_Btn.IsEnabled = true;
+                                break;
+                        }                        
+                    }
+                    #endregion
+                }
+                else
+                {
+                    this.WindowState = WindowState.Minimized;
+                    await StartGameInstance(GetSelectedServer().IPWithPort, password); //<-Start 
+                    this.WindowState = WindowState.Normal;
+                }
+
+            }
         }
 
         private async Task RefreshServersAsync()
@@ -421,28 +595,28 @@ namespace LauncherTwo
             //sv_MapPreview.Source = BitmapToImageSourceConverter.Convert(MapPreviewSettings.GetMapBitmap(selected.MapName));
 
             //Movie mappreview code
-            if (File.Exists(GameInstallation.GetRootPath() + "\\PreviewVids\\" + selected.MapName + ".mp4"))
+            if (File.Exists(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/" + selected.MapName + ".wmv"))
             {
-                this._defaultMoviePlays = false;
-                sv_MapPreviewVid.Source = new Uri(GameInstallation.GetRootPath() + "\\PreviewVids\\" + selected.MapName + ".mp4");
-                sv_MapPreviewVid.Play();
+                this.DefaultMoviePlays = false;
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/" + selected.MapName + ".wmv");
             }
             else if (!this._defaultMoviePlays)
             {
-                sv_MapPreviewVid.Source = new Uri(GameInstallation.GetRootPath() + "\\PreviewVids\\Default.mp4");
-                this._defaultMoviePlays = true;
-                sv_MapPreviewVid.Play();
+                sv_MapPreviewVid.Source = new Uri(System.IO.Directory.GetCurrentDirectory() + "/PreviewVids/Default.wmv");
+                this.DefaultMoviePlays = true;
             }
 
-            SD_ClanHeader.Source = BannerTools.GetBanner(selected.IpWithPort);
-            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IpWithPort) != "" ? Cursors.Hand : null;
 
-            SD_Name.Content = selected.ServerName;
+            SD_ClanHeader.Source = BannerTools.GetBanner(selected.IPAddress);
+            SD_ClanHeader.Cursor = BannerTools.GetBannerLink(selected.IPAddress) != "" ? Cursors.Hand : null;
+
+            SD_Name.Text = selected.ServerName;
+            SD_IP.Text = selected.IPWithPort;
             SD_GameLength.Content = selected.TimeLimit.ToString();
             SD_MineLimit.Content = selected.MineLimit.ToString();
             SD_GameMode.Content = selected.MapMode.ToString();
             SD_PlayerLimit.Content = selected.MaxPlayers.ToString();
-            SD_ServerVersion.Content = selected.GameVersion;
+            SD_ServerVersion.Text = selected.GameVersion;
             SD_VehicleLimit.Content = selected.VehicleLimit;
             SD_CN.Content = selected.CountryName;
 
@@ -454,29 +628,6 @@ namespace LauncherTwo
             Steam_Checkbx.Source = GetChkBxImg(selected.SteamRequired);
             Crates_Checkbx.Source = GetChkBxImg(selected.SpawnCrates);
             InfantryOnly_Checkbx.Source = GetChkBxImg(selected.VehicleLimit <= 0);
-            Ranked_Checkbx.Source = GetChkBxImg(selected.Ranked);
-
-            // Set version mismatch message visibility and join button opacity
-            if (VersionCheck.GetGameVersionName() == selected.GameVersion)
-            {
-                VersionMismatch = false;
-                SD_VersionMismatch.Visibility = Visibility.Hidden;
-                this.Join_Server_Btn.Background.Opacity = 1.0;
-                this.Join_Server_Btn.Content = "Join Server";
-            }
-            else
-            {
-                VersionMismatch = true;
-                SD_VersionMismatch.Visibility = Visibility.Visible;
-                this.Join_Server_Btn.Background.Opacity = 0.5;
-                this.Join_Server_Btn.Content = "Server Version Mismatch";
-            }
-            
-            // Ax: This just doesnt work, i assume it was meant to make the Join Game button actually "glow", however it just makes it fade out and back in when a user picks a new server in the list
-            // Schmitz - i assume this was something you were working on?
-            //System.Windows.Media.Animation.Storyboard sb = this.FindResource("JoinButtonGlow") as System.Windows.Media.Animation.Storyboard;
-            //System.Windows.Media.Animation.Storyboard.SetTarget(sb, this.Join_Server_Btn);
-            //sb.Begin();
 
             ServerInfoGrid.UpdateLayout();
         }
@@ -522,8 +673,13 @@ namespace LauncherTwo
                 startupParameters.Username = Properties.Settings.Default.Username;
                 startupParameters.IpEndpoint = ipEndpoint;
                 startupParameters.Password = password;
+                //startupParameters.SkipIntroMovies = false; <-Default value
                 startupParameters.SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies; // <-Dynamic skipMovies bool
-                startupParameters.Use64bit = Properties.Settings.Default.Binaries64;
+                startupParameters.Use64Bit = Properties.Settings.Default.Use64Bit;
+
+
+                
+
 
                 GameInstance = EngineInstance.Start(startupParameters);
 
@@ -660,6 +816,7 @@ namespace LauncherTwo
             {
                 SetMessageboxText("Game was updated! " + VersionCheck.GetGameVersionName());
             }
+            SD_GameVersion.Text = VersionCheck.GetGameVersionName();
         }
 
         /// <summary>
@@ -710,33 +867,32 @@ namespace LauncherTwo
             }
         }
 
-        private async void JoinSelectedServer()
+        private void SD_LaunchIrcClient_Click(object sender, RoutedEventArgs e)
         {
-            ServerInfo selectedServerInfo = GetSelectedServer();
-            if (selectedServerInfo != null)
-            {
-                string password = null;
-                if (GetSelectedServer().PasswordProtected)
-                {
-                    PasswordWindow passWindow = new PasswordWindow();
-                    passWindow.Owner = this;
-                    passWindow.ShowDialog();
-                    if (!passWindow.WantsToJoin)
-                    {
-                        return;
-                    }
-                    password = passWindow.Password;
-                }
+            IrcWindow ircWindow = new IrcWindow(this.SD_Username.Content.ToString());
+            ircWindow.Owner = this;
+            ircWindow.Show();
+        }
 
-                this.WindowState = WindowState.Minimized;
-                await StartGameInstance(GetSelectedServer().IpWithPort, password); //<-Start 
-                this.WindowState = WindowState.Normal;
+
+        //This is the non functional queue button handler.
+        //I need more info from the servers before this will become functional.
+        /*
+        private void Queue_Server_Btn_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.serverQueue.Enqueue(this.GetSelectedServer()))
+            {
+                this.Queue_Server_Btn.Content = "Dequeue from server";
+                this.Join_Server_Btn.IsEnabled = false;
+            }
+            else
+            {
+                this.Join_Server_Btn.IsEnabled = true;
+                this.Queue_Server_Btn.Content = "Queue this server";
             }
         }
-
-        private void ServerInfoGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            JoinSelectedServer();
-        }
+        */
     }
+
+    
 }

@@ -30,21 +30,23 @@ namespace LauncherTwo.Views
         }
         #endregion
 
-        #region Use64Bit Setting
-        private bool _use64Bit;
-        public bool Use64Bit
+        #region UseSeeker Setting
+        private bool _UseSeeker;
+        public bool UseSeeker
         {
             get
             {
-                return _use64Bit;
+                return _UseSeeker;
             }
             set
             {
-                _use64Bit = value;
-                NotifyPropertyChanged("Use64Bit");
+                _UseSeeker = value;
+                NotifyPropertyChanged("UseSeeker");
             }
         }
         #endregion
+
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -69,7 +71,7 @@ namespace LauncherTwo.Views
             Settings = new Settings
             {
                 SkipIntroMovies = Properties.Settings.Default.SkipIntroMovies,
-                Use64Bit = Properties.Settings.Default.Binaries64,
+                UseSeeker = Properties.Settings.Default.UseSeeker,
             };
             InitializeComponent();
         }
@@ -77,7 +79,7 @@ namespace LauncherTwo.Views
         public void ApplyAndClose(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.SkipIntroMovies = Settings.SkipIntroMovies;
-            Properties.Settings.Default.Binaries64 = Settings.Use64Bit;
+            Properties.Settings.Default.UseSeeker = Settings.UseSeeker;
             Properties.Settings.Default.Save();
             Close();
         }
@@ -108,16 +110,14 @@ namespace LauncherTwo.Views
         {
             var targetDir = GameInstallation.GetRootPath();
             var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
-            var patchPath = VersionCheck.GamePatchPath;
             var patchUrls = VersionCheck.GamePatchUrls;
             var patchVersion = VersionCheck.GetLatestGameVersionName();
 
             var progress = new Progress<DirectoryPatcherProgressReport>();
             var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+            Task task = new RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-            Task task = RxPatcher.Instance.ApplyPatchFromWeb(patchPath, targetDir, applicationDir, progress, cancellationTokenSource.Token, VersionCheck.InstructionsHash);
-
-            var window = new ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, type);
+            var window = new ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, type);
             window.Owner = this;
             window.ShowDialog();
 

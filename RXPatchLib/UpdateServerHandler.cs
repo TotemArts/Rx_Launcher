@@ -14,12 +14,14 @@ namespace RXPatchLib
     public class UpdateServerEntry
     {
         public Uri Uri;
+        public string Name;
         public bool IsUsed;
         public bool HasErrored;
 
-        public UpdateServerEntry(string url)
+        public UpdateServerEntry(string url, string name)
         {
             Uri = new Uri(url);
+            Name = name;
         }
     }
 
@@ -30,9 +32,9 @@ namespace RXPatchLib
     {
         private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
 
-        public void AddUpdateServer(string url)
+        public void AddUpdateServer(string url, string friendlyName)
         {
-            _updateServers.Add(new UpdateServerEntry(url));
+            _updateServers.Add(new UpdateServerEntry(url, friendlyName));
 
         }
 

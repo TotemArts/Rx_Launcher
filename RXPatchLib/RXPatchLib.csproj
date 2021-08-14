@@ -55,9 +55,7 @@
     <Compile Include="DirectoryPatcherProgress.cs" />
     <Compile Include="DirectoryPatchPhaseProgress.cs" />
     <Compile Include="DiscreteProgress.cs" />
-    <Compile Include="HashMistmatchException.cs" />
     <Compile Include="ITimeProvider.cs" />
-    <Compile Include="NoReliableHostException.cs" />
     <Compile Include="ObjectEx.cs" />
     <Compile Include="PingExtensions.cs" />
     <Compile Include="RetryStrategy.cs" />
@@ -74,7 +72,7 @@
     <Compile Include="PatchCreationException.cs" />
     <Compile Include="PatchInfo.cs" />
     <Compile Include="PatchSourceLoadException.cs" />
-    <Compile Include="SHA256.cs" />
+    <Compile Include="SHA1.cs" />
     <Compile Include="SpeedComputer.cs" />
     <Compile Include="StaticTimeProvider.cs" />
     <Compile Include="TaskExtensions.cs" />

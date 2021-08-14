@@ -12,7 +12,7 @@
     WindowStartupLocation="CenterScreen"
     MinHeight="0"
     MinWidth="0"
-    ResizeMode="NoResize" Height="194.038">
+    ResizeMode="NoResize" d:DesignHeight="201.373">
     <parent:RxWindow.Resources>
         <Style x:Key="MinimizeTitleBarButton" TargetType="{x:Type UserControl}"/>
         <Style x:Key="MaximizeTitleBarButton" TargetType="{x:Type UserControl}"/>
@@ -33,13 +33,13 @@
         </StackPanel>
         <Border Padding="3" BorderBrush="{DynamicResource RenX_Window_Border_Color_Brush}" MinHeight="75" MinWidth="250">
             <StackPanel>
-                <CheckBox Content="Skip Movies" Margin="1,0,0,2" ToolTip="Disables all movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
-                <CheckBox Content="Use 64bit" Margin="1,0,0,2" ToolTip="Use 64bit binaries instead of 32bit" IsChecked="{Binding Settings.Use64Bit}" />
+                <CheckBox Content="Skip intro movies" IsChecked="{Binding Settings.SkipIntroMovies}"/>
+                <CheckBox Content="Use UDKSeeker" IsChecked="{Binding Settings.UseSeeker}"/>
                 <Separator Height="5" Margin="2"/>
-                <DockPanel RenderTransformOrigin="0.505,1.732">
-                    <Button x:Name="BT_Verify" Content=" ✔ Verify Game Integrity " ToolTip="Resets all game settings; verifies integrity" Margin="5" Height="21" HorizontalAlignment="Left" VerticalContentAlignment="Center" Click="Verify_Click" />
-                    <Button x:Name="BT_Reset" Content=" ↻ Reset Game " ToolTip="Verifies the integrity of all game files" Margin="5" Height="21" HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Reset_Click" />
-                </DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="BT_Verify" Content="✔ Verify Game Integrity" Height="21" Width="140"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Verify_Click" Margin="0,0,2,0"/>
+                    <Button x:Name="BT_Reset" Content="↻ Reset Game" Height="21" Width="100"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Click="Reset_Click" Margin="2,0,0,0"/>
+                </StackPanel>
             </StackPanel>
 
 

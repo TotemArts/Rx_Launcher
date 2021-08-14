@@ -43,19 +43,10 @@ namespace RXPatch
                 return 1;
             }
 
-            var splitIndex = patchUrl.LastIndexOf('/');
-            var mirrorUrl = patchUrl.Substring(0, splitIndex + 1);
-            var patchPath = patchUrl.Substring(splitIndex + 1);
-            RxPatcher.Instance.WebPatchPath = patchPath;
-            RxPatcher.Instance.AddNewUpdateServer(mirrorUrl);
-
-            var entry = RxPatcher.Instance.GetNextUpdateServerEntry();
-            //await RxPatcher.Instance.UpdateServerSelector.QueryHost(entry);
-            // await UpdateServerSelector.SelectHosts(UpdateServerHandler.GetUpdateServers());
-            await RxPatcher.Instance.UpdateServerSelector.SelectHosts(RxPatcher.Instance.UpdateServerHandler.GetUpdateServers());
+            RxPatcher.Instance.AddNewUpdateServer(remainingArguments[0], "");
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => RxPatcher.Instance.ApplyPatchFromWebDownloadTask(entry, targetDir, applicationDir, progress, new CancellationToken(), null) // intentionally skipping instructions.json verification
+                (progress) => new RXPatcher().ApplyPatchFromWeb(patchUrl, targetDir, applicationDir, progress, new CancellationToken())
             );
 
             return 0;

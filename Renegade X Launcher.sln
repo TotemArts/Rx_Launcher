@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31424.327
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebAPI", "SteamWebAPI-master\SteamWebAPI.csproj", "{D846D108-D95B-4488-BA01-E487DA220C17}"
 EndProject
@@ -13,18 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RXPatchLibTest", "RXPatchLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RXPatch", "RXPatch\RXPatch.csproj", "{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDKSeeker", "UDKSeeker\UDKSeeker.csproj", "{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}"
+EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Renegade X Installer", "Renegade X Installer\Renegade X Installer.wixproj", "{1081A06F-6D2C-46A8-8EEC-E30C54E29093}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D846D108-D95B-4488-BA01-E487DA220C17} = {D846D108-D95B-4488-BA01-E487DA220C17}
-		{E465D232-EE02-495D-8391-BFDAFE350CF0} = {E465D232-EE02-495D-8391-BFDAFE350CF0}
-		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2} = {C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}
-		{DF79C6AB-E013-4211-8983-C9A97984AB49} = {DF79C6AB-E013-4211-8983-C9A97984AB49}
-		{407A95B5-B682-4785-9813-49B5FB614C8E} = {407A95B5-B682-4785-9813-49B5FB614C8E}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxLogger", "RxLogger\RxLogger.csproj", "{407A95B5-B682-4785-9813-49B5FB614C8E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfUpdateExecutor", "SelfUpdateExecutor\SelfUpdateExecutor.csproj", "{07AA9339-2F27-466D-A69A-FCB4E5B04F92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,11 +67,18 @@ Global
 		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}.Release|x86.ActiveCfg = Release|Any CPU
 		{C7CBDC5B-4A80-4F54-8239-F416C9AC5ED2}.Release|x86.Build.0 = Release|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Debug|x86.Build.0 = Debug|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|x86.ActiveCfg = Release|Any CPU
+		{605F489B-1C72-4FFA-AFDA-3388BCA59D1E}.Release|x86.Build.0 = Release|Any CPU
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Debug|x86.ActiveCfg = Debug|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Debug|x86.Build.0 = Debug|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Release|Any CPU.ActiveCfg = Release|x86
-		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Release|Any CPU.Build.0 = Release|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Release|x86.ActiveCfg = Release|x86
 		{1081A06F-6D2C-46A8-8EEC-E30C54E29093}.Release|x86.Build.0 = Release|x86
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -89,19 +89,8 @@ Global
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Release|x86.ActiveCfg = Release|Any CPU
 		{407A95B5-B682-4785-9813-49B5FB614C8E}.Release|x86.Build.0 = Release|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Debug|x86.Build.0 = Debug|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|x86.ActiveCfg = Release|Any CPU
-		{07AA9339-2F27-466D-A69A-FCB4E5B04F92}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {5FC060C6-C4C1-4BA5-895F-DDB63FF8508D}
 	EndGlobalSection
 EndGlobal

@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,76 +42,58 @@ namespace RXPatchLib
 
         public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
-            // Nothing to download; return CompletedTask
             return TaskExtensions.CompletedTask;
         }
 
         public Task Execute()
         {
-            string targetPath = _directoryPatcher.GetTargetPath(_subPath);
-            string backupPath = _directoryPatcher.GetBackupPath(_subPath);
-
-            Logger.Instance.Write($"RemoveAction - {targetPath} - {backupPath}");
-
-            // Deletes or moves the file to backupPath, if it exists
+            string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
+            string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
             if (File.Exists(targetPath))
             {
                 if (_needsBackup)
                 {
-                    // Backup file
                     Directory.CreateDirectory(Path.GetDirectoryName(backupPath));
                     File.Move(targetPath, backupPath);
                 }
                 else
                 {
-                    // Delete file
                     File.Delete(targetPath);
                 }
             }
-
-            // We're done; return CompletedTask
             return TaskExtensions.CompletedTask;
         }
     }
 
     class DeltaPatchAction : IFilePatchAction
     {
-        private readonly DirectoryPatcher _directoryPatcher;
-        private readonly string _subPath;
-        private readonly string _patchSubPath;
-        private readonly string _hash;
+        private DirectoryPatcher DirectoryPatcher;
+        private string SubPath;
+        private string PatchSubPath;
         public long PatchSize { get; private set; }
         public bool IsActive { get; set; }
         public bool IsComplete { get; set; }
 
-        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long patchSize, string hash)
+        public DeltaPatchAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, long patchSize)
         {
-            _directoryPatcher = directoryPatcher;
-            _subPath = subPath;
-            _patchSubPath = patchSubPath;
-            _hash = hash;
+            DirectoryPatcher = directoryPatcher;
+            SubPath = subPath;
+            PatchSubPath = patchSubPath;
             PatchSize = patchSize;
         }
 
         public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
-            // Downloads delta; Hash is 'DeltaHash'
-            return _directoryPatcher.PatchSource.Load(_patchSubPath, _hash, cancellationToken, progressCallback);
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
         }
 
         public async Task Execute()
         {
-            string tempPath = _directoryPatcher.GetTempPath(_subPath);
-            string targetPath = _directoryPatcher.GetTargetPath(_subPath);
-            string patchPath = _directoryPatcher.PatchSource.GetSystemPath(_patchSubPath);
-
-            Logger.Instance.Write($"DeltaPatchAction - {tempPath} - {targetPath} - {patchPath}");
-
-            // Ensure the temp directory exists, and generate the new file based on the old file and the delta
+            string tempPath = DirectoryPatcher.GetTempPath(SubPath);
+            string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
+            string patchPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
-            await _directoryPatcher.FilePatcher.ApplyPatchAsync(targetPath, tempPath, patchPath);
-
-            // Delete the old file and move the new one into place
+            await DirectoryPatcher.FilePatcher.ApplyPatchAsync(targetPath, tempPath, patchPath);
             File.Delete(targetPath);
             File.Move(tempPath, targetPath);
         }
@@ -118,45 +101,36 @@ namespace RXPatchLib
 
     class FullReplaceAction : IFilePatchAction
     {
-        private readonly DirectoryPatcher _directoryPatcher;
-        private readonly string _subPath;
-        private readonly string _patchSubPath;
-        private readonly bool _needsBackup;
-        private readonly string _hash;
+        private DirectoryPatcher DirectoryPatcher;
+        private string SubPath;
+        private string PatchSubPath;
+        private bool NeedsBackup;
         public long PatchSize { get; private set; }
         public bool IsActive { get; set; }
         public bool IsComplete { get; set; }
 
-        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long patchSize, string hash)
+        public FullReplaceAction(DirectoryPatcher directoryPatcher, string subPath, string patchSubPath, bool needsBackup, long patchSize)
         {
-            _directoryPatcher = directoryPatcher;
-            _subPath = subPath;
-            _patchSubPath = patchSubPath;
-            _needsBackup = needsBackup;
-            _hash = hash;
+            DirectoryPatcher = directoryPatcher;
+            SubPath = subPath;
+            PatchSubPath = patchSubPath;
+            NeedsBackup = needsBackup;
             PatchSize = patchSize;
         }
 
         public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
-            // Downloads full; Hash is 'CompressedHash' since full versions of files are compressed
-            return _directoryPatcher.PatchSource.Load(_patchSubPath, _hash, cancellationToken, progressCallback);
+            return DirectoryPatcher.PatchSource.Load(PatchSubPath, null, cancellationToken, progressCallback); // TODO: Check hash to avoid redownloading.
         }
 
         public async Task Execute()
         {
-            string tempPath = _directoryPatcher.GetTempPath(_subPath);
-            string newPath = _directoryPatcher.PatchSource.GetSystemPath(_patchSubPath);
-            string targetPath = _directoryPatcher.GetTargetPath(_subPath);
-            string backupPath = _directoryPatcher.GetBackupPath(_subPath);
-
-            Logger.Instance.Write($"FullReplaceAction - {tempPath} - {newPath} - {targetPath} - {backupPath}");
-
-            // Ensure the temp directory exists, and decompress the file
+            string tempPath = DirectoryPatcher.GetTempPath(SubPath);
+            string newPath = DirectoryPatcher.PatchSource.GetSystemPath(PatchSubPath);
+            string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
+            string backupPath = DirectoryPatcher.GetBackupPath(SubPath);
             Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
-            await _directoryPatcher.FilePatcher.DecompressAsync(tempPath, newPath); // Extract to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted). Copying is also necessary because the file may be shared (moving is not allowed).
-
-            // Get the old file out of the way, if it exists
+            await DirectoryPatcher.FilePatcher.DecompressAsync(tempPath, newPath); // Extract to a temp location, so that after copying, swapping the old and new file is a quick operation (i.e. not likely to cause inconsistency when interrupted). Copying is also necessary because the file may be shared (moving is not allowed).
             if (File.Exists(targetPath))
             {
                 if (_needsBackup)
@@ -169,8 +143,6 @@ namespace RXPatchLib
                     File.Delete(targetPath);
                 }
             }
-
-            // Move the new file into place
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
             File.Move(tempPath, targetPath);
         }
@@ -198,26 +170,13 @@ namespace RXPatchLib
 
         public Task Load(CancellationToken cancellationToken, Action<long, long, byte> progressCallback)
         {
-            // Nothing to download; return CompletedTask
             return TaskExtensions.CompletedTask;
         }
 
         public Task Execute()
         {
-            string targetPath = _directoryPatcher.GetTargetPath(_subPath);
-
-            Logger.Instance.Write($"ModifiedTimeReplaceAction - {targetPath} - {_lastWriteTime.ToString(CultureInfo.InvariantCulture)}");
-
-            // Update LastWriteTime
-            try
-            {
-                new FileInfo(targetPath).LastWriteTimeUtc = _lastWriteTime;
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.Write($"ModifiedTimeReplaceAction encountered an error\r\n{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
-            }
-
+            string targetPath = DirectoryPatcher.GetTargetPath(SubPath);
+            new FileInfo(targetPath).LastWriteTimeUtc = LastWriteTime;
             return TaskExtensions.CompletedTask;
         }
     }
@@ -239,53 +198,28 @@ namespace RXPatchLib
                 _progressCallback(_progress);
             }
 
-            public async void StartLoading(IFilePatchAction action)
+            public async Task StartLoading(IFilePatchAction action)
             {
-                // Initialize progress-related variables
-                var progressItem = _progress.AddItem();
+                var progressItem = Progress.AddItem();
                 progressItem.Total = action.PatchSize;
-
-                // Starts loading an action
-                var task = action.Load(_cancellationToken, (done, total, totalThreads) => {
-                    // Anonymous function to update progress
+                var task = action.Load(CancellationToken, (done, total) => {
                     Debug.Assert(total == progressItem.Total);
                     progressItem.Done = done;
                     _progress.DownloadThreads = totalThreads;
                     _progressCallback(_progress);
                 });
-
-                // Add task to task list; used mostly by 'AwaitAllTasksAndFinish'
-                _tasks.Add(task);
-
-                var guid = Guid.NewGuid();
-                try
-                {
-                    await task;
-                }
-                catch (Exception ex)
-                {
-                    // The RenX client seems to crash around here when the cancel button is pressed
-                    // while it does crash, it does however achieve our goal of stopping the download
-                    // (I'm not saying that it's right, i just dont know how to fix it right now.)
-                    Logger.Instance.Write($"{ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}", Logger.ErrorLevel.ErrError);
-                    throw;
-                }
-
-                // Update progress
+                Tasks.Add(task);
+                await task;
                 progressItem.Finish();
                 _progressCallback(_progress);
             }
 
             public async Task AwaitAllTasksAndFinish()
             {
-                _progress.State = DirectoryPatchPhaseProgress.States.Started;
-
-                // Wait until all actions have finished loading
-                await Task.WhenAll(_tasks);
-
-                // We're done here; update our State and update progress
-                _progress.State = DirectoryPatchPhaseProgress.States.Finished;
-                _progressCallback(_progress);
+                Progress.State = DirectoryPatchPhaseProgress.States.Started;
+                await Task.WhenAll(Tasks);
+                Progress.State = DirectoryPatchPhaseProgress.States.Finished;
+                ProgressCallback(Progress);
             }
         }
 
@@ -309,23 +243,17 @@ namespace RXPatchLib
             PatchSource = patchSource;
         }
 
-        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback, string instructions_hash)
+        internal async Task Analyze(CancellationToken cancellationToken, Action<IFilePatchAction> callback, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
-            // Download instructions
-            await PatchSource.Load("instructions.json", instructions_hash, cancellationToken, (done, total, totalThreads) => { });
-
-            // Open downloaded instructions.json and copy its contents to headerFileContents
+            await PatchSource.Load("instructions.json", null, cancellationToken, (done, total) => {});
             string headerFileContents;
             using (var file = File.Open(PatchSource.GetSystemPath("instructions.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var streamReader = new StreamReader(file, Encoding.UTF8))
             {
                 headerFileContents = streamReader.ReadToEnd();
             }
-
-            // Deserialize JSON data from headerFileContents
             List<FilePatchInstruction> instructions = JsonConvert.DeserializeObject<List<FilePatchInstruction>>(headerFileContents);
 
-            // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
             var paths = instructions.Select(i => Path.Combine(_targetPath, i.Path));
             var sizes = paths.Select(p => !File.Exists(p) ? 0 : new FileInfo(p).Length);
@@ -333,64 +261,45 @@ namespace RXPatchLib
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
-            // This will ensure that all instruction hashes are at the BOTTOM of the order list.
-            // These must be last as these are actions against complete files
-            instructions = instructions.OrderBy(x => x.OldHash != "").ToList();
-
-            // Process each instruction in instructions.json
             foreach (var pair in instructions.Zip(sizes, (i, s) => new { Instruction = i, Size = s }))
             {
                 var instruction = pair.Instruction;
-
+                var size = pair.Size;
                 cancellationToken.ThrowIfCancellationRequested();
-                string targetFilePath = Path.Combine(_targetPath, instruction.Path);
-
-                // Determine action(s) to take based on instruction; any new actions get passed to the callback
+                string targetFilePath = Path.Combine(TargetPath, instruction.Path);
                 await BuildFilePatchAction(instruction, targetFilePath, callback);
-
-                // Update progress
                 progress.AdvanceItem(pair.Size);
                 progressCallback(progress);
             }
 
-            // We're done here; update our State and update progress
             progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
         }
 
         private async Task BuildFilePatchAction(FilePatchInstruction instruction, string targetFilePath, Action<IFilePatchAction> callback)
         {
-            string installedHash = await Sha256.GetFileHashAsync(targetFilePath);
+            string installedHash = await SHA1.GetFileHashAsync(targetFilePath);
             bool isOld = installedHash == instruction.OldHash;
-
-            instruction.isActive = true;
-
-            // Patch file only if it is different from the new version
-            if (installedHash != instruction.NewHash)
+            bool isNew = installedHash == instruction.NewHash;
+            if (!isNew)
             {
-                // Backup any existing files that don't match the old hash
                 bool needsBackup = !isOld && installedHash != null;
-
                 if (instruction.NewHash == null)
                 {
-                    // File deleted
                     callback(new RemoveAction(this, instruction.Path, needsBackup));
                 }
                 else if (isOld && instruction.HasDelta)
                 {
-                    // Incremental update
                     string deltaFileName = Path.Combine("delta", instruction.NewHash + "_from_" + instruction.OldHash);
-                    callback(new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize, instruction.DeltaHash));
+                    callback(new DeltaPatchAction(this, instruction.Path, deltaFileName, instruction.DeltaSize));
                 }
                 else
                 {
-                    // Full download
                     string fullFileName = Path.Combine("full", instruction.NewHash);
-                    callback(new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.FullReplaceSize, instruction.CompressedHash));
+                    callback(new FullReplaceAction(this, instruction.Path, fullFileName, needsBackup, instruction.FullReplaceSize));
                 }
             }
 
-            // Update LastWriteTime
             if (instruction.NewHash != null)
             {
                 callback(new ModifiedTimeReplaceAction(this, instruction.Path, instruction.NewLastWriteTime));
@@ -399,11 +308,6 @@ namespace RXPatchLib
 
         private static async Task Apply(CancellationToken cancellationToken, List<IFilePatchAction> actions, Action<DirectoryPatchPhaseProgress> progressCallback)
         {
-            List<IFilePatchAction> tmpActions = actions.ToList(); // Create a copy of our list
-            List<BackgroundWorker> bgWorkers = new List<BackgroundWorker>();
-            var guid = Guid.NewGuid();
-
-            // Initialize progress-related variables
             var progress = new DirectoryPatchPhaseProgress();
             var secondPhaseProgress = new DirectoryPatchPhaseProgress();
             secondPhaseProgress.SetTotals(tmpActions.Count(m => m.PatchSize == 0), tmpActions.Count(m => m.PatchSize == 0));
@@ -412,115 +316,18 @@ namespace RXPatchLib
             progress.State = DirectoryPatchPhaseProgress.States.Started;
             progressCallback(progress);
 
-            // Create our workers, but clamp the value to 4, we dont want to cook peoples PC's
-            // (on testing with using all cores, it maxed out my 24 core server, but it did patch in about 30 seconds!)
-            Logger.Instance.Write(
-                $"Spawning Background Workers - Detected {Environment.ProcessorCount} processors, using {(Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount)} of them");
-
-            for (var i = 0; i < (Environment.ProcessorCount > MaximumDeltaThreads ? MaximumDeltaThreads : Environment.ProcessorCount); i++)
+            foreach (var action in actions)
             {
-                Logger.Instance.Write($"Spawning new background worker for task with an ID of {i}");
-                bgWorkers.Add(new BackgroundWorker() {WorkerSupportsCancellation = true});
+                await action.Execute();
+                progress.AdvanceItem(action.PatchSize);
+                progressCallback(progress);
             }
 
-            foreach (var backgroundWorker in bgWorkers)
-            {
-                Logger.Instance.Write($"Assigning DoWork methods to bgworker");
-                backgroundWorker.DoWork += async (sender, args) =>
-                {
-                    // While there are still some in the array to use.
-                    while (tmpActions.Any(checker => !checker.IsComplete) && !backgroundWorker.CancellationPending && !backgroundWorker.CancellationPending)
-                    {
-                        // Execute action
-                        IFilePatchAction thisAction;
-
-                        // Lock our tmpActions variable so we have unique access to it now
-                        lock (tmpActions)
-                        {
-                            if (tmpActions.Any(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize > 0))
-                                // If an action is not complete, not active and is above zero patch size
-                                thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize > 0);
-                            else
-                                // We have no actions that are above a patch size of zero, do we have any that are zero that still need doing?
-                                if (tmpActions.Any(l => !l.IsComplete && !l.IsActive && l.PatchSize == 0))
-                                    thisAction = tmpActions.DefaultIfEmpty(null).FirstOrDefault(filePatchAction => !filePatchAction.IsComplete && !filePatchAction.IsActive && filePatchAction.PatchSize == 0);
-                                else
-                                    // We're done, break out of our loop to close this thread
-                                    break;
-
-                            // Grab an action that is not complete, and not active and has a file size
-                            
-                            if (thisAction == null)
-                                continue;
-
-                            thisAction.IsActive = true;
-                        }
-
-                        Logger.Instance.Write($"Starting action with file size of  {thisAction.PatchSize}");
-                        try
-                        {
-                            await thisAction.Execute();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Instance.Write($"Error while attempting to apply a patch, error:\r\n{ex.Message}\r\n{ex.StackTrace}");
-                            // Throw a new exception to let the gui know.
-                            throw new Exception($"Unable to apply patch, we ran into an error\r\n{ex.Message}");
-                        }
-                        
-                        // Complete this action
-                        lock (tmpActions)
-                        {
-                            // Patch Size will ONLY equal ZERO when the instruction is one that expects the file to be present
-                            // An operation such as moving the file, renaming the file or setting it's metadata timestamp.
-                            // We have to check for zero, to ensure that the asyncronus method of performing this action
-                            // does not attempt to move/rename/etc a file before it has been actually downloaded.
-                            if (thisAction.PatchSize == 0)
-                            {
-                                secondPhaseProgress.AdvanceItem(1);
-                                progressCallback(secondPhaseProgress);
-                            }
-                            else
-                            {
-                                progress.AdvanceItem(thisAction.PatchSize);
-                                progressCallback(progress);
-                            }
-
-                            thisAction.IsComplete = true;
-                            thisAction.IsActive = false;
-                        }
-                    }
-
-                    Logger.Instance.Write("Background worker terminated");
-                };
-
-                backgroundWorker.RunWorkerAsync();
-            }
-
-            while (tmpActions.Any(action => !action.IsComplete))
-            {
-                await Task.Delay(1000);
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    foreach (var bgWorker in bgWorkers)
-                    {
-                        bgWorker.CancelAsync();
-                    }
-
-                    break;
-                }
-            }
-
-            // Dispose of all of our workers
-            foreach (var b in bgWorkers)
-                b.Dispose();
-
-            // We're done here; update our State and update progress
             progress.State = DirectoryPatchPhaseProgress.States.Finished;
             progressCallback(progress);
         }
 
-        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback, CancellationToken cancellationToken, string instructionsHash)
+        public async Task ApplyPatchAsync(IProgress<DirectoryPatcherProgressReport> progressCallback, CancellationToken cancellationToken)
         {
             var actions = new List<IFilePatchAction>();
             var progress = new DirectoryPatcherProgressReport();
@@ -530,19 +337,15 @@ namespace RXPatchLib
             };
             var loadPhase = new LoadPhase(cancellationToken, phaseProgress => reportProgress(() => progress.Load = phaseProgress));
 
-            // Analyze files to determine which files to download and how to download them
             await Analyze(cancellationToken, action =>
             {
-                loadPhase.StartLoading(action);
+                Task ignoreWarning = loadPhase.StartLoading(action);
                 actions.Add(action);
-                cancellationToken.ThrowIfCancellationRequested();
-            }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress), instructionsHash);
+            }, phaseProgress => reportProgress(() => progress.Analyze = phaseProgress));
 
-            // Wait for downloads to finish
             await loadPhase.AwaitAllTasksAndFinish();
 
-            // Apply the new files
-            await Apply(cancellationToken, actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
+            await Apply(actions, phaseProgress => reportProgress(() => progress.Apply = phaseProgress));
         }
     }
 }

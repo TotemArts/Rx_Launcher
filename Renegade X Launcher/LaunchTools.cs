@@ -11,9 +11,14 @@ namespace LauncherTwo
 {
     public abstract class EngineInstanceStartupParameters
     {
-        public virtual string GetProcessPath()
+        public bool Use64Bit { get; set; }
+
+        public string GetProcessPath ()
         {
-            return GameInstallation.GetRootPath() + "Binaries\\UDKLift.exe";
+            if(Use64Bit && File.Exists(GameInstallation.GetRootPath() + "Binaries\\Win64\\UDK.exe"))
+                return GameInstallation.GetRootPath() + "Binaries\\Win64\\UDK.exe";
+
+            return GameInstallation.GetRootPath() + "Binaries\\Win32\\UDK.exe";
         }
 
         public abstract string GetProcessArguments ();
@@ -33,7 +38,7 @@ namespace LauncherTwo
     {
         public override string GetProcessArguments()
         {
-            return "server CNC-Walls -nosteam";
+            return "server CNC-Walls_Flying.udk?game=RenX_Game.Rx_Game?dedicated=true -nosteam";
         }
     }
 
@@ -43,7 +48,6 @@ namespace LauncherTwo
         public string Password { get; set; }
         public string IpEndpoint { get; set; }
         public bool SkipIntroMovies { get; set; }
-        public bool Use64bit { get; set; }
 
         public override string GetProcessArguments ()
         {
@@ -61,16 +65,14 @@ namespace LauncherTwo
                 arguments += " -nomoviestartup"; 
             }
 
-            arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username.Replace(' ', '\u00A0');
-            return arguments;
-        }
+            //Pinpoint location of quote error
+            //Arguments += " -ini:UDKGame:DefaultPlayer.Name=\"" + Username + "\"";
+            //End quote error
 
-        public override string GetProcessPath()
-        {
-            if (Use64bit)
-                return GameInstallation.GetRootPath() + "Binaries\\Win64\\UDK.exe";
-            else
-                return GameInstallation.GetRootPath() + "Binaries\\Win32\\UDK.exe";
+            //Fix for quote error
+            arguments += " -ini:UDKGame:DefaultPlayer.Name=" + Username + "";
+            //End Fix
+            return arguments;
         }
 
     }
@@ -83,17 +85,13 @@ namespace LauncherTwo
 
         public static EngineInstance Start(EngineInstanceStartupParameters startupParameters)
         {
+            var ipHack  = (GameInstanceStartupParameters)StartupParameters;
+          
             var instance = new EngineInstance();
+            instance.IPEndpoint = ipHack.IPEndpoint;
+            ipHack = null;
 
-            try
-            {
-                var ipHack = (GameInstanceStartupParameters)startupParameters;
-                instance.IpEndpoint = ipHack.IpEndpoint;
-                ipHack = null;
-            }
-            catch { };
-
-            instance.StartupParameters = startupParameters;
+            instance.StartupParameters = StartupParameters;
             instance.Task = instance.StartAsync();
             return instance;
         }

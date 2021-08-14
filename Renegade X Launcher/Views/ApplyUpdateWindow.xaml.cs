@@ -189,6 +189,19 @@ namespace LauncherTwo.Views
                 NotifyPropertyChanged("StatusMessage");
             }
         }
+        private string _serverMessage;
+        public string ServerMessage
+        {
+            get
+            {
+                return _serverMessage;
+            }
+            private set
+            {
+                _serverMessage = value;
+                NotifyPropertyChanged("ServerMessage");
+            }
+        }
         private string _targetVersionString;
         public string TargetVersionString
         {
@@ -250,7 +263,9 @@ namespace LauncherTwo.Views
         /// <param name="targetVersionString">The version to update to</param>
         /// <param name="cancellationTokenSource">Cancellationsource for the updatetask</param>
         /// <param name="isInstall">Is this the first install</param>
-        public ApplyUpdateWindow(Task patchTask, RxPatcher patcher, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type)
+        
+        
+        public ApplyUpdateWindow(Task patchTask, Progress<DirectoryPatcherProgressReport> progress, string targetVersionString, CancellationTokenSource cancellationTokenSource, UpdateWindowType type, String server = "Skynet")
         {
             TargetVersionString = targetVersionString;
             _cancellationTokenSource = cancellationTokenSource;
@@ -264,9 +279,8 @@ namespace LauncherTwo.Views
                 {UpdateWindowType.Reset, new string[]{"modified", "modification" } }
             };
 
-            statusTitleDict.TryGetValue(type, out statusTitle);
-
-            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", statusTitle[0]);
+            this.StatusMessage = string.Format("Please wait while Renegade X is being {0}.", Status);
+            this.ServerMessage = string.Format("Downloadserver: {0}", server);
 
             InitializeComponent();
             this.Title = string.Format("Renegade X {0} ", statusTitle[1]);
@@ -279,8 +293,6 @@ namespace LauncherTwo.Views
             {
                 while (await Task.WhenAny(patchTask, Task.Delay(500)) != patchTask)
                 {
-                    if ( _cancellationTokenSource.IsCancellationRequested )
-                        throw new OperationCanceledException();
                     ProgressReport = lastReport;
                 }
                 ProgressReport = lastReport;
@@ -318,7 +330,7 @@ namespace LauncherTwo.Views
             ModernDialog areYouSureDialog = new ModernDialog();
             areYouSureDialog.Title = "Stop Download - Renegade X";
             areYouSureDialog.Content = "Are you sure you want to stop this download?\r\nYou can come back to it later.";
-            areYouSureDialog.Buttons = new Button[] { areYouSureDialog.YesButton, areYouSureDialog.NoButton };
+            areYouSureDialog.Buttons = new Button[] { areYouSureDialog.OkButton, areYouSureDialog.CancelButton };
             areYouSureDialog.ShowDialog();
 
             if (areYouSureDialog.DialogResult.Value == true)

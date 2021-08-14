@@ -21,13 +21,48 @@ namespace LauncherTwo
 {
     public class ServerInfo : INotifyPropertyChanged
     {
-        public enum GameMode
+        public enum SERVER_INFO_POSITIONS
         {
-            None,
-            Other,
-            Dm,
-            Cnc,
-            Ts
+            Server_Name = 0,
+            Server_IP = 1,
+            Bots = 2,
+            Password_Required = 3,
+            Map_Name = 4,
+            Server_Settings = 5,
+            Player_Count = 6,
+            Player_Limit = 7,
+        }
+
+
+        public enum SERVER_SETTINGS_POSTIONS
+        {
+            MaxPlayers = 0,
+            VehicleLimit = 1,
+            MineLimit = 2,
+            SpawnCreate = 3,
+            CrateRespawnTime = 4,
+            AutoBalance = 5,
+            TimeLimit = 6,
+            AllowPm = 7,
+            PmTeamOnly = 8,
+            SteamRequired = 9,
+            Version = 10
+        }
+
+
+        public enum SERVER_SETTINGS_POSTIONS
+        {
+            MaxPlayers = 0,
+            VehicleLimit = 1,
+            MineLimit = 2,
+            SpawnCreate = 3,
+            CrateRespawnTime = 4,
+            AutoBalance = 5,
+            TimeLimit = 6,
+            AllowPm = 7,
+            PmTeamOnly = 8,
+            SteamRequired = 9,
+            Version = 10
         }
 
         /// <summary>
@@ -281,23 +316,20 @@ namespace LauncherTwo
 
             try
             {
-                string serverListUrl = LauncherTwo.Properties.Settings.Default.ServerListUrl;
                 string jsonText = "";
                 //Grab the string from the RenX Website.
-                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {serverListUrl}");
+                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl}");
                 try
                 {
-                    var client = new WebClient();
-                    client.Headers.Set("User-Agent", "RenX-Launcher (" + VersionCheck.GetLauncherVersionName() + ")");
-                    client.QueryString.Set("id", "launcher");
-                    jsonText = await client.DownloadStringTaskAsync(serverListUrl);
+                    jsonText =
+                        await new WebClient().DownloadStringTaskAsync(RenXWebLinks.RenxActiveServerJsonUrl);
                 }
                 catch (Exception ex)
                 {
                     RxLogger.Logger.Instance.Write($"Server JSON Downloading Issue: {ex.Message}\r\nStack Trace:\r\n{ex.StackTrace}");
                 }
 
-                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {serverListUrl} Complete");
+                RxLogger.Logger.Instance.Write($"Downloading RenxActiveServerJsonUrl {RenXWebLinks.RenxActiveServerJsonUrl} Complete");
 
                 if (jsonText == "")
                     return;
@@ -316,19 +348,9 @@ namespace LauncherTwo
                         //SET STRINGS
                         newServer.ServerName = data["Name"] ?? "Missing";
 
-                        newServer.ServerNamePrefix = data["NamePrefix"] ?? "";
-                        if (newServer.ServerNamePrefix != "" && !newServer.ServerNamePrefix.EndsWith(" "))
-                        {
-                            newServer.ServerNamePrefix = newServer.ServerNamePrefix + " ";
-                        }
-
                         newServer.MapName = data["Current Map"] ?? "Missing";
 
-                        newServer.SimplifiedMapName = GetPrettyMapName(newServer.MapName);
-
-                        newServer.MapMode = GetGameMode(newServer.MapName);
-
-                        newServer.GameVersion = data["Game Version"] ?? "Missing";
+                        NewServer.MapName = MapPreviewSettings.GetPrettyMapName(NewServer.MapName);
 
                         newServer.IpAddress = data["IP"] ?? "Missing";
 
@@ -383,6 +405,132 @@ namespace LauncherTwo
             ActiveServers = newActiveServers;
         }
 
+        public static void ParseServers()
+        {
+            //Empty the list of our active servesr
+            ActiveServers = new List<ServerInfo>();
+
+            //Grab the string from the RenX Website.
+            string serverText = new WebClient().DownloadString(RenXWebLinks.RENX_ACTIVE_SERVERS_LIST_URL);
+
+            //Turn it into a JSon object that we can parse.
+            string[] results = serverText.Split(RenXWebLinks.RENX_SERVER_INFO_BREAK_SYMBOL, StringSplitOptions.RemoveEmptyEntries);
+
+
+            //We start at 2 to skip the dev notes. 
+            //We end one early to skip the html tags.
+            for(int i = 2; i < results.Length - 1; i++ )
+            {
+                string[] info = results[i].Split(RenXWebLinks.RENX_SERVER_INFO_SPACER_SYMBOL);
+
+                ServerInfo newServer = new ServerInfo();
+
+                // SERVER NAME
+                newServer.ServerName = info[(int)SERVER_INFO_POSITIONS.Server_Name];
+
+                // SERVER IP & PORT
+                string[] address = info[ (int)SERVER_INFO_POSITIONS.Server_IP ].Split(':');
+                newServer.IPAddress = address[0];
+                newServer.Port = ParseInt(address[1]);
+
+                //BOT COUNT
+                newServer.BotCount = ParseInt( info[(int)SERVER_INFO_POSITIONS.Bots] ) ;
+
+                //PASSWORD REQUIRED
+                newServer.PasswordProtected = ParseBool( info[(int)SERVER_INFO_POSITIONS.Password_Required] );
+
+                //MAP
+                newServer.MapName = MapPreviewSettings.GetPrettyMapName(info[(int)SERVER_INFO_POSITIONS.Map_Name]);
+
+                //SERVER SETTINGS
+                {
+                    //Break down the settings
+                    string[] serverSettings = info[(int)SERVER_INFO_POSITIONS.Server_Settings].Split(RenXWebLinks.RENX_SERVER_SETTING_SPACE_SYMBOL);
+
+                    newServer.MaxPlayers          = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.VehicleLimit      ] );
+                    newServer.VehicleLimit        = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.MaxPlayers        ] );
+                    newServer.MineLimit           = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.MineLimit         ] );
+                    newServer.SpawnCrates         = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.SpawnCreate       ] );
+                    newServer.CrateRespawnRate    = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.CrateRespawnTime  ] );
+                    newServer.AutoBalance         = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.AutoBalance       ] );
+                    newServer.TimeLimit           = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.TimeLimit         ] );
+                    newServer.AllowPM             = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.AllowPm           ] );
+                    newServer.PmTeamOnly          = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.PmTeamOnly        ] );
+                    newServer.SteamRequired       = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.SteamRequired     ] );
+                    newServer.GameVersion         =           serverSettings[ (int)SERVER_SETTINGS_POSTIONS.Version];
+                }
+
+                // PLAYER COUNT
+                newServer.PlayerCount = ParseInt(info[(int)SERVER_INFO_POSITIONS.Player_Count]);
+
+                ActiveServers.Add(newServer);
+            }
+        }
+
+        public static void ParseServers()
+        {
+            //Empty the list of our active servesr
+            ActiveServers = new List<ServerInfo>();
+
+            //Grab the string from the RenX Website.
+            string serverText = new WebClient().DownloadString(RenXWebLinks.RENX_ACTIVE_SERVERS_LIST_URL);
+
+            //Turn it into a JSon object that we can parse.
+            string[] results = serverText.Split(RenXWebLinks.RENX_SERVER_INFO_BREAK_SYMBOL, StringSplitOptions.RemoveEmptyEntries);
+
+
+            //We start at 2 to skip the dev notes. 
+            //We end one early to skip the html tags.
+            for(int i = 2; i < results.Length - 1; i++ )
+            {
+                string[] info = results[i].Split(RenXWebLinks.RENX_SERVER_INFO_SPACER_SYMBOL);
+
+                ServerInfo newServer = new ServerInfo();
+
+                // SERVER NAME
+                newServer.ServerName = info[(int)SERVER_INFO_POSITIONS.Server_Name];
+
+                // SERVER IP & PORT
+                string[] address = info[ (int)SERVER_INFO_POSITIONS.Server_IP ].Split(':');
+                newServer.IPAddress = address[0];
+                newServer.Port = ParseInt(address[1]);
+
+                //BOT COUNT
+                newServer.BotCount = ParseInt( info[(int)SERVER_INFO_POSITIONS.Bots] ) ;
+
+                //PASSWORD REQUIRED
+                newServer.PasswordProtected = ParseBool( info[(int)SERVER_INFO_POSITIONS.Password_Required] );
+
+                //MAP
+                newServer.MapName = MapPreviewSettings.GetPrettyMapName(info[(int)SERVER_INFO_POSITIONS.Map_Name]);
+
+                //SERVER SETTINGS
+                {
+                    //Break down the settings
+                    string[] serverSettings = info[(int)SERVER_INFO_POSITIONS.Server_Settings].Split(RenXWebLinks.RENX_SERVER_SETTING_SPACE_SYMBOL);
+
+                    newServer.MaxPlayers          = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.VehicleLimit      ] );
+                    newServer.VehicleLimit        = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.MaxPlayers        ] );
+                    newServer.MineLimit           = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.MineLimit         ] );
+                    newServer.SpawnCrates         = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.SpawnCreate       ] );
+                    newServer.CrateRespawnRate    = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.CrateRespawnTime  ] );
+                    newServer.AutoBalance         = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.AutoBalance       ] );
+                    newServer.TimeLimit           = ParseInt( serverSettings[ (int)SERVER_SETTINGS_POSTIONS.TimeLimit         ] );
+                    newServer.AllowPM             = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.AllowPm           ] );
+                    newServer.PmTeamOnly          = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.PmTeamOnly        ] );
+                    newServer.SteamRequired       = ParseBool(serverSettings[ (int)SERVER_SETTINGS_POSTIONS.SteamRequired     ] );
+                    newServer.GameVersion         =           serverSettings[ (int)SERVER_SETTINGS_POSTIONS.Version];
+                }
+
+                // PLAYER COUNT
+                newServer.PlayerCount = ParseInt(info[(int)SERVER_INFO_POSITIONS.Player_Count]);
+
+                ActiveServers.Add(newServer);
+            }
+        }
+
+
+
         private static bool ParseBool(String str, bool def = false)
         {
             bool b;
@@ -410,64 +558,9 @@ namespace LauncherTwo
                 return def;
         }
 
-        public static GameMode GetGameMode(string map)
-        {
-            string[] separated = map.Split(new char[] { '-' }, 2);
+ 
 
-            if (separated.Length <= 0)
-                return GameMode.None;
-
-            if (separated[0].ToUpper() == "DM")
-                return GameMode.Dm;
-
-            if (separated[0].ToUpper() == "CNC")
-                return GameMode.Cnc;
-
-            if (separated[0].ToUpper() == "TS")
-                return GameMode.Ts;
-
-            return GameMode.Other;
-        }
-
-        public static string StripGameMode(string map)
-        {
-            string[] separated = map.Split(new char[] { '-' }, 2);
-            if (separated.Length >= 2)
-                return separated[1];
-
-            return "";
-        }
-
-        public static string GetPrettyMapName(string map)
-        {
-            string[] separated;
-
-            map = StripGameMode(map);
-
-            separated = map.Split(new char[] { '_' });
-
-            if (separated.Length == 0)
-                return "";
-
-            map = separated[0];
-
-            for (int index = 1; index != separated.Length; ++index)
-            {
-                map += " ";
-                if (separated[index].ToLower() == "day")
-                    map += "(Day)";
-                else if (separated[index].ToLower() == "night")
-                    map += "(Night)";
-                else if (separated[index].ToLower() == "flying")
-                    map += "(Flying)";
-                else
-                    map += separated[index];
-            }
-
-            return map;
-        }
-
-        public static async Task PingActiveServersAsync()
+        public async static Task PingActiveServersAsync()
         {
             List<Task> pingTasks = new List<Task>();
             foreach (ServerInfo serverInfo in ActiveServers)
@@ -499,8 +592,43 @@ namespace LauncherTwo
         /// <returns>The name of the country that belongs to the IPAddress</returns>
         static async Task<string[]> GrabCountry(string ipAddress)
         {
-            // TODO: reimplement
-            return new string[2] { "Unknown", "Unknown" };
+            //GET CountryCode
+            //If the Ip is known, we can check the country.
+            //Otherwise, assume CountryCode and name is missing
+            if (ipAddress != "Missing")
+            {
+                string[] countryCode;
+                //First check the cache if we already have the current ip, this reduces the call to the api
+                CountryCodeCache.TryGetValue(ipAddress, out countryCode);
+                //If the CountryCode was not found in the cache (null), grab it from the api
+                //Else, use the CountryCode from the cache
+                if (countryCode == null)
+                {
+                    try
+                    {
+                        //Grab the Countrycode and name
+                        string countryJson = await new WebClient().DownloadStringTaskAsync("https://api.ip2country.info/ip?" + ipAddress);
+                        var countryResults = JsonConvert.DeserializeObject<dynamic>(countryJson);
+
+                        //Add Countrycode and name to cache and return
+                        CountryCodeCache.Add(ipAddress, new string[2] {(string)countryResults["countryName"], (string)countryResults["countryCode"]});
+                        return new string[2] { (string)countryResults["countryName"], (string)countryResults["countryCode"] };
+                    }
+                    catch
+                    {
+                        //If the api does not respond in any way, assume CountryCode is missing
+                        return new string[2] { "Unknown", "Unknown" };
+                    }
+                }
+                else
+                {
+                    return countryCode;
+                }
+            }
+            else
+            {
+                return new string[2] { "Unknown", "Unknown" };
+            }
         }
 
 
@@ -508,10 +636,6 @@ namespace LauncherTwo
         // FRONT PAGE INFO
         public string ServerName { get; set; }
         public string MapName { get; set; }
-        public string SimplifiedMapName { get; set; }
-        public GameMode MapMode { get; set; }
-        public bool Ranked { get; set; }
-        public string ServerNamePrefix { get; set; }
         // Raw ping value
         public int Ping { get; set; }
         // Value used to sort ping in the server list
@@ -636,7 +760,6 @@ namespace LauncherTwo
         {
             ServerName = string.Empty;
             MapName = string.Empty;
-            SimplifiedMapName = string.Empty;
             PlayerCount = -1;
             Ping = -1;
             Port = -1;

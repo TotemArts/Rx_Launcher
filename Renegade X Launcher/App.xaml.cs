@@ -19,33 +19,32 @@ namespace LauncherTwo
         public void StartupApp(object sender, StartupEventArgs e)
         {
             //Determine if the permissionChange is succesfull after launcher update
-            bool didTryUpdate = false;
+            bool isGoodUpdate = false;
             bool isLogging = false;
 
-            Logger.Instance.Write("Application starting up; checking command line options...");
+            Logger.Instance.Write("Application starting up...");
 
             foreach (string a in e.Args)
             {
-                Logger.Instance.Write("Parsing option: " + a);
                 if (a.Equals("--log", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Instance.StartLogConsole();
                     isLogging = true;
                 }
                 if (a.StartsWith("--patch-result="))
-                {                   
-                    didTryUpdate = true;
+                {
                     string code = a.Substring("--patch-result=".Length);
                     Logger.Instance.Write($"Startup Parameter 'patch-result' found - contents: {code}");
                     //If the code !=0 -> there is something wrong with the patching of the launcher
-                    if (code != "0" && code != "Success")
+                    if (code != "0")
                     {
                         MessageBox.Show(string.Format("Failed to update the launcher (code {0}).\n\nPlease close any applications related to Renegade-X and try again.", code), "Patch failed", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    else // Otherwise -> change folderpermissions and afterwards launch the launcher
+                    else//Otherwise -> change folderpermissions and afterwards launch the launcher
                     {
                         try {
                             SetFullControlPermissionsToEveryone(GameInstallation.GetRootPath());
+                            isGoodUpdate = true; //Set isGoodUpdate to true to indicate correct permissionChange
                         }
                         catch (Exception ex)
                         {
@@ -61,7 +60,7 @@ namespace LauncherTwo
                     x.FirstInstall();
                     return;
                 }
-                else if(a.StartsWith("--UpdateGame=")) // Manually update the game to a given URL.
+                else if(a.StartsWith("--UpdateGame="))//Manually opdate the game to a given URL.
                 {
                     // Close any other instances of the RenX-Launcher
                     if ( InstanceHandler.IsAnotherInstanceRunning() )
@@ -69,41 +68,44 @@ namespace LauncherTwo
 
                     var targetDir = GameInstallation.GetRootPath();
                     var applicationDir = System.IO.Path.Combine(GameInstallation.GetRootPath(), "patch");
-                    String patchUrl = a.Substring("--UpdateGame=".Length);
+                    String[] patchUrls = new string[1];
+                    patchUrls[0] = a.Substring("--UpdateGame=".Length);
                     var patchVersion = VersionCheck.GetLatestGameVersionName();
 
                     var progress = new Progress<DirectoryPatcherProgressReport>();
                     var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+                    System.Threading.Tasks.Task task = new RXPatchLib.RXPatcher().ApplyPatchFromWeb(patchUrls, targetDir, applicationDir, progress, cancellationTokenSource.Token);
 
-                    RxPatcher.Instance.AddNewUpdateServer(patchUrl);
-                    System.Threading.Tasks.Task task = RxPatcher.Instance.ApplyPatchFromWebDownloadTask(RXPatchLib.RxPatcher.Instance.GetNextUpdateServerEntry(), targetDir, applicationDir, progress, cancellationTokenSource.Token, null); // no verificaiton on instructions.json, as we're bypassing standard version checking
-
-                    var window = new Views.ApplyUpdateWindow(task, RxPatcher.Instance, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
-
+                    var window = new Views.ApplyUpdateWindow(task, progress, patchVersion, cancellationTokenSource, Views.ApplyUpdateWindow.UpdateWindowType.Update);
                     window.ShowDialog();
 
                     VersionCheck.UpdateGameVersion();
                     return;
                 }
-                Logger.Instance.Write("Parsed option: " + a);
             }
-
-            Logger.Instance.Write("Done checking command line options");
 
             if (LauncherTwo.Properties.Settings.Default.UpgradeRequired)
             {
-                Logger.Instance.Write("Upgrading properties...");
                 LauncherTwo.Properties.Settings.Default.Upgrade();
                 LauncherTwo.Properties.Settings.Default.UpgradeRequired = false;
                 LauncherTwo.Properties.Settings.Default.Save();
-                Logger.Instance.Write("Properties upgraded");
             }
 
-            //If no args are present, or a permissionChange update was executed -> normally start the launcher
-            // didTryUpdate - If we tried an update, we have args, so we need to check this as well to make the main window load.
-            if (e.Args.Length == 0 || didTryUpdate || isLogging)
+            /* Commented out untill I found a better way to intergrate it in the installation
+            if (!GameInstallation.IsRootPathPlausible())
             {
-                if (InstanceHandler.IsAnotherInstanceRunning() && !didTryUpdate)
+                var result = MessageBox.Show("The game path seems to be incorrect. Please ensure that the launcher is placed in the correct location. If you proceed, files in the following location might be affected:\n\n" + GameInstallation.GetRootPath() + "\n\nAre you sure want to proceed?", "Invalid game path", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+                if (result != MessageBoxResult.Yes)
+                {
+                    Shutdown();
+                    return;
+                }
+            }
+            */
+            //If no args are present, or a permissionChange update was executed -> normally start the launcher
+            if (e.Args.Length == 0 || isGoodUpdate || isLogging)
+            {
+                if (InstanceHandler.IsAnotherInstanceRunning() && !isGoodUpdate)
                 {
                     MessageBox.Show("Error:\nUnable to start Renegade-X Launcher: Another instance is already running!",
                         "Renegade-X Launcher", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
@@ -113,8 +115,11 @@ namespace LauncherTwo
                 Logger.Instance.Write("Initial application startup complete, Creating new MainWindow");
                 new MainWindow().Show();
             }
-
-            Logger.Instance.Write("Exiting StartupApp...");
+            else
+            {
+                Application.Current.Shutdown();
+            }
+            
         }
 
         /// <summary>
