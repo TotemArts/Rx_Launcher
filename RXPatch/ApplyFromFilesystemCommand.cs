@@ -1,4 +1,5 @@
-﻿using RXPatchLib;
+﻿/*
+using RXPatchLib;
 using ManyConsole;
 using System;
 using System.Collections.Generic;
@@ -48,10 +49,11 @@ namespace RXPatch
             }
 
             await ProgressReporter.AwaitWithProgressReporting<DirectoryPatcherProgressReport>(
-                (progress) => new RXPatcher().ApplyPatchFromFilesystem(patchDir, destinationDir, applicationDir, progress, new CancellationToken())
+                (progress) => new RxPatcher().ApplyPatchFromFilesystem(patchDir, destinationDir, applicationDir, progress, new CancellationToken(), null)
             );
 
             return 0;
         }
     }
 }
+*/

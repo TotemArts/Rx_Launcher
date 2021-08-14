@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RxLogger
@@ -46,12 +43,12 @@ namespace RxLogger
             try
             {
                 var filePath = $"{Environment.GetEnvironmentVariable("APPDATA")}\\Renegade-X Launcher";
-                var fileName = $"{DateTime.Now:dd-mm-yyyy - HH-mm-ss}-Application.log";
+                var fileName = $"{DateTime.Now:dd-MM-yyyy_HH-mm-ss}_Application.log";
                 _fullPath = $"{filePath}\\{fileName}";
 
                 if (!System.IO.Directory.Exists(filePath))
                     System.IO.Directory.CreateDirectory(filePath);
-
+   
                 InitLog();
             }
             catch (Exception ex)
@@ -100,7 +97,7 @@ namespace RxLogger
             {
                 // ReSharper disable once LocalizableElement
                 System.IO.File.AppendAllText(_fullPath,
-                    $"[{DateTime.Now:dd-mm-yyyy - HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] | {errorLevel.ToString()} - {message}\r\n");
+                    $"[{DateTime.Now:dd-MM-yyyy_HH-mm-ss}] | [{callingMethod} @ Line {callingFileLineNumber} In {System.IO.Path.GetFileName(callingFilePath)} Thread {Thread.CurrentThread.ManagedThreadId}] | {errorLevel.ToString()} - {message}\r\n");
                 if (_hasConsole)
                 {
                     switch (errorLevel)

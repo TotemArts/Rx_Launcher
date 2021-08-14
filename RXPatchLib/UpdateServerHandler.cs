@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RxLogger;
 
 namespace RXPatchLib
 {
@@ -14,14 +10,12 @@ namespace RXPatchLib
     public class UpdateServerEntry
     {
         public Uri Uri;
-        public string Name;
         public bool IsUsed;
         public bool HasErrored;
 
-        public UpdateServerEntry(string url, string name)
+        public UpdateServerEntry(string url)
         {
             Uri = new Uri(url);
-            Name = name;
         }
     }
 
@@ -32,9 +26,9 @@ namespace RXPatchLib
     {
         private List<UpdateServerEntry> _updateServers = new List<UpdateServerEntry>();
 
-        public void AddUpdateServer(string url, string friendlyName)
+        public void AddUpdateServer(string url)
         {
-            _updateServers.Add(new UpdateServerEntry(url, friendlyName));
+            _updateServers.Add(new UpdateServerEntry(url));
 
         }
 

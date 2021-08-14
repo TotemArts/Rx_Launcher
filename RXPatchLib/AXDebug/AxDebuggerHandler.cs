@@ -35,7 +35,7 @@ namespace RXPatchLib.AXDebug
         /// <param name="serverUri">The server URL that it's downloading from</param>
         public void AddDownload(Guid guid, string filepath, string serverUri)
         {
-            _frmAgnDebug.AddDownload(guid, filepath, serverUri);
+            if (_frmAgnDebug.Visible) _frmAgnDebug.AddDownload(guid, filepath, serverUri);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace RXPatchLib.AXDebug
         /// <param name="guid">The GUID you passed in during AddDownload</param>
         public void RemoveDownload(Guid guid)
         {
-            _frmAgnDebug.RemoveDownload(guid);
+            if (_frmAgnDebug.Visible) _frmAgnDebug.RemoveDownload(guid);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace RXPatchLib.AXDebug
         /// <param name="fileSize">The current total file size from the WebClient OnDownloadProgressed event</param>
         public void UpdateDownload(Guid guid, long progress, long fileSize)
         {
-            _frmAgnDebug.UpdateDownload(guid, progress, fileSize);
+            if (_frmAgnDebug.Visible) _frmAgnDebug.UpdateDownload(guid, progress, fileSize);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace RXPatchLib.AXDebug
         /// </summary>
         public void Dispose()
         {
-            _frmAgnDebug.Close();
+            if (_frmAgnDebug.Visible) _frmAgnDebug.Close();
         }
     }
 }

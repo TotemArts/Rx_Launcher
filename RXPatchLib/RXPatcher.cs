@@ -1,10 +1,9 @@
-﻿using System;
+﻿/*
+ using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace RXPatchLib
         const string DownloadSubPath = "download"; // Note that this directory will be automatically emptied after patching.
         const string TempSubPath = "apply"; // Note that this directory will be automatically emptied after patching.
 
-        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
+        public async Task ApplyPatchFromWeb(string baseUrl, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
         {
             var backupPath = CreateBackupPath(applicationDirPath);
             var downloadPath = CreateDownloadPath(applicationDirPath);
@@ -26,29 +25,30 @@ namespace RXPatchLib
             using (var patchSource = new WebPatchSource(baseUrl, downloadPath))
             {
                 var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-                await patcher.ApplyPatchAsync(progress, cancellationToken);
+                await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
                 DirectoryEx.DeleteContents(downloadPath);
                 DirectoryEx.DeleteContents(tempPath);
             }
         }
-        public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
+
+        public async Task ApplyPatchFromWeb(string[] baseUrls, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash)
         {
             Contract.Assert(baseUrls.Length > 0);
             var hosts = baseUrls.Select(url => new Uri(url)).ToArray();
             int index = await new UpdateServerSelector().SelectHostIndex(hosts);
             var bestHost = baseUrls[index];
             Console.WriteLine("#######HOST: {0}", bestHost);
-            await ApplyPatchFromWeb(bestHost, targetPath, applicationDirPath, progress, cancellationToken);
+            await ApplyPatchFromWeb(bestHost, targetPath, applicationDirPath, progress, cancellationToken,instructionsHash);
         }
 
-        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken)
+        public async Task ApplyPatchFromFilesystem(string patchPath, string targetPath, string applicationDirPath, IProgress<DirectoryPatcherProgressReport> progress, CancellationToken cancellationToken, string instructionsHash = null)
         {
             var backupPath = CreateBackupPath(applicationDirPath);
             var tempPath = CreateTempPath(applicationDirPath);
 
             var patchSource = new FileSystemPatchSource(patchPath);
             var patcher = new DirectoryPatcher(new XdeltaPatcher(XdeltaPatchSystemFactory.Preferred), targetPath, backupPath, tempPath, patchSource);
-            await patcher.ApplyPatchAsync(progress, cancellationToken);
+            await patcher.ApplyPatchAsync(progress, cancellationToken, instructionsHash);
         }
 
         private static string CreateBackupPath(string applicationDirPath)
@@ -74,3 +74,4 @@ namespace RXPatchLib
         }
     }
 }
+*/

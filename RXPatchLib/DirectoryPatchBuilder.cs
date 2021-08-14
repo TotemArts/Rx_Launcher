@@ -1,22 +1,21 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace RXPatchLib
 {
     public class DirectoryPatchBuilder : IDisposable
     {
-        SHA1CryptoServiceProvider CryptoProvider = new SHA1CryptoServiceProvider();
-        XdeltaPatchBuilder PatchBuilder;
+        readonly SHA256CryptoServiceProvider _cryptoProvider = new SHA256CryptoServiceProvider();
+        readonly XdeltaPatchBuilder PatchBuilder;
 
         public DirectoryPatchBuilder(XdeltaPatchBuilder patchBuilder)
         {
-            _patchBuilder = patchBuilder;
+            PatchBuilder = patchBuilder;
         }
 
         public void Dispose()
@@ -52,7 +51,10 @@ namespace RXPatchLib
                 string newPath = newRootPath + Path.DirectorySeparatorChar + path;
                 string oldHash = GetHash(oldPath);
                 string newHash = GetHash(newPath);
-                long newSize = File.Exists(newPath) ? new FileInfo(newPath).Length : 0;
+
+                string compressedHash = null;
+                string deltaHash = null;
+                
                 DateTime oldLastWriteTime = File.Exists(oldPath) ? new FileInfo(oldPath).LastWriteTimeUtc : DateTime.MinValue;
                 DateTime newLastWriteTime = File.Exists(newPath) ? new FileInfo(newPath).LastWriteTimeUtc : DateTime.MinValue;
                 long fullReplaceSize = 0;
@@ -63,6 +65,7 @@ namespace RXPatchLib
                 {
                     string fullPath = patchPath + Path.DirectorySeparatorChar + "full" + Path.DirectorySeparatorChar + newHash;
                     await PatchBuilder.CompressAsync(newPath, fullPath);
+                    compressedHash = await SHA256.GetFileHashAsync(fullPath);
                     fullReplaceSize = new FileInfo(fullPath).Length;
 
                     if (oldHash != null && oldHash != newHash)
@@ -75,6 +78,7 @@ namespace RXPatchLib
                         }
                         else
                         {
+                            deltaHash = await SHA256.GetFileHashAsync(deltaPath);
                             deltaSize = new FileInfo(deltaPath).Length;
                             hasDelta = true;
                         }
@@ -86,6 +90,8 @@ namespace RXPatchLib
                     Path = path,
                     OldHash = oldHash,
                     NewHash = newHash,
+                    CompressedHash = compressedHash,
+                    DeltaHash = deltaHash,
                     OldLastWriteTime = oldLastWriteTime,
                     NewLastWriteTime = newLastWriteTime,
                     FullReplaceSize = fullReplaceSize,

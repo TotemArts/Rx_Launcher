@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -25,20 +26,20 @@ namespace RXPatchLib
         /// <param name="index">The index of this host in the main hostArray</param>
         /// <returns>A task object with no usefull data other than task info</returns>
         async Task CheckAndPingHost(Uri fullHost, int index)
-        {  
-                //Try getting a response from the desired patch folder on the host
-                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(fullHost);
-                request.Method = "GET";
-                //Default to "not found"
-                System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
-                try
-                {
-                    response = ((System.Net.HttpWebResponse)request.GetResponse()).StatusCode; //This needs to become async... For now it will do
-                }
-                catch
-                {                           
-                    Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", fullHost));
-                }
+        {
+            //Try getting a response from the desired patch folder on the host
+            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(fullHost);
+            request.Method = "GET";
+            //Default to "not found"
+            System.Net.HttpStatusCode response = System.Net.HttpStatusCode.NotFound;
+            try
+            {
+                response = ((System.Net.HttpWebResponse)request.GetResponse()).StatusCode; //This needs to become async... For now it will do
+            }
+            catch
+            {
+                Trace.WriteLine(string.Format("<!><!><!>The host: {0} is down.", fullHost));
+            }
 
             //If host response from the desired patch folder on the host is OK
             //Ping the host and determine the best RoundTripTime
@@ -87,7 +88,7 @@ namespace RXPatchLib
             Contract.Assume(fullHosts.Count > 0);
 
             //If there is only one host, return index 0
-            if (fullHosts.Count == 1) 
+            if (fullHosts.Count == 1)
             {
                 return 0;
             }
@@ -107,7 +108,7 @@ namespace RXPatchLib
 
             await Task.WhenAll(pingTasks).ProceedIfCanceled().CancelAfter(5000);
             if (bestHostIndex == null)
-            {      
+            {
                 throw new Exception("Could not select a reliable downloadserver. Please try again later...");
             }
 
@@ -115,3 +116,4 @@ namespace RXPatchLib
         }
     }
 }
+*/

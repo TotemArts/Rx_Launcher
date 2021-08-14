@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RXPatchLib
@@ -16,10 +14,10 @@ namespace RXPatchLib
             public Exception Exception;
         }
 
-        ITimeProvider TimeProvider;
-        TimeSpan TestIntervalLength = new TimeSpan(0, 0, 40);
-        int MaxExceptionsInInterval = 10;
-        TimeSpan DelayAfterException = new TimeSpan(0, 0, 4);
+        readonly ITimeProvider _timeProvider;
+        readonly TimeSpan _testIntervalLength = new TimeSpan(0, 0, 40);
+        readonly int _maxExceptionsInInterval = 10;
+        readonly TimeSpan _delayAfterException = new TimeSpan(0, 0, 4);
 
         public RetryStrategy(ITimeProvider timeProvider = null)
         {

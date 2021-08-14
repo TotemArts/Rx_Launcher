@@ -18,7 +18,7 @@ namespace SteamWebAPI
         private String accessToken;
         private String umqid;
         private String steamid;
-        private int message = 0;
+        private int message;
 
         /// <summary>
         /// Enumeration of possible authentication results.

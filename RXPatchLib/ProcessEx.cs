@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -31,7 +28,7 @@ namespace RXPatchLib
             using (Process process = new Process())
             {
                 process.EnableRaisingEvents = true;
-                string x = Directory.GetCurrentDirectory();
+                Directory.GetCurrentDirectory();
                 process.Exited += (sender, e) => { tcs.SetResult(process.ExitCode); };
                 process.StartInfo = startInfo;
                 process.Start();

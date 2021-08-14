@@ -1,9 +1,9 @@
-﻿using System;
+﻿/*
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RXPatchLib;
 using System.Threading.Tasks;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace RXPatchLibTest
@@ -44,20 +44,6 @@ namespace RXPatchLibTest
             }
         }
 
-        [TestMethod]
-        [Ignore]
-        public async Task Beta2To3Patch()
-        {
-            var newDir = "C:\\games\\Renegade X Beta 3";
-            var targetDir = "C:\\games\\Renegade X patchtest";
-            var applicationDir = "C:\\games\\Renegade X patchtest\\patch";
-            var patchDir = "C:\\games\\Renegade X patchtest source";
-
-            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir, TestProgressHandlerFactory.Create(), new CancellationToken());
-
-            await DirectoryAssertions.IsSubsetOf(newDir, targetDir);
-        }
-
         public async Task RoundtripTest(Action<string, string, string, string, string> setupFiles)
         {
             using (var oldDir = new TemporaryDirectory())
@@ -84,9 +70,10 @@ namespace RXPatchLibTest
             var builder = new RxPatchBuilder();
             await builder.CreatePatchAsync(patchInfo);
 
-            await new RXPatcher().ApplyPatchFromWeb("file:///" + PatchDir, TargetDir, ApplicationDir, TestProgressHandlerFactory.Create(), new CancellationToken());
+            await new RxPatcher().ApplyPatchFromWeb("file:///" + patchDir, targetDir, applicationDir, TestProgressHandlerFactory.Create(), new CancellationToken(), null);
 
             await DirectoryAssertions.IsSubsetOf(newDir, targetDir);
         }
     }
 }
+*/
